@@ -53,6 +53,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 /* Header */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand[hidden] { display: none; }
+.top:has(.brand[hidden]) { justify-content: flex-end; }
 .brand h1 { font-size: clamp(26px, 5vw, 38px); color: var(--chalk); }
 .brand h1 span { color: var(--gold); }
 .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -484,7 +486,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-032245';</script>
+<script>window.GF_BUILD = '20261005-033709';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -3125,7 +3127,8 @@ function show() {
   $("#end").hidden = scr !== "end"; $("#end").style.display = scr === "end" ? "flex" : "none";
   $("#end").style.flexDirection = "column"; $("#end").style.gap = "16px";
   $("#quitBtn").hidden = scr === "setup"; $("#quitBtn").textContent = "New game";
-  $("#subtitle").textContent = scr === "setup" ? "A General Conference game" : (S.mode === "scramble" ? "Scramble" : CAT_NAME[S.mode]);
+  $(".brand").hidden = scr === "setup"; // the start page carries the title in its picture (Nick: not twice)
+  $("#subtitle").textContent = scr === "setup" ? "" : (S.mode === "scramble" ? "Scramble" : CAT_NAME[S.mode]);
   hideBubble(); DIR.token++;
   if (scr === "setup") { NET.pend.splice(0).forEach(r => { if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push(r); }); if (!$("#heroArt").innerHTML) $("#heroArt").innerHTML = `<img src="${HERO_IMG}" alt="Gospel Football: a brother and sister in church clothes and helmets on the field">`; renderModes(); renderRoster(); renderAvPick(); }
   if (scr === "game") {
