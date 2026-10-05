@@ -52,11 +52,11 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 .av svg, .av img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .me { display: flex; align-items: center; gap: 12px; }
 .me .av { width: 56px; height: 56px; }
-/* While this phone has to act (its own question, a pick, the hike), the question comes first and the player card with the score drops below it, so the question is never pushed off the screen (Nick) */
-#main.act #meCard { order: 2; padding: 12px 14px; gap: 8px; }
+#meCard { gap: 10px; }
+/* While this phone has to act (its own question, a pick, the hike), render() moves the player card below the question card, so the question is never pushed off the screen (Nick); the card also shrinks */
+#main.act #meCard { padding: 12px 14px; gap: 8px; }
 #main.act .me { gap: 10px; } #main.act .me .av { width: 36px; height: 36px; } #main.act .me .nm { font-size: 18px; } #main.act .me .tm { font-size: 12px; }
 #main.act .strip { padding: 8px 12px; } #main.act .strip .t .sc { font-size: 22px; } #main.act .strip .mid { font-size: 14px; padding-top: 4px; }
-@media (max-height: 760px) { .q { font-size: 19px; } .opt { min-height: 54px; padding: 10px 12px; font-size: 18px; } .opts { gap: 8px; } #view.card { padding: 14px; gap: 10px; } .who { gap: 8px; } }
 .me .nm { font-size: 24px; font-weight: 700; line-height: 1.1; }
 .me .tm { font-size: 14px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .strip { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4px 10px; background: var(--panel-2); border-radius: 14px; padding: 10px 14px; }
@@ -98,6 +98,15 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 .stats div { background: var(--panel-2); border-radius: 12px; padding: 10px; text-align: center; }
 .stats b { display: block; font-family: var(--f-display); font-size: 26px; }
 .stats span { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.note .cat { white-space: nowrap; }
+/* Short screens (a phone with its browser bars showing): tighter question card while this phone acts, so four answers fit above the fold. Placed after the base rules so it wins the cascade. */
+@media (max-height: 760px) {
+  #main.act { gap: 8px; } body:has(#main.act) .wrap { padding-top: 6px; gap: 8px; }
+  #main.act #view.card { padding: 14px; gap: 10px; }
+  #main.act .q { font-size: 19px; line-height: 1.3; }
+  #main.act .opts { gap: 8px; } #main.act .opt { min-height: 50px; padding: 8px 12px; font-size: 18px; } #main.act .opt .k { width: 28px; height: 28px; font-size: 16px; }
+  #main.act .who { gap: 8px; } #main.act .who .av { width: 32px !important; height: 32px !important; }
+}
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
@@ -146,11 +155,11 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
   </section>
 
   <section id="main" hidden style="display:flex;flex-direction:column;gap:14px">
-    <div class="card" id="meCard" style="gap:10px"></div>
+    <div class="card" id="meCard"></div>
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-062446';</script>
+<script>window.GF_BUILD = '20261005-065521';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -277,7 +286,7 @@ const ps = params.get("ps");
 const cfg = ps ? { host: ps.split(":")[0], port: +ps.split(":")[1] || 9000, path: "/", secure: false, debug: 0 } : location.protocol === "http:" ? { host: location.hostname, port: +location.port || 80, path: "/peerjs", secure: false, debug: 0 } : { debug: 0 }; // plain http = the local play server, which signals at /peerjs
 const teamColor = t => t ? "#2f7fb8" : "#b8482c";
 const LVL = { pewee: "Pewee", college: "College", pro: "Pro", random: "Random" };
-let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", sentPick = null, sentHike = false, myAns = null, editing = false;
+let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", lastKey = "", sentPick = null, sentHike = false, myAns = null, editing = false;
 let pending = null, stopped = false, misses = 0, lastMsg = 0;
 const form = { av: 0, level: "pewee", team: 0, avSet: false, gl: "black" };
 const key = () => "gfme_" + code;
@@ -419,6 +428,11 @@ $("#codeForm").addEventListener("submit", e => {
 });
 
 // ---- the game, as seen from this phone ----
+function placeMe(act) { // the player card goes under the question card while this phone acts (and back on top after), in the DOM so screen readers follow
+  const main = $("#main"), me = $("#meCard"), v = $("#view");
+  main.classList.toggle("act", act);
+  if (act && me.nextElementSibling === v) main.appendChild(me); else if (!act && me.previousElementSibling === v) main.insertBefore(me, v);
+}
 function render() {
   if (editing) return;
   showOnly("main");
@@ -428,13 +442,15 @@ function render() {
   $("#meCard").innerHTML = `<div class="me"><span class="av" style="border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team), m.gl)}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
     (s && s.score ? `<div class="strip"><div class="t"><b>${s.poss === 0 ? "\u{1F3C8} " : ""}${esc(names[0])}</b><span class="sc">${s.score[0]}</span></div><div class="t r"><b>${esc(names[1])}${s.poss === 1 ? " \u{1F3C8}" : ""}</b><span class="sc">${s.score[1]}</span></div>${s.poss != null && s.view !== "end" ? `<div class="mid">${esc(names[s.poss])} ball \u00b7 ${esc(s.down || "")} \u00b7 ${esc(s.play || "")}</div>` : ""}</div>` : "");
   const v = $("#view");
-  if (!s) { $("#main").classList.remove("act"); v.innerHTML = `<div class="eyebrow">Game ${esc(code)}</div><p class="msg">${conn && conn.open ? "Joining…" : "Connecting to the big screen…"}</p>`; return; }
+  if (!s) { placeMe(false); v.innerHTML = `<div class="eyebrow">Game ${esc(code)}</div><p class="msg">${conn && conn.open ? "Joining…" : "Connecting to the big screen…"}</p>`; return; }
   const view = s.view;
   const act = view === "question" || view === "pick" || view === "hike";
-  $("#main").classList.toggle("act", act);
-  const buzz = act && view !== lastView;
+  placeMe(act);
+  const qKey = view + "|" + (s.q ? `${s.q.n}:${s.q.who}:${s.q.text}` : ""); // a new question on the same view (a team question followed by this player's own) is a new turn too
+  const buzz = act && (view !== lastView || qKey !== lastKey);
   if (view !== lastView) { sentPick = null; sentHike = false; if (view !== "question") myAns = null; }
-  lastView = view;
+  if (view === "question" && qKey !== lastKey) myAns = null;
+  lastView = view; lastKey = qKey;
   if (buzz) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (x) {} try { window.scrollTo({ top: 0 }); } catch (x) {} }
   let h = "";
   if (view === "lobby") {
@@ -445,8 +461,8 @@ function render() {
   } else if (view === "question" || view === "watch") {
     const q = s.q, a = s.answered, mineQ = view === "question";
     const who = q.crew ? `Team question for ${esc(teamOf(q.team))}` : `${esc(q.who)}'s question`;
-    h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team), q.gl)}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span><span class="tag">${esc(q.cat)}</span></div>
-      <div class="note">${mineQ ? (q.crew ? "Everyone on your team votes. Majority wins." : "Your turn! Tap an answer.") : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
+    h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team), q.gl)}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span>${mineQ ? "" : `<span class="tag">${esc(q.cat)}</span>`}</div>
+      <div class="note">${mineQ ? `${q.crew ? "Everyone on your team votes. Majority wins." : "Your turn! Tap an answer."} <span class="cat">· ${esc(q.cat)}</span>` : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
       <div class="q">${esc(q.text)}</div>`;
     const voteNote = mineQ && s.vote ? `<div class="note">${s.vote.mine != null ? `Your vote: <b>${esc(s.vote.mine)}</b>. ` : ""}${s.vote.got} of ${s.vote.need} on your team have voted.</div>` : "";
     const canTap = mineQ && !a;
