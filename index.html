@@ -547,7 +547,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-051433';</script>
+<script>window.GF_BUILD = '20261005-052025';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2459,6 +2459,7 @@ const DIR = { token: 0 };
 const OPEN = OFF.filter(a => a.k !== "fum").map(a => a.k === "inc" ? Object.assign({}, a, { w: 7 }) : a);
 const POS = {};
 let CAM = { c: 50, z: 1, l: 50 };
+const ZOOM_PLAYS = false; // the camera used to move in on the line for each play; Nick wants the whole field to stay in view (2026-10-05)
 function newGame() {
   S = {
     screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
@@ -2740,6 +2741,7 @@ function moveBall(x, y, ms, arcH, endH) {
 function zoomFor() { const w = stadium().clientWidth; return w >= 900 ? 2.0 : w >= 600 ? 2.2 : 1.35; }
 function phone() { return stadium().clientWidth < 600; }
 function camNow(c, z, lane) {
+  if (!ZOOM_PLAYS) { c = 50; z = 1; lane = 50; }
   if (lane == null) lane = 50;
   CAM = { c, z, l: lane };
   const pl = $("#plane"); if (!pl) return;
@@ -2765,6 +2767,7 @@ function qbTok(x, y) { const e = document.createElement("div"); e.className = "t
 function cap(text, kind, ms, key) {
   const c = $("#cap"); if (!c) return;
   c.hidden = false; c.className = "cap show " + (kind || ""); c.textContent = text;
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9+]/g, ""); document.querySelectorAll("#plane .tsay:not([hidden])").forEach(e => { if (norm(e.textContent) === norm(text)) e.hidden = true; }); // "FUMBLE!" above and "Fumble" on the player is one word too many
   refSay(key || capKey(text), text, { flush: true });
   if (ms) setTimeout(() => { if (c.textContent === text) c.hidden = true; }, ms * SLOW());
 }
@@ -2954,8 +2957,8 @@ async function animateSnap(sn, res, los, token) {
   // reveal what each side does
   if (o) say(o, res.oa || "Blocking", "o " + (res.turnover ? "badb" : res.gain >= 10 ? "goodb" : ""));
   if (d) say(d, res.da || (dk === "open" ? "" : "Covering"), "d " + (res.flag ? "flag" : ""));
-  S.players.filter(p => inLine(p) && p.team === off && (!o || p.id !== o.id)).forEach(p => say(p, "Block", "o"));
-  S.players.filter(p => inLine(p) && p.team !== off && (!d || p.id !== d.id)).forEach(p => say(p, res.sackBy === p.id ? "Free rush!" : (res.unblocked || []).includes(p.id) ? "Rush" : "Cover", "d " + (res.sackBy === p.id ? "flag" : "")));
+  // only the two players in the play speak; the rest of the line used to say Block, Rush or Cover too, which buried the field in text (Nick, 2026-10-05)
+  if (res.sackBy != null) { const r = S.players.find(p => p.id === res.sackBy); if (r && (!d || r.id !== d.id)) say(r, "Free rush!", "d flag"); }
   await sleep(1000); if (!alive()) return;
   if (dk === "sack" && res.sackBy != null) { // nobody blocked this rusher
     const r = S.players[res.sackBy];
