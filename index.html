@@ -537,7 +537,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-041654';</script>
+<script>window.GF_BUILD = '20261005-041916';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2104,6 +2104,8 @@ function hush() { ttsStop(); voxStop(); }
 // ---------- voice clips: ElevenLabs recordings under audio/ (see audio/lines.json), with the browser voice as the fallback ----------
 const AUDIO_BASE = (typeof window.GF_AUDIO_URL === "string" && window.GF_AUDIO_URL) || "audio/";
 const VOX = { on: false, cache: new Map(), refQ: [], refCur: null, refIt: null, avCur: [] };
+// players: whether the players' own recordings play (their speech bubbles stay). Off since Nick found those voices not good (2026-10-05) and they are being recast; the Referee still calls the plays and reads the questions.
+VOX.players = false;
 // the recordings are in use once audio/voices.json can be read; until then (and when a clip is missing) the browser voice reads the line
 try { fetch(AUDIO_BASE + "voices.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(v => { if (v && typeof v === "object") { VOX.on = true; VOX.voices = v; } }).catch(() => {}); } catch (e) {}
 // caps on the field that have a referee recording (the text as cap() shows it -> the key in audio/lines.json)
@@ -2146,7 +2148,7 @@ function refSay(key, text, o) {
 function detail(text, o) { if (!VOX.on) speak(text, o); }
 // avSay(av, key, delay): a player's own recorded line, chosen by their picture (Robo has its own); drawn team players and the QB have none
 function avSay(av, key, delay) {
-  if (!sound || voiceMode === "off" || !VOX.on) return;
+  if (!sound || voiceMode === "off" || !VOX.on || !VOX.players) return;
   const folder = av === "bot" ? "56" : Number.isInteger(av) && av >= 0 && av < AVATARS.length ? String(av).padStart(2, "0") : null; if (!folder) return;
   const go = () => { const a = clipAudio("av/" + folder + "/" + key + ".mp3"); VOX.avCur.push(a); playClip(a).then(() => { const i = VOX.avCur.indexOf(a); if (i >= 0) VOX.avCur.splice(i, 1); }); };
   if (delay) setTimeout(go, delay); else go();
@@ -2205,7 +2207,7 @@ function readStop() {
 }
 function setReadQ(v) { readQ = !!v; store.set("gf_readq", readQ); if (!readQ) readStop(); }
 // preloadVoices(avs): warm the referee's calls and the lines of the players in the game
-function preloadVoices(avs) { if (!VOX.on) return; Object.values(CAP_KEYS).concat(["welcome", "newgame", "td", "first", "correct", "wrong", "field", "bench", "qb", "captain", "final", "tie", "gain", "big"]).forEach(k => clipAudio("ref/" + k + ".mp3")); (avs || []).forEach(av => { const f = av === "bot" ? "56" : Number.isInteger(av) ? String(av).padStart(2, "0") : null; if (f) ["field", "right", "wrong", "throw", "run", "td", "hit", "block"].forEach(k => clipAudio("av/" + f + "/" + k + ".mp3")); }); }
+function preloadVoices(avs) { if (!VOX.on) return; Object.values(CAP_KEYS).concat(["welcome", "newgame", "td", "first", "correct", "wrong", "field", "bench", "qb", "captain", "final", "tie", "gain", "big"]).forEach(k => clipAudio("ref/" + k + ".mp3")); if (VOX.players) (avs || []).forEach(av => { const f = av === "bot" ? "56" : Number.isInteger(av) ? String(av).padStart(2, "0") : null; if (f) ["field", "right", "wrong", "throw", "run", "td", "hit", "block"].forEach(k => clipAudio("av/" + f + "/" + k + ".mp3")); }); }
 function syncVoice() {
   const b = $("#voiceBtn"); if (!b) return;
   b.hidden = !TTS.ok;
