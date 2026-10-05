@@ -48,7 +48,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .lvl { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--night); color: var(--muted); flex: none; }
 .lvl.pewee { color: #9fe0a9; } .lvl.college { color: #f5c96a; } .lvl.pro { color: #ff9c8a; } .lvl.random { color: #c9b6ff; }
 .av { display: inline-block; position: relative; border-radius: 50%; overflow: hidden; flex: none; background: var(--panel-2); vertical-align: middle; }
-.av .specs, .avpick button .specs, .tfig .specs { position: absolute; height: auto; object-fit: fill; border-radius: 0; transform: translate(-50%, -50%); pointer-events: none; }
+.av .specs, .avpick button .specs, .tfig .specs { position: absolute; height: auto; object-fit: fill; border-radius: 0; transform: translate(-50%, -50%) rotate(var(--tilt, 0deg)); pointer-events: none; }
 .seg.glstyles button { padding: 4px 8px; } .seg.glstyles img { height: 18px; width: auto; display: block; }
 .glwrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-basis: 100%; }
 #glStyles[hidden] { display: none !important; }
@@ -58,12 +58,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .brand[hidden] { display: none; }
-.setupbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1 1 100%; min-width: 0; }
+.setupbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
 .setupbar[hidden] { display: none; }
-.setupbar .modes { gap: 6px; }
-.setupbar .mode { padding: 6px 13px; border-radius: 999px; }
-.setupbar .mode b { font-size: 15px; }
-.setupbar .mode small { display: none; }
 .barsel { display: flex; align-items: center; gap: 8px; }
 .barsel select { padding: 6px 10px; font-size: 14px; border-radius: 999px; }
 .top-actions .btn { padding: 8px 18px; font-size: 15px; }
@@ -76,35 +72,47 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 /* Hero */
 .hero { position: relative; border-radius: 22px; overflow: hidden; background: #0e2a3a; min-height: 220px; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
 .hero[hidden] { display: none !important; }
-.hero-art > img { display: block; width: 100%; height: clamp(210px, 33.4vw, 470px); object-fit: cover; object-position: 50% 0; }
+.hero-art > img { display: block; width: 100%; height: clamp(210px, max(33.4vw, 400px), 470px); object-fit: cover; object-position: 50% 0; } /* never shorter than 400px on a laptop, so the team lists and the code fit beside the kids */
 .hero .hero-text { position: absolute; left: 2.5%; top: 6%; max-width: 27%; display: flex; flex-direction: column; gap: 6px; padding: 12px 16px 14px; border-radius: 16px; background: rgba(6,18,26,.58); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
 .hero h2 { font-size: clamp(22px, 3.6vw, 44px); color: var(--chalk); text-shadow: 0 3px 0 #0a1a22, 0 6px 18px rgba(0,0,0,.5); line-height: 1; }
 .hero h2 span { color: var(--gold); }
 .hero p { margin: 0; font-family: var(--f-read); font-size: clamp(13px, 1.3vw, 16px); color: #e8f0ec; text-shadow: 0 2px 6px rgba(0,0,0,.6); max-width: 34ch; }
 /* phones: the QR code and join code sit on the lower right of the picture, so nobody has to scroll */
-.hero .hero-side { position: absolute; right: 2%; top: 5%; bottom: 5%; width: 44%; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 0; }
+.hero .hero-side { position: absolute; right: 1.8%; top: 4%; bottom: 4%; width: 30.5%; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 0; }
 .hero .hero-phones { padding: 10px 12px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 0; gap: 8px; flex: none; }
 /* who is on which team, above the code */
-.hero .hero-teams { flex: 0 1 auto; min-height: 0; overflow: auto; padding: 8px 12px 10px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.hero .hero-teams { flex: 0 1 auto; min-height: 0; overflow: hidden; padding: 8px 10px 8px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 2px 8px; }
+.hero .hero-teams .hcol { display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: 0; border-radius: 10px; padding: 2px 4px; }
+.hero .hero-teams .hcol.over { outline: 2px dashed var(--gold); outline-offset: 1px; }
+.hero .hero-teams li[data-i] { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hero .hero-teams li.dragging { opacity: .35; }
+.hero .hero-teams li .av { pointer-events: none; }
+.hero .hero-teams h3 { cursor: text; }
+.hero .hero-teams input.rename { font: inherit; font-size: 13px; font-weight: 600; width: 100%; min-width: 0; padding: 1px 5px; border-radius: 6px; border: 1px solid var(--gold); background: #0f2430; color: var(--chalk); outline: none; }
+.hero .hero-teams h3 input.rename { text-transform: none; letter-spacing: 0; }
 .hero .hero-teams:empty { display: none; }
-.hero .hero-teams h3 { grid-row: 1; margin: 0; font-family: var(--f-ui); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--chalk); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero .hero-teams h3 { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-family: var(--f-ui); font-size: 12.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--chalk); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams h3 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
 .hero .hero-teams h3 small { font-weight: 500; color: #b7c6c0; letter-spacing: 0; text-transform: none; }
-.hero .hero-teams ul { grid-row: 2; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hero .hero-teams ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; overflow: auto; }
 .hero .hero-teams li { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 1.2; color: #e8f0ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams li span { overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams li.none { color: #9fb0aa; font-style: italic; }
 .hero .hero-teams .av { width: 20px; height: 20px; flex: none; }
-.hero .hero-teams .cap { grid-column: 1 / -1; grid-row: 3; font-size: 12px; color: #b7c6c0; margin: 2px 0 0; }
+.hero .hero-teams .note { grid-column: 1 / -1; font-family: var(--f-ui); max-width: none; font-size: 12px; line-height: 1.25; color: #b7c6c0; margin: 2px 0 0; }
 .hero .hero-phones h2 { font-size: 18px; text-shadow: none; color: var(--chalk); }
 .hero .hero-phones .hint { font-size: 13px; color: #d6e0dc; max-width: 36ch; margin: 0; }
-.hero .hero-phones .qr { width: clamp(96px, 11vw, 150px); height: clamp(96px, 11vw, 150px); padding: 6px; border-radius: 10px; }
+.hero .hero-phones .qr { width: clamp(90px, 9.2vw, 130px); height: clamp(90px, 9.2vw, 130px); padding: 6px; border-radius: 10px; }
 .hero .hero-phones .qr-wrap { gap: 12px; }
-.hero .hero-phones .qr-text { flex-basis: 150px; }
+.hero .hero-phones .qr-text { flex-basis: 130px; }
 .hero .hero-phones .qr-text .code { font-size: clamp(30px, 3.6vw, 44px); }
 .hero .hero-phones .btn.ghost { padding: 6px 12px; font-size: 13px; }
 .hero .hero-phones:empty { display: none; }
-@media (max-width: 560px) {
+@media (max-width: 1200px) { .hero .hero-phones .hint:not(.stat) { display: none; } .hero .hero-phones .qr-text { flex-basis: 110px; } }
+.hero-foot { display: flex; justify-content: flex-end; margin-top: 10px; }
+.hero-foot[hidden] { display: none; }
+.hero-foot .btn { font-size: 19px; padding: 12px 36px; }
+@media (max-width: 760px) {
   .hero { background: #4aa6e3; display: flex; flex-direction: column; }
   .hero .hero-text { position: static; max-width: none; padding: 14px 16px 10px; order: -1; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; }
   .hero-art > img { height: auto; }
@@ -389,8 +397,7 @@ td.n, th.n { text-align: right; }
   <header class="top">
     <div class="brand"><h1>Gospel <span>Football</span></h1><span class="eyebrow" id="subtitle">A General Conference game</span></div>
     <div class="setupbar" id="setupBar" hidden>
-      <span class="eyebrow">Playbook</span>
-      <div class="modes" id="modes"></div>
+      <label class="barsel" for="modeSel"><span class="eyebrow">Playbook</span><select id="modeSel"></select></label>
       <label class="barsel" for="playsSel"><span class="eyebrow">Length</span>
         <select id="playsSel">
           <option value="14">14 plays (quick)</option>
@@ -404,7 +411,6 @@ td.n, th.n { text-align: right; }
       <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
       <button class="icon-btn" id="voiceBtn" type="button" hidden>Announcer: plays</button>
       <button class="icon-btn" id="quitBtn" type="button" hidden>New game</button>
-      <button class="btn" id="startTop" type="button" hidden>Kick off</button>
     </div>
   </header>
 
@@ -413,6 +419,7 @@ td.n, th.n { text-align: right; }
     <div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Pewee, College and Pro levels for the whole family.</p></div>
     <div class="hero-side"><div class="hero-teams" id="heroTeams"></div><div class="hero-phones phones" id="phoneBox"></div></div>
   </div>
+  <div class="hero-foot" id="heroFoot" hidden><button class="btn" id="startHero" type="button">Kick off</button></div>
 
 <!-- SETUP -->
   <section id="setup" style="display:flex;flex-direction:column;gap:16px">
@@ -530,7 +537,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-035408';</script>
+<script>window.GF_BUILD = '20261005-041654';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -1774,9 +1781,10 @@ function teamSVG(helmet) {
 }
 
 // ---------- glasses: an overlay a player can switch on, in four ChatGPT-drawn styles (img/glasses-<style>.webp) ----------
-// Positions are [cx, cy, w] in % of the picture (pic-NN, measured on the Mac) or of the field sprite (sp-NN): the point between the eyes and the glasses width.
+// Positions are [cx, cy, w, tilt]: the point between the eyes and the glasses width in % of the picture (pic-NN, measured on the Mac) or of the
+// field sprite (sp-NN), and the tilt of the eye line in degrees so the frames follow the head. Made by scratchpad mkglasses.py.
 // "has" lists the pictures that already wear glasses (the grandparents), which get no overlay.
-const GLASSES = { styles: ["black", "brown", "gold", "red"], has: [3, 7, 11, 19, 27, 31, 35, 39, 43, 47, 51, 55], pic: { "00": [48.74, 59.15, 42.94], "01": [49.51, 56.53, 40.75], "02": [50.15, 51.26, 38.51], "03": [51.62, 54.59, 40.75], "04": [49.47, 57.43, 43.16], "05": [48.92, 54.65, 41.96], "06": [50.57, 53.74, 39.24], "07": [51.8, 54.5, 41.45], "08": [49.56, 59.4, 43.49], "09": [50.6, 57.7, 40.55], "10": [50.16, 52.94, 38.06], "11": [51.73, 54.11, 39.62], "12": [50.52, 55.12, 46.96], "13": [52.75, 50.5, 45.62], "14": [50.81, 48.62, 38.95], "15": [51.01, 50.35, 43.01], "16": [49.33, 55.68, 43.91], "17": [50.44, 52.57, 41.31], "18": [49.24, 49.69, 36.56], "19": [50.25, 52.63, 39.62], "20": [49.26, 55.72, 44.45], "21": [49.37, 51.38, 40.8], "22": [50.55, 49.37, 38.23], "23": [50.65, 51.22, 39.83], "24": [49.34, 58.17, 47.9], "25": [49.85, 55.55, 44.39], "26": [49.64, 55.59, 42.65], "27": [49.83, 54.31, 44.25], "28": [49.36, 55.46, 47.23], "29": [49.19, 54.76, 49.39], "30": [48.65, 53.96, 47.74], "31": [49.47, 52.58, 43.74], "32": [49.68, 55.46, 51.33], "33": [48.92, 53.51, 50.81], "34": [50.29, 54.44, 49.94], "35": [49.5, 52.25, 44.98], "36": [49.27, 53.26, 47.29], "37": [49.06, 54.13, 50.1], "38": [49.76, 52.93, 47.64], "39": [51.13, 53.25, 42.12], "40": [48.06, 51.49, 48.91], "41": [50.62, 48.44, 44.44], "42": [49.83, 48.53, 48.01], "43": [51.13, 53.25, 44.51], "44": [50.5, 57.91, 46.84], "45": [51.88, 57.81, 46.49], "46": [50.26, 56.46, 47.25], "47": [51.52, 57.08, 44.51], "48": [51.35, 56.68, 46.76], "49": [52.81, 57.81, 49.21], "50": [48.53, 54.35, 48.27], "51": [51.13, 53.25, 44.51], "52": [50.54, 58.34, 47.41], "53": [51.88, 57.81, 45.8], "54": [50.42, 55.64, 47.62], "55": [51.35, 59.84, 46.16], "robo": [50.0, 54.7, 57.5] }, sp: { "00": [53.78, 22.9, 41.34], "01": [50.97, 19.21, 34.67], "02": [52.54, 17.7, 33.18], "03": [52.36, 20.91, 37.68], "04": [53.79, 23.62, 45.05], "05": [51.75, 19.63, 37.23], "06": [52.36, 18.38, 34.42], "07": [51.97, 20.87, 38.48], "08": [52.72, 22.95, 42.65], "09": [48.96, 19.78, 36.7], "10": [53.03, 18.24, 34.27], "11": [51.58, 20.65, 39.03], "12": [54.09, 22.35, 47.44], "13": [50.05, 17.75, 39.18], "14": [52.59, 17.23, 36.51], "15": [51.48, 18.89, 39.24], "16": [51.57, 24.21, 46.94], "17": [50.3, 19.0, 31.0], "18": [52.73, 18.74, 37.21], "19": [54.51, 21.38, 41.17], "20": [51.73, 24.3, 48.59], "21": [48.8, 19.77, 39.44], "22": [52.97, 19.18, 37.57], "23": [55.91, 21.35, 42.93], "24": [52.01, 22.6, 42.35], "25": [49.75, 18.6, 36.74], "26": [51.7, 17.71, 34.36], "27": [45.13, 20.88, 39.22], "28": [53.06, 22.1, 44.77], "29": [51.16, 17.48, 37.01], "30": [49.3, 17.5, 29.4], "31": [57.01, 20.76, 63.74], "32": [52.05, 20.34, 43.69], "33": [50.68, 16.74, 36.56], "34": [51.69, 18.29, 38.55], "35": [51.9, 20.66, 39.85], "36": [53.98, 21.11, 41.65], "37": [49.78, 19.2, 37.51], "38": [53.15, 19.69, 37.96], "39": [46.3, 20.99, 37.74], "40": [52.51, 22.17, 44.97], "41": [51.07, 20.09, 41.18], "42": [49.34, 19.83, 40.86], "43": [52.52, 22.24, 39.85], "44": [54.66, 20.78, 43.06], "45": [49.07, 18.09, 38.18], "46": [53.23, 18.89, 39.98], "47": [48.02, 17.05, 65.6], "48": [52.93, 21.74, 46.13], "49": [50.0, 19.5, 36.0], "50": [51.62, 19.67, 41.8], "51": [51.7, 22.12, 41.1], "52": [52.45, 21.55, 43.49], "53": [49.57, 17.61, 38.1], "54": [49.65, 17.73, 38.36], "55": [47.54, 20.4, 40.43], "robo": [52.27, 21.61, 37.65] } };
+const GLASSES = { styles: ["black", "brown", "gold", "red"], has: [3, 7, 11, 19, 27, 31, 35, 39, 43, 47, 51, 55], pic: { "00": [48.74, 59.15, 38.0, 3.5], "01": [49.51, 56.53, 36.06, 1.0], "02": [50.15, 51.26, 34.08, 1.2], "03": [51.62, 54.59, 36.06, -8.3], "04": [49.47, 57.43, 38.2, 3.1], "05": [48.92, 54.65, 37.14, 0.9], "06": [50.57, 53.74, 34.73, 0.4], "07": [51.8, 54.5, 36.68, -9.8], "08": [49.56, 59.4, 38.49, 2.5], "09": [50.6, 57.7, 35.89, -6.4], "10": [50.16, 52.94, 33.69, 1.8], "11": [51.73, 54.11, 35.07, 5.9], "12": [50.52, 55.12, 41.56, 1.6], "13": [52.75, 50.5, 40.38, -6.1], "14": [50.81, 48.62, 34.47, 4.9], "15": [51.01, 50.35, 38.07, 6.2], "16": [49.33, 55.68, 38.86, 2.9], "17": [50.44, 52.57, 36.56, -5.6], "18": [49.24, 49.69, 32.36, 2.1], "19": [50.25, 52.63, 35.07, 2.2], "20": [49.26, 55.72, 39.34, 4.9], "21": [49.37, 51.38, 36.11, -5.7], "22": [50.55, 49.37, 33.83, 3.8], "23": [50.65, 51.22, 35.25, 3.8], "24": [49.34, 58.17, 42.39, 2.4], "25": [49.85, 55.55, 39.28, 2.6], "26": [49.64, 55.59, 37.75, -5.7], "27": [49.83, 54.31, 39.16, -2.4], "28": [49.36, 55.46, 41.79, 6.2], "29": [49.19, 54.76, 43.71, 4.5], "30": [48.65, 53.96, 42.25, 2.7], "31": [49.47, 52.58, 38.71, 6.7], "32": [49.68, 55.46, 45.42, 3.9], "33": [48.92, 53.51, 44.97, 5.7], "34": [50.29, 54.44, 44.19, 2.5], "35": [49.5, 52.25, 39.8, 6.3], "36": [49.27, 53.26, 41.85, 7.9], "37": [49.06, 54.13, 44.34, -12.6], "38": [49.76, 52.93, 42.16, 5.1], "39": [51.13, 53.25, 37.28, -8.1], "40": [48.06, 51.49, 43.29, 6.8], "41": [50.62, 48.44, 39.33, -9.0], "42": [49.83, 48.53, 42.49, 4.2], "43": [51.13, 53.25, 39.39, -12.0], "44": [50.5, 57.91, 41.45, -5.1], "45": [51.88, 57.81, 41.14, -11.5], "46": [50.26, 56.46, 41.82, -10.7], "47": [51.52, 57.08, 39.39, 3.4], "48": [51.35, 56.68, 41.38, -7.8], "49": [52.81, 57.81, 43.55, -11.8], "50": [48.53, 54.35, 42.72, -9.4], "51": [51.13, 53.25, 39.39, 7.8], "52": [50.54, 58.34, 41.96, -6.3], "53": [51.88, 57.81, 40.53, -1.6], "54": [50.42, 55.64, 42.15, -7.2], "55": [51.35, 59.84, 40.85, -4.5], "robo": [50.0, 54.7, 50.89, -0.4] }, sp: { "00": [53.78, 22.9, 30.57, 3.8], "01": [50.97, 19.21, 25.44, 0.4], "02": [52.54, 17.7, 24.39, 3.2], "03": [52.36, 20.91, 27.89, -7.0], "04": [53.79, 23.62, 33.27, 5.5], "05": [51.75, 19.63, 27.33, 2.1], "06": [52.36, 18.38, 25.27, 0.9], "07": [51.97, 20.87, 28.73, -10.3], "08": [52.72, 22.95, 31.43, 4.0], "09": [48.96, 19.78, 27.29, -10.0], "10": [53.03, 18.24, 25.3, 4.5], "11": [51.58, 20.65, 28.86, 7.6], "12": [54.09, 22.35, 35.06, 5.9], "13": [50.05, 17.75, 28.88, -5.5], "14": [52.59, 17.23, 26.86, 3.7], "15": [51.48, 18.89, 29.02, 6.6], "16": [51.57, 24.21, 34.58, 2.6], "17": [50.3, 19.0, 22.79, -5.6], "18": [52.73, 18.74, 27.45, 5.2], "19": [54.51, 21.38, 30.44, 6.1], "20": [51.73, 24.3, 35.84, 5.1], "21": [48.8, 19.77, 29.24, -7.0], "22": [52.97, 19.18, 27.71, 4.4], "23": [55.91, 21.35, 31.76, 7.5], "24": [52.01, 22.6, 31.21, 4.4], "25": [49.75, 18.6, 27.05, -4.8], "26": [51.7, 17.71, 25.27, 1.0], "27": [45.13, 20.88, 29.1, -7.9], "28": [53.06, 22.1, 33.16, 7.9], "29": [51.16, 17.48, 27.3, 7.0], "30": [49.3, 17.5, 21.61, 8.0], "31": [57.01, 20.76, 47.11, 3.9], "32": [52.05, 20.34, 32.32, 6.6], "33": [50.68, 16.74, 27.08, 6.4], "34": [51.69, 18.29, 28.53, 6.9], "35": [51.9, 20.66, 29.64, 10.7], "36": [53.98, 21.11, 31.06, 9.6], "37": [49.78, 19.2, 28.38, -13.8], "38": [53.15, 19.69, 27.97, 5.3], "39": [46.3, 20.99, 28.28, -11.8], "40": [52.51, 22.17, 33.35, 7.3], "41": [51.07, 20.09, 30.71, -10.6], "42": [49.34, 19.83, 30.22, -7.4], "43": [52.52, 22.24, 29.37, 5.8], "44": [54.66, 20.78, 32.16, 10.6], "45": [49.07, 18.09, 28.57, -10.9], "46": [53.23, 18.89, 29.56, 6.9], "47": [48.02, 17.05, 49.32, 0.0], "48": [52.93, 21.74, 34.13, 8.0], "49": [50.0, 19.5, 26.46, -8.9], "50": [51.62, 19.67, 31.13, -9.6], "51": [51.7, 22.12, 30.33, 6.1], "52": [52.45, 21.55, 32.41, 10.3], "53": [49.57, 17.61, 28.71, 1.5], "54": [49.65, 17.73, 28.54, -10.4], "55": [47.54, 20.4, 30.41, -11.9], "robo": [52.27, 21.61, 27.84, 6.1] } };
 GLASSES.img = s => IMG_BASE + "glasses-" + (GLASSES.styles.includes(s) ? s : "black") + ".webp";
 function glKey(i) { return i === "bot" ? "robo" : Number.isInteger(i) ? String(i).padStart(2, "0") : null; }
 function hasGlasses(i) { return Number.isInteger(i) && GLASSES.has.includes(i); }
@@ -1784,8 +1792,8 @@ function canGlasses(i) { const k = glKey(i); return !!k && !hasGlasses(i) && !!G
 // glassesHTML(kind, i, style): the overlay for a picture ("pic") or a field figure ("sp"); the field sprite (3:4) sits at the bottom of the figure box (2:3)
 function glassesHTML(kind, i, style) {
   if (!style || !GLASSES.styles.includes(style)) return ""; const k = glKey(i), p = k && GLASSES[kind] ? GLASSES[kind][k] : null; if (!p || hasGlasses(i)) return "";
-  const cx = p[0], cy = kind === "sp" ? 100 / 9 + p[1] * 8 / 9 : p[1], w = p[2];
-  return `<img class="specs" src="${GLASSES.img(style)}" style="left:${cx}%;top:${cy}%;width:${w}%" alt="" draggable="false">`;
+  const cx = p[0], cy = kind === "sp" ? 100 / 9 + p[1] * 8 / 9 : p[1], w = p[2], a = p[3] || 0;
+  return `<img class="specs" src="${GLASSES.img(style)}" style="left:${cx}%;top:${cy}%;width:${w}%;--tilt:${a}deg" alt="" draggable="false">`;
 }
 
 // ChatGPT footballs: flat, tilted spiral, upright, and the ball's ground shadow
@@ -2208,14 +2216,15 @@ function syncVoice() {
 
 // ---------- setup UI ----------
 function renderModes() {
-  $("#modes").innerHTML = MODES.map(m => `<button type="button" class="mode" data-m="${m.id}" aria-pressed="${setup.mode === m.id}"><b>${m.name}</b><small>${m.desc}</small></button>`).join("");
+  $("#modeSel").innerHTML = MODES.map(m => `<option value="${m.id}" title="${m.desc}"${setup.mode === m.id ? " selected" : ""}>${m.name}</option>`).join("");
 }
 // the team lists on the picture, above the code; the caption says whether phones pick their team
 function renderHeroTeams() {
   const box = $("#heroTeams"); if (!box) return;
   const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
-  box.innerHTML = [0, 1].map(t => { const list = setup.roster.filter(p => p.team === t); return `<h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(p => `<li>${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul>`; }).join("") +
-    `<p class="cap">${setup.openTeams ? "Teams are open: players pick or switch teams on their phones." : "Phones are placed on a team. Open teams to let players pick."}</p>`;
+  box.innerHTML = [0, 1].map(t => { const list = setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t);
+    return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
+    `<p class="note">${setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move anyone." : "Drag a player to the other team. Open teams to let phones pick."}</p>`;
 }
 function renderRoster() {
   store.set("gf_roster", setup.roster);
@@ -2231,7 +2240,7 @@ function renderRoster() {
 }
 function segSet(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(v)))); }
 
-$("#modes").addEventListener("click", e => { const b = e.target.closest(".mode"); if (!b) return; setup.mode = b.dataset.m; renderModes(); });
+$("#modeSel").addEventListener("change", e => { setup.mode = e.target.value; });
 $("#avPick").addEventListener("click", e => {
   const b = e.target.closest("[data-av]"); if (!b) return;
   if (b.dataset.av === "team") { $("#crewChk").checked = true; $("#botChk").checked = false; }
@@ -2313,24 +2322,45 @@ $("#fillBtn").addEventListener("click", () => {
   $("#setupErr").textContent = ""; renderRoster();
 });
 let drag = null;
-$("#rosterCols").addEventListener("pointerdown", e => {
-  const g = e.target.closest("[data-grip]"); if (!g) return;
+function startDrag(e) {
+  const g = e.target.closest("[data-grip]"); if (!g || e.target.closest("input")) return;
   e.preventDefault();
   const i = +g.dataset.grip, li = g.closest("li"), p = setup.roster[i];
-  const ghost = document.createElement("div"); ghost.className = "drag-ghost";
-  ghost.innerHTML = `${avHTML(p.av, 30, p.gl)}<span>${esc(p.name)}</span>`; document.body.appendChild(ghost);
-  li.classList.add("dragging");
-  drag = { i, ghost, li, team: p.team, before: null, id: e.pointerId };
+  drag = { i, li, p, team: p.team, before: null, id: e.pointerId, x0: e.clientX, y0: e.clientY, pending: true };
   try { g.setPointerCapture(e.pointerId); } catch (err) {}
-  moveDrag(e);
+}
+$("#rosterCols").addEventListener("pointerdown", startDrag);
+let lastTap = { el: null, t: 0 };
+function doubleTap(el) { const now = Date.now(), dbl = lastTap.el === el && now - lastTap.t < 450; lastTap = { el: dbl ? null : el, t: now }; return dbl; }
+function renameBox(holder, value, commit) {
+  const inp = document.createElement("input"); inp.className = "rename"; inp.value = value; inp.maxLength = 24; inp.setAttribute("aria-label", "New name");
+  holder.replaceChildren(inp); inp.focus(); inp.select();
+  let done = false; const finish = ok => { if (done) return; done = true; const v = inp.value.trim(); if (ok && v && v !== value) commit(v); else renderRoster(); };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); finish(true); } else if (e.key === "Escape") finish(false); });
+  inp.addEventListener("blur", () => finish(true));
+  inp.addEventListener("pointerdown", e => e.stopPropagation());
+}
+$("#heroTeams").addEventListener("pointerdown", e => {
+  if (e.target.closest("input")) return;
+  const h = e.target.closest("h3[data-team]"), li = e.target.closest("li[data-i]");
+  if (h && doubleTap(h)) { e.preventDefault(); const t = +h.dataset.team; renameBox(h, $("#team" + t).value, v => { $("#team" + t).value = v; renderRoster(); }); return; }
+  if (li && doubleTap(li)) { e.preventDefault(); if (drag) { drag = null; } const i = +li.dataset.i; renameBox(li.querySelector("span") || li, setup.roster[i].name, v => { setup.roster[i].name = v; if (setup.editing === i) $("#pName").value = v; renderRoster(); }); return; }
+  startDrag(e); // the team lists on the picture drag too
 });
 function moveDrag(e) {
   if (!drag) return;
+  if (drag.pending) { // the drag begins once the pointer has moved a little, so a tap or double-click on a name is not a drag
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return;
+    drag.pending = false;
+    const ghost = document.createElement("div"); ghost.className = "drag-ghost";
+    ghost.innerHTML = `${avHTML(drag.p.av, 30, drag.p.gl)}<span>${esc(drag.p.name)}</span>`; document.body.appendChild(ghost);
+    drag.ghost = ghost; drag.li.classList.add("dragging");
+  }
   drag.ghost.style.left = e.clientX + "px"; drag.ghost.style.top = e.clientY + "px";
   if (e.clientY > innerHeight - 70) scrollBy(0, 14); else if (e.clientY < 70) scrollBy(0, -14);
   const el = document.elementFromPoint(e.clientX, e.clientY);
-  const col = el && el.closest(".team-col");
-  document.querySelectorAll(".team-col.over").forEach(c => c.classList.remove("over"));
+  const col = el && el.closest(".team-col, .hcol");
+  document.querySelectorAll(".team-col.over, .hcol.over").forEach(c => c.classList.remove("over"));
   document.querySelectorAll(".drop-mark").forEach(m => m.remove());
   if (!col) { drag.over = null; return; }
   col.classList.add("over"); drag.over = +col.dataset.team;
@@ -2338,13 +2368,14 @@ function moveDrag(e) {
   const next = items.find(l => { const b = l.getBoundingClientRect(); return e.clientY < b.top + b.height / 2; });
   drag.before = next ? +next.dataset.i : null;
   const mark = document.createElement("div"); mark.className = "drop-mark";
-  const ul = col.querySelector(".roster");
+  const ul = col.querySelector("ul");
   if (next) next.before(mark); else if (ul) ul.appendChild(mark); else col.appendChild(mark);
 }
 document.addEventListener("pointermove", e => { if (drag && e.pointerId === drag.id) moveDrag(e); });
 function endDrag(e, cancel) {
   if (!drag || (e && e.pointerId !== drag.id)) return;
-  const d = drag; drag = null; d.ghost.remove();
+  const d = drag; drag = null; if (d.ghost) d.ghost.remove();
+  if (d.pending) return;
   if (!cancel && d.over != null) {
     const p = setup.roster.splice(d.i, 1)[0]; p.team = d.over;
     if (d.before == null) setup.roster.push(p);
@@ -2386,7 +2417,7 @@ function syncOpenTeams() { const b = $("#openTeamsBtn"); if (!b) return; b.textC
 $("#openTeamsBtn").addEventListener("click", () => { setup.openTeams = !setup.openTeams; syncOpenTeams(); renderHeroTeams(); if (typeof netHello === "function") netHello(); });
 syncOpenTeams();
 $("#startBtn").addEventListener("click", kickOff);
-$("#startTop").addEventListener("click", kickOff);
+$("#startHero").addEventListener("click", kickOff);
 $("#soundBtn").addEventListener("click", () => { sound = !sound; store.set("gf_sound", sound); syncSound(); if (sound) sfx.good(); else hush(); });
 $("#voiceBtn").addEventListener("click", () => {
   voiceMode = voiceMode === "off" ? "plays" : "off"; store.set("gf_voice", voiceMode); syncVoice();
@@ -3218,7 +3249,7 @@ function show() {
   $("#end").style.flexDirection = "column"; $("#end").style.gap = "16px";
   $("#quitBtn").hidden = scr === "setup"; $("#quitBtn").textContent = "New game";
   $(".brand").hidden = scr === "setup"; // the start page carries the title in its picture (Nick: not twice)
-  $("#setupBar").hidden = scr !== "setup"; $("#startTop").hidden = scr !== "setup"; // playbook and game length live in the top bar on the start page
+  $("#setupBar").hidden = scr !== "setup"; $("#heroFoot").hidden = scr !== "setup"; // playbook and game length live in the top bar on the start page
   $("#subtitle").textContent = scr === "setup" ? "" : (S.mode === "scramble" ? "Scramble" : CAT_NAME[S.mode]);
   hideBubble(); DIR.token++;
   if (scr === "setup") { NET.pend.splice(0).forEach(r => { if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push(r); }); if (!$("#heroArt").innerHTML) $("#heroArt").innerHTML = `<img src="${HERO_IMG}" alt="Gospel Football: a brother and sister in church clothes and helmets on the field">`; renderModes(); renderRoster(); renderAvPick(); }
