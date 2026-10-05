@@ -144,7 +144,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-041654';</script>
+<script>window.GF_BUILD = '20261005-042333';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -268,7 +268,7 @@ const GF_BUILD = (typeof window.GF_BUILD === "string" && window.GF_BUILD) || "de
 const params = new URLSearchParams(location.search);
 let code = (params.get("g") || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
 const ps = params.get("ps");
-const cfg = ps ? { host: ps.split(":")[0], port: +ps.split(":")[1] || 9000, path: "/", secure: false, debug: 0 } : { debug: 0 };
+const cfg = ps ? { host: ps.split(":")[0], port: +ps.split(":")[1] || 9000, path: "/", secure: false, debug: 0 } : location.protocol === "http:" ? { host: location.hostname, port: +location.port || 80, path: "/peerjs", secure: false, debug: 0 } : { debug: 0 }; // plain http = the local play server, which signals at /peerjs
 const teamColor = t => t ? "#2f7fb8" : "#b8482c";
 const LVL = { pewee: "Pewee", college: "College", pro: "Pro", random: "Random" };
 let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", sentPick = null, sentHike = false, myAns = null, editing = false;

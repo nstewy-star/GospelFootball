@@ -537,7 +537,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-041916';</script>
+<script>window.GF_BUILD = '20261005-042333';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -3281,9 +3281,12 @@ function start(data) {
 const PLAY_PAGE = (typeof window.GF_PLAY_URL === "string" && window.GF_PLAY_URL) || "play.html";
 const GF_BUILD = (typeof window.GF_BUILD === "string" && window.GF_BUILD) || "dev";
 const NET = { peer: null, code: null, status: "off", err: "", phones: [], pend: [], qvotes: {}, last: {} };
+// netCfg(): where the signalling server is. ?ps=host:port names one (local testing); a page served over plain http (the local
+// play download: the laptop runs the site and the signalling together) uses its own origin at /peerjs; otherwise the public PeerJS cloud.
 function netCfg() {
   const ps = new URLSearchParams(location.search).get("ps");
   if (ps) { const [h, p] = ps.split(":"); return { host: h, port: +p || 9000, path: "/", secure: false, debug: 0 }; }
+  if (location.protocol === "http:") return { host: location.hostname, port: +location.port || 80, path: "/peerjs", secure: false, debug: 0 };
   return { debug: 0 };
 }
 function playUrl() {

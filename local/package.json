@@ -1,0 +1,10 @@
+{
+  "name": "gospel-football-local",
+  "version": "1.0.0",
+  "description": "Runs Gospel Football on one laptop for a room with no internet: serves the game and connects the phones over the local wifi.",
+  "main": "server.js",
+  "bin": "server.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": { "express": "^5.1.0", "peer": "^1.0.2" }
+}
