@@ -1,0 +1,328 @@
+{
+ "format": "audio/ref/<key>.mp3 for the referee, audio/av/<folder>/<key>.mp3 for each avatar (folder = avatar index 00..15 in picker order, same as the avatars-helmets.png grid)",
+ "referee": {
+  "voice_hint": "stadium announcer / referee, big and clear",
+  "lines": {
+   "welcome": "Welcome to Gospel Football!",
+   "newgame": "Here we go!",
+   "hike": "Hut... hut... HIKE!",
+   "kick": "Snap... hold... KICK!",
+   "punt": "Punt!",
+   "td": "TOUCHDOWN!",
+   "good": "It's good!",
+   "short": "Short!",
+   "wideleft": "Wide left!",
+   "wideright": "Wide right!",
+   "sack": "Sack!",
+   "fumble": "Fumble!",
+   "int": "Intercepted!",
+   "inc": "Incomplete.",
+   "batted": "Batted down!",
+   "knocked": "Knocked down!",
+   "caught": "Caught it!",
+   "flag": "Flag on the play! Holding.",
+   "first": "First down!",
+   "gain": "Picks up yards!",
+   "big": "Big gain!",
+   "stopped": "Stopped!",
+   "nogain": "No gain.",
+   "fourth": "Fourth down.",
+   "downs": "Turnover on downs!",
+   "correct": "Correct!",
+   "wrong": "Not quite.",
+   "field": "Takes the field!",
+   "bench": "Heads to the bench.",
+   "qb": "Quarterback, pick who gets the ball. Defense, no peeking!",
+   "captain": "Captain, guess who gets the ball.",
+   "huddle": "Back to the huddle!",
+   "ot": "Tied up! Overtime. Next score wins.",
+   "final": "That's the game!",
+   "tie": "It's a tie!"
+  }
+ },
+ "avatar_keys": {
+  "hello": "tapped in the avatar picker",
+  "field": "right answer, takes the field",
+  "right": "answers right",
+  "wrong": "answers wrong",
+  "throw": "the quarterback picks them",
+  "run": "gains yards",
+  "td": "scores a touchdown",
+  "hit": "tackled, sacked, blocked or intercepted",
+  "block": "makes the block, pick or tackle on defense"
+ },
+ "avatars": [
+  {
+   "index": 0,
+   "folder": "00",
+   "name": "Freckled Freddie",
+   "voice_hint": "boy, about 8, energetic",
+   "lines": {
+    "hello": "Hi! I'm Freckled Freddie!",
+    "field": "Put me in, coach!",
+    "right": "Yes! I knew that one!",
+    "wrong": "Aw, man. I'll get the next one.",
+    "throw": "Throw it to me! I'm open!",
+    "run": "Go, go, go!",
+    "td": "Touchdown! Woo-hoo!",
+    "hit": "Oof! You got me.",
+    "block": "Gotcha! Not today!"
+   }
+  },
+  {
+   "index": 1,
+   "folder": "01",
+   "name": "Curly Clara",
+   "voice_hint": "girl, about 7, sweet",
+   "lines": {
+    "hello": "Hi, I'm Curly Clara!",
+    "field": "Here I come!",
+    "right": "Yay! That's right!",
+    "wrong": "Oops. Next time!",
+    "throw": "Over here! Pass it to me!",
+    "run": "Wheee! Catch me if you can!",
+    "td": "Touchdown! Did you see that?",
+    "hit": "Hey! No fair!",
+    "block": "Got your flag!"
+   }
+  },
+  {
+   "index": 2,
+   "folder": "02",
+   "name": "Bearded Bart",
+   "voice_hint": "man in his thirties, warm and relaxed",
+   "lines": {
+    "hello": "Howdy, I'm Bearded Bart.",
+    "field": "Let's do this, team.",
+    "right": "That's the one. Nailed it.",
+    "wrong": "Hmm, I'll study up on that.",
+    "throw": "Hit me, I've got room.",
+    "run": "Comin' through!",
+    "td": "Touchdown! Ha-ha! Still got it.",
+    "hit": "Whoa! Nice stop.",
+    "block": "Nope. Not on my watch."
+   }
+  },
+  {
+   "index": 3,
+   "folder": "03",
+   "name": "Lavender Lila",
+   "voice_hint": "teen girl, poised and confident",
+   "lines": {
+    "hello": "Hey there, I'm Lavender Lila.",
+    "field": "On my way!",
+    "right": "Yes! Easy.",
+    "wrong": "Ugh. So close.",
+    "throw": "I'm wide open!",
+    "run": "Too fast for you!",
+    "td": "Touchdown! Let's go!",
+    "hit": "Oh! Okay, good tackle.",
+    "block": "Blocked! Try again."
+   }
+  },
+  {
+   "index": 4,
+   "folder": "04",
+   "name": "Grandma Gert",
+   "voice_hint": "jolly grandma",
+   "lines": {
+    "hello": "Hello, dears. I'm Grandma Gert.",
+    "field": "Make way, I'm coming!",
+    "right": "Oh, my goodness, I got it right!",
+    "wrong": "Oh dear. Well, bless my heart.",
+    "throw": "Toss it here, sweetie!",
+    "run": "Out of my way, I've got cookies in the oven!",
+    "td": "Touchdown! Goodness gracious!",
+    "hit": "Oh my! Help me up, dear.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 5,
+   "folder": "05",
+   "name": "Tall Tyler",
+   "voice_hint": "teen boy, calm and cool",
+   "lines": {
+    "hello": "Hey, I'm Tall Tyler.",
+    "field": "Alright, I'm in.",
+    "right": "Got it. Too easy.",
+    "wrong": "Dang. I should've known that.",
+    "throw": "Up top! I'm the tallest!",
+    "run": "See ya!",
+    "td": "Touchdown! That's what I'm talking about!",
+    "hit": "Oof. Good hit.",
+    "block": "Denied!"
+   }
+  },
+  {
+   "index": 6,
+   "folder": "06",
+   "name": "Sunny Sally",
+   "voice_hint": "girl, about 8, bubbly",
+   "lines": {
+    "hello": "Hi, hi! I'm Sunny Sally!",
+    "field": "Yay, my turn!",
+    "right": "I got it right! I got it right!",
+    "wrong": "Aww. That's okay!",
+    "throw": "Me, me, me! Pick me!",
+    "run": "Sunshine coming through!",
+    "td": "Touchdown! Best day ever!",
+    "hit": "Whoa! Ouchie.",
+    "block": "Ha! Got your flag!"
+   }
+  },
+  {
+   "index": 7,
+   "folder": "07",
+   "name": "Grandpa Gus",
+   "voice_hint": "folksy Southern grandpa",
+   "lines": {
+    "hello": "Well, howdy. I'm Grandpa Gus.",
+    "field": "Let an old fella show you how it's done.",
+    "right": "Ha! Still sharp as a tack.",
+    "wrong": "Well, shoot. My memory ain't what it was.",
+    "throw": "Toss it to the old man!",
+    "run": "Back in my day, we ran faster!",
+    "td": "Touchdown! Hot diggity!",
+    "hit": "Whoa, Nelly! Easy on the old bones.",
+    "block": "Not today, sonny!"
+   }
+  },
+  {
+   "index": 8,
+   "folder": "08",
+   "name": "Jumping Jamal",
+   "voice_hint": "boy, about 9, playful",
+   "lines": {
+    "hello": "What's up! I'm Jumping Jamal!",
+    "field": "Let's go, let's go!",
+    "right": "Boom! Got it!",
+    "wrong": "Nooo! I knew that one!",
+    "throw": "I'm open! Throw it!",
+    "run": "Can't catch me!",
+    "td": "Touchdown! Jump for joy!",
+    "hit": "Aw, man! Good one.",
+    "block": "Blocked! Oh yeah!"
+   }
+  },
+  {
+   "index": 9,
+   "folder": "09",
+   "name": "Smiling Mei",
+   "voice_hint": "teen girl, cheerful",
+   "lines": {
+    "hello": "Hi, I'm Smiling Mei!",
+    "field": "Okay, I've got this.",
+    "right": "Yes! I studied that one.",
+    "wrong": "Oh no. I'll remember next time.",
+    "throw": "Right here! Pass it!",
+    "run": "Here I go!",
+    "td": "Touchdown! I can't stop smiling!",
+    "hit": "Oof! Okay, you got me.",
+    "block": "Got your flag! Sorry!"
+   }
+  },
+  {
+   "index": 10,
+   "folder": "10",
+   "name": "Elder Evan",
+   "voice_hint": "young man, earnest missionary",
+   "lines": {
+    "hello": "Hello! I'm Elder Evan.",
+    "field": "Excited to serve, team!",
+    "right": "That's right! I love that one.",
+    "wrong": "Hmm, I'll look that up tonight.",
+    "throw": "I'm open, send it!",
+    "run": "On my way!",
+    "td": "Touchdown! What a blessing!",
+    "hit": "Whoa! Good tackle, friend.",
+    "block": "Not through here!"
+   }
+  },
+  {
+   "index": 11,
+   "folder": "11",
+   "name": "Red Rosie",
+   "voice_hint": "girl, about 7, feisty",
+   "lines": {
+    "hello": "I'm Red Rosie, and I'm fast!",
+    "field": "Finally, my turn!",
+    "right": "Ha! Told you I knew it!",
+    "wrong": "Hmph. That was a trick question.",
+    "throw": "Throw it to Rosie!",
+    "run": "Zoom! Zoom!",
+    "td": "Touchdown! Rosie rules!",
+    "hit": "Hey! I'll get you back!",
+    "block": "Nope! Flag's mine!"
+   }
+  },
+  {
+   "index": 12,
+   "folder": "12",
+   "name": "Sister Sadie",
+   "voice_hint": "young woman, kind",
+   "lines": {
+    "hello": "Hi, everyone. I'm Sister Sadie.",
+    "field": "Here I come, team!",
+    "right": "Yes, that's the one!",
+    "wrong": "Oh, so close. Good question, though.",
+    "throw": "I'm open on the left!",
+    "run": "Excuse me, coming through!",
+    "td": "Touchdown! Oh, that was fun!",
+    "hit": "Oh! Well played.",
+    "block": "Got your flag. Nice try!"
+   }
+  },
+  {
+   "index": 13,
+   "folder": "13",
+   "name": "Kicker Kenji",
+   "voice_hint": "boy, about 8, confident",
+   "lines": {
+    "hello": "Hey! I'm Kicker Kenji.",
+    "field": "Kenji's in the game!",
+    "right": "Yes! Right on target.",
+    "wrong": "Aw, just missed it.",
+    "throw": "Pass it! I'll take it to the house!",
+    "run": "Watch this!",
+    "td": "Touchdown! Kick it up!",
+    "hit": "Oof! That one hurt.",
+    "block": "Blocked! Boom!"
+   }
+  },
+  {
+   "index": 14,
+   "folder": "14",
+   "name": "Twirly Tia",
+   "voice_hint": "teen girl, dancer energy",
+   "lines": {
+    "hello": "Hi! I'm Twirly Tia!",
+    "field": "Spinning into action!",
+    "right": "Yes! Nailed it!",
+    "wrong": "Oops, I twirled right past that one.",
+    "throw": "Over here! I'm open!",
+    "run": "Twirl and go!",
+    "td": "Touchdown! Take a bow!",
+    "hit": "Whoa! Dizzy!",
+    "block": "Got you! Flag's mine!"
+   }
+  },
+  {
+   "index": 15,
+   "folder": "15",
+   "name": "Coach Carlos",
+   "voice_hint": "man in his forties, coach energy",
+   "lines": {
+    "hello": "I'm Coach Carlos. Let's get to work.",
+    "field": "Coach is in! Let's go!",
+    "right": "That's it! That's the answer!",
+    "wrong": "Hmm. We'll work on that one.",
+    "throw": "Right here, right here!",
+    "run": "Hustle! Hustle!",
+    "td": "Touchdown! That's what we practice for!",
+    "hit": "Good hit! That's how you do it.",
+    "block": "Shut down! Great defense!"
+   }
+  }
+ ]
+}
