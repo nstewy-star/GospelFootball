@@ -445,6 +445,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
+<script>window.GF_BUILD = '20261005-002114';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>
@@ -2027,6 +2028,7 @@ function start(data) {
 
 // ---------- phones as controllers (peer-to-peer through PeerJS) ----------
 const PLAY_PAGE = (typeof window.GF_PLAY_URL === "string" && window.GF_PLAY_URL) || "play.html";
+const GF_BUILD = (typeof window.GF_BUILD === "string" && window.GF_BUILD) || "dev";
 const NET = { peer: null, code: null, status: "off", err: "", phones: [], pend: [], qvotes: {}, last: {} };
 function netCfg() {
   const ps = new URLSearchParams(location.search).get("ps");
@@ -2187,7 +2189,7 @@ function renderPhones() {
 }
 function stateFor(ph) {
   const rec = phoneRec(ph);
-  const base = { t: "state", code: NET.code, teams: teamNames(), me: rec ? { name: rec.name, av: rec.av, level: rec.level, team: rec.team } : null, nPhones: NET.phones.filter(p => p.online).length };
+  const base = { t: "state", build: GF_BUILD, code: NET.code, teams: teamNames(), me: rec ? { name: rec.name, av: rec.av, level: rec.level, team: rec.team } : null, nPhones: NET.phones.filter(p => p.online).length };
   if (!S || S.screen === "setup") {
     base.screen = "lobby"; base.view = "lobby";
     base.roster = setup.roster.map(p => ({ name: p.name, av: p.av, team: p.team, phone: !!p.pid, on: !!p.pid && phoneOnline(p.pid) }));

@@ -133,6 +133,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
+<script>window.GF_BUILD = '20261005-002114';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Caricature avatars drawn as inline SVG. Girls wear dresses; boys wear white shirts and ties.
@@ -264,6 +265,7 @@ function teamSVG(helmet) {
 "use strict";
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const GF_BUILD = (typeof window.GF_BUILD === "string" && window.GF_BUILD) || "dev";
 const params = new URLSearchParams(location.search);
 let code = (params.get("g") || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
 const ps = params.get("ps");
@@ -324,7 +326,13 @@ function onData(d) {
   if (d.t === "hello") { hello = d; applyTeams(); if (!me) showSign(); else render(); }
   else if (d.t === "full") { $("#signErr").textContent = "The roster is full (16 players). Ask the host to make room."; showSign(); }
   else if (d.t === "kicked") { me = null; try { localStorage.removeItem(key()); } catch (e) {} state = null; showSign("The host took you off the roster. You can sign up again."); }
-  else if (d.t === "state") { state = d; render(); }
+  else if (d.t === "state") {
+    if (d.build && d.build !== GF_BUILD) { // the big screen runs a newer page: reload once to match it
+      let seen = null; try { seen = sessionStorage.getItem("gf_reloaded_for"); } catch (e) {}
+      if (seen !== d.build) { try { sessionStorage.setItem("gf_reloaded_for", d.build); } catch (e) {} location.reload(); return; }
+    }
+    state = d; render();
+  }
 }
 
 // ---- screens ----
