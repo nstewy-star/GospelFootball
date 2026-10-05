@@ -2202,7 +2202,7 @@ function stateFor(ph) {
     const cur = S.players[S.order[S.qi]], q = S.q, a = S.answered;
     const asker = cur.pid === ph.pid || (cur.crew && cur.team === rec.team);
     base.view = asker ? "question" : "watch";
-    base.q = { who: cur.name, av: cur.av, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: asker ? q.options : null, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
+    base.q = { who: cur.name, av: cur.av, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: q.options, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
     if (a) base.answered = { opt: a.opt, ok: a.ok, answer: q.answer, note: q.note || "" };
     if (asker && cur.crew) { const v = voteInfo(); base.vote = v ? { got: v.got, need: v.need, mine: NET.qvotes[ph.pid] ?? null } : null; }
     return base;

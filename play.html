@@ -66,6 +66,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 .opt.right { border-color: var(--good); background: #1d3f2c; }
 .opt.wrong { border-color: var(--bad); background: #4a2622; }
 .opt[disabled] { cursor: default; }
+.opt.ro { border-color: #223c40; }
 .verdict { font-family: var(--f-display); font-size: 26px; }
 .verdict.good { color: var(--good); } .verdict.bad { color: var(--bad); }
 .note { font-family: var(--f-read); color: var(--muted); font-size: 16px; }
@@ -393,12 +394,11 @@ function render() {
     h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team))}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span><span class="tag">${esc(q.cat)}</span></div>
       <div class="note">${mineQ ? (q.crew ? "Everyone on your team votes. Majority wins." : "It's your turn! Answer on your phone.") : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
       <div class="q">${esc(q.text)}</div>`;
-    if (mineQ) {
-      const voteNote = s.vote ? `<div class="note">${s.vote.mine != null ? `Your vote: <b>${esc(s.vote.mine)}</b>. ` : ""}${s.vote.got} of ${s.vote.need} on your team have voted.</div>` : "";
-      h += `<div class="opts">${q.options.map((o, i) => { let cls = ""; const chosen = a ? a.opt : (s.vote ? s.vote.mine : myAns); if (a) { if (o === a.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } else if (o === chosen) cls = "mine"; return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>${a ? "" : voteNote}`;
-    }
-    if (a) h += `<div class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "take" : "takes"} the field.` : `Not quite. ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "sit" : "sits"} this one out.`}</div><div class="note">${a.ok ? "" : `Answer: <b>${esc(a.answer)}</b>. `}${esc(a.note || "")}</div>`;
-    else if (!mineQ) h += `<div class="note">${q.bot ? "The computer is thinking…" : `Answering on the big screen${q.crew ? "" : " or their phone"}…`}</div>`;
+    const voteNote = mineQ && s.vote ? `<div class="note">${s.vote.mine != null ? `Your vote: <b>${esc(s.vote.mine)}</b>. ` : ""}${s.vote.got} of ${s.vote.need} on your team have voted.</div>` : "";
+    const canTap = mineQ && !a;
+    h += `<div class="opts">${(q.options || []).map((o, i) => { let cls = ""; const chosen = a ? a.opt : (mineQ ? (s.vote ? s.vote.mine : myAns) : null); if (a) { if (o === a.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } else if (o === chosen) cls = "mine"; return `<button type="button" class="opt ${cls}${mineQ ? "" : " ro"}" data-o="${i}" ${canTap ? "" : "disabled"}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>${a ? "" : voteNote}`;
+    if (a) h += `<div class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "take" : "takes"} the field.` : `Not quite. ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "sit" : "sits"} this one out.`}</div><div class="note">Answer: <b>${esc(a.answer)}</b>.${a.note ? ` ${esc(a.note)}` : ""}</div>`;
+    else if (!mineQ) h += `<div class="note">${q.bot ? "The computer is thinking…" : `${esc(q.who)} is picking${q.crew ? "" : " on the big screen or their phone"}…`}</div>`;
   } else if (view === "pick") {
     h = `<div class="eyebrow">${s.kind === "target" ? "Quarterback" : "Defensive captain"}</div><p class="msg">${esc(s.msg)}</p>
       <div class="opts">${s.cands.map(c => `<button type="button" class="opt ${sentPick === c.id ? "mine" : ""}" data-pick="${c.id}" ${sentPick != null ? "disabled" : ""}><span class="av">${avatarSVG(c.av, teamColor(s.kind === "target" ? s.poss : 1 - s.poss))}</span><span>${esc(c.name)}</span></button>`).join("")}</div>
@@ -416,7 +416,7 @@ function render() {
     h = `<div class="eyebrow">${esc(s.play || "")}</div><p class="msg">${esc(s.msg || "Waiting for the big screen…")}</p>`;
   }
   v.innerHTML = h;
-  v.querySelectorAll(".opt[data-o]").forEach(b => b.addEventListener("click", () => { const o = s.q.options[+b.dataset.o]; myAns = o; send({ t: "answer", opt: o }); render(); }));
+  v.querySelectorAll(".opt[data-o]:not([disabled])").forEach(b => b.addEventListener("click", () => { const o = s.q.options[+b.dataset.o]; myAns = o; send({ t: "answer", opt: o }); render(); }));
   v.querySelectorAll(".opt[data-pick]").forEach(b => b.addEventListener("click", () => { sentPick = +b.dataset.pick; send({ t: "pick", id: sentPick }); render(); }));
   const hb = $("#hikeBtn"); if (hb) hb.addEventListener("click", () => { sentHike = true; send({ t: "hike" }); render(); });
   const eb = $("#editBtn"); if (eb) eb.addEventListener("click", () => showSign());
