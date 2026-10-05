@@ -205,11 +205,11 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 
 /* Stadium (3D) */
 .arena { position: relative; }
-.stadium { position: relative; height: clamp(400px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
-  background: linear-gradient(#0b1e2b 0%, #10303c 26%, #173a44 30%, #1d4047 38%, #113a2e 40%, #0f2f27 100%);
+.stadium { --far: 40%; position: relative; height: clamp(380px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
+  background: linear-gradient(#0b1e2b 0%, #10303c calc(var(--far) - 56px), #173a44 calc(var(--far) - 40px), #1d4047 calc(var(--far) - 8px), #113a2e var(--far), #0f2f27 100%);
   perspective: 1100px; perspective-origin: 50% 18%; }
-.stadium::before { content: ""; position: absolute; left: 0; right: 0; top: 30%; height: 10%; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
-.cam { position: absolute; left: 0; width: 100%; aspect-ratio: 120 / 54; bottom: 7%; transform-origin: 50% 100%; transform: rotateX(var(--tilt)); transform-style: preserve-3d; }
+.stadium::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--far) - 40px); height: 40px; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
+.cam { position: absolute; z-index: 1; left: 0; right: 0; margin-inline: auto; width: 100%; aspect-ratio: 120 / 54; bottom: 12px; transform-origin: 50% 100%; transform: rotateX(var(--tilt)); transform-style: preserve-3d; }
 .plane { position: absolute; inset: 0; transform-origin: 0 0; transition: transform .9s cubic-bezier(.4,.1,.2,1); transform-style: preserve-3d; }
 .turf { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, var(--turf) 0 4.1667%, var(--turf-2) 4.1667% 8.3333%); box-shadow: 0 0 0 6px #d9d3bf; }
 .ez { position: absolute; top: 0; bottom: 0; width: 8.3333%; display: flex; align-items: center; justify-content: center; }
@@ -253,7 +253,7 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .tok.qbtok { z-index: 1; } /* the stand-in quarterback stays behind the receiver's tag */
 .tsay { position: absolute; bottom: calc(100% + 8px); left: 50%; z-index: 3; transform: translateX(-50%); background: var(--chalk); color: #0c1a1c; font-weight: 800; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; padding: 5px 11px; border-radius: 12px; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.4); animation: pop .3s ease-out; }
 .tsay::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--chalk); }
-.tsay.o { bottom: calc(100% + 12px); left: 30%; }
+.tsay.o { bottom: calc(100% + 30px); left: 30%; } /* the offense bubble sits higher than the defender's, so two players at the same spot do not overlap their bubbles */
 .tsay.d { background: #0c1a1c; color: var(--chalk); border: 2px solid var(--chalk); left: 70%; } .tsay.d::after { border-top-color: var(--chalk); }
 .tsay.flag { background: var(--flag); color: #241d00; } .tsay.flag::after { border-top-color: var(--flag); }
 .tsay.goodb { background: var(--good); color: #062010; } .tsay.goodb::after { border-top-color: var(--good); }
@@ -262,7 +262,7 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 @keyframes pop { from { transform: translateX(-50%) scale(.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
 .tok.turn .tshadow { background: rgba(233,185,73,.45); box-shadow: 0 0 0 3px var(--gold), 0 0 18px var(--gold); }
 @keyframes shake { 0%,100% { translate: 0 0; } 25% { translate: -6px 2px; } 50% { translate: 6px -2px; } 75% { translate: -4px 0; } }
-.tshadow { position: absolute; left: calc(var(--tw) * -.38); top: calc(var(--tw) * -.14); width: calc(var(--tw) * .76); height: calc(var(--tw) * .28); border-radius: 50%; background: rgba(0,0,0,.38); }
+.tshadow { position: absolute; left: calc(var(--tw) * -.38); top: calc(var(--tw) * -.14); width: calc(var(--tw) * .76); height: calc(var(--tw) * .28); border-radius: 50%; background: rgba(0,0,0,.38); transform: scale(var(--ts)); }
 /* cast shadow on the grass, made from the player's outline: the image is 250x120 for a 150-wide sprite with the feet at its top-left quarter */
 /* cast shadow of a pictured player: a 240x180 image with the feet at (75,180); it lies on the grass and falls up the field behind the player, scaled like the figure */
 .tcast { position: absolute; left: calc(var(--tw) * -.5); top: calc(var(--tw) * -1.2); width: calc(var(--tw) * 1.6); height: calc(var(--tw) * 1.2); background: no-repeat 0 0 / 100% 100%; transform-origin: 31.25% 100%; transform: scale(var(--ts)); pointer-events: none; transition: opacity .3s, transform .3s; }
@@ -308,16 +308,16 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .chip { position: absolute; top: 12px; z-index: 20; background: rgba(7,17,19,.8); backdrop-filter: blur(4px); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; max-width: 48%; }
 .chip.l { left: 12px; } .chip.r { right: 12px; color: var(--muted); }
 .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cap { position: absolute; left: 50%; top: 7.5%; transform: translateX(-50%); font-family: var(--f-display); font-size: clamp(20px, 3.4vw, 32px); color: var(--chalk); text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.6); white-space: nowrap; z-index: 21; pointer-events: none; }
+.cap { position: absolute; left: 50%; top: 7.5%; transform: translateX(-50%); font-family: var(--f-display); font-size: clamp(20px, 3.4vw, 32px); color: var(--chalk); text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.6); white-space: nowrap; z-index: 0; pointer-events: none; } /* the big caption sits behind the field, the players and their bubbles (Nick) */
 .cap.show { animation: capIn .35s ease-out; }
 .cap.good { color: var(--gold); } .cap.bad { color: #ff8a7a; } .cap.flag { color: var(--flag); } .cap.meh { color: #cfe3dc; }
 .cap[hidden] { display: none; }
 @keyframes capIn { from { transform: translateX(-50%) scale(.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-.headline { position: absolute; left: 50%; top: 12%; transform: translate(-50%, -50%); font-family: var(--f-display); font-size: clamp(24px, 4.2vw, 48px); color: var(--gold); text-shadow: 0 4px 0 #000, 0 0 30px rgba(0,0,0,.8); z-index: 22; pointer-events: none; white-space: nowrap; animation: bannerIn .5s ease-out; }
+.headline { position: absolute; left: 50%; top: 12%; transform: translate(-50%, -50%); font-family: var(--f-display); font-size: clamp(24px, 4.2vw, 48px); color: var(--gold); text-shadow: 0 4px 0 #000, 0 0 30px rgba(0,0,0,.8); z-index: 0; pointer-events: none; white-space: nowrap; animation: bannerIn .5s ease-out; }
 .headline.bad { color: #ff8a7a; } .headline.flag { color: var(--flag); } .headline.meh { color: var(--chalk); }
 .headline[hidden] { display: none; }
 @keyframes bannerIn { from { transform: translate(-50%, -50%) scale(.4); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-.ticker { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 25; background: rgba(7,17,19,.9); backdrop-filter: blur(6px); border-radius: 16px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.ticker { position: relative; margin-top: 10px; background: rgba(7,17,19,.9); backdrop-filter: blur(6px); border-radius: 16px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .ticker[hidden] { display: none; }
 .tk-head { font-family: var(--f-display); font-size: 20px; color: var(--gold); flex-basis: 100%; }
 .tk-head.bad { color: #ff8a7a; } .tk-head.flag { color: var(--flag); } .tk-head.meh { color: var(--chalk); }
@@ -398,7 +398,7 @@ td.n, th.n { text-align: right; }
   .tm .poss { font-size: 11px; }
   .mid .big { font-size: 16px; } .mid .sm { font-size: 11px; }
   .chip.r { display: none; } .chip.l { max-width: 75%; }
-  .ticker { left: 8px; right: 8px; bottom: 8px; padding: 10px 12px; }
+  .ticker { margin-top: 8px; padding: 10px 12px; }
   .tk-text { font-size: 15px; }
   .chip { font-size: 12px; }
 }
@@ -538,8 +538,8 @@ td.n, th.n { text-align: right; }
         <div class="shade" id="shade" hidden></div>
         <div class="tdot" id="tdot1" hidden></div><div class="tdot" id="tdot2" hidden></div>
         <div class="thought" id="thought" hidden role="dialog" aria-label="Question"></div>
-        <div class="ticker" id="ticker" hidden></div>
       </div>
+      <div class="ticker" id="ticker" hidden></div>
     </div>
     <details class="logbox"><summary>Play-by-play</summary><ul class="log" id="log"></ul></details>
   </section>
@@ -549,7 +549,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-052911';</script>
+<script>window.GF_BUILD = '20261005-060236';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2461,12 +2461,12 @@ const DIR = { token: 0 };
 const OPEN = OFF.filter(a => a.k !== "fum").map(a => a.k === "inc" ? Object.assign({}, a, { w: 7 }) : a);
 const POS = {};
 let CAM = { c: 50, z: 1, l: 50 };
-const ZOOM_PLAYS = false; // the camera used to move in on the line for each play; Nick wants the whole field to stay in view (2026-10-05)
+const ZOOM_PLAYS = false, FIG = 0.8; // FIG: figure size on the un-zoomed field (full size stacked the line into one pile; Nick, 2026-10-05 05:34Z) // the camera used to move in on the line for each play; Nick wants the whole field to stay in view (2026-10-05)
 function newGame() {
   S = {
     screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Team A", score: 0, drive: START }, { name: $("#team1").value.trim() || "Team B", score: 0, drive: START }],
-    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
+    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, pass: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
     line: [[], []], used: {}, log: [], snaps: [], snapIdx: 0, cur: null, kick: null, cands: [], target: null, guess: null
   };
@@ -2558,8 +2558,8 @@ function resolveSnap(sn) {
     return Object.assign(base, { ok: "none", dk: "sack", oa: o ? "Never got the ball" : "", da: "Sack!", gain: -5, stop: true, sackBy: r.id, text: `Nobody on offense was there to block ${r.name}, who comes in untouched and sacks the quarterback. Loss of 5.` });
   }
   if (!o) {
-    const a = pick(SCRAMBLE);
-    return Object.assign(base, { ok: "scramble", dk: "none", oa: "", da: "", gain: a.yds, stop: a.yds <= 0, text: a.yds > 0 ? `Nobody on offense made the line, so the quarterback tucks the ball and scrambles for ${a.yds} yards.` : a.yds < 0 ? `Nobody on offense made the line. The quarterback scrambles and gets dragged down for a loss of ${-a.yds}.` : `Nobody on offense made the line. The quarterback scrambles and is stopped at the line. No gain.` });
+    const a = pick(SCRAMBLE), qbName = S.qb != null ? S.players[S.qb].name : "the quarterback";
+    return Object.assign(base, { ok: "scramble", dk: "none", oa: "", da: "", gain: a.yds, stop: a.yds <= 0, text: a.yds > 0 ? `Nobody on offense made the line, so ${qbName} tucks the ball and scrambles for ${a.yds} yards.` : a.yds < 0 ? `Nobody on offense made the line. ${qbName} scrambles and gets dragged down for a loss of ${-a.yds}.` : `Nobody on offense made the line. ${qbName} scrambles and is stopped at the line. No gain.` });
   }
   let d = sn.d != null ? S.players[sn.d] : null, table = DEF, lead = "";
   const g = sn.guess != null ? S.players[sn.guess] : null;
@@ -2607,6 +2607,9 @@ function applySnap(sn) {
   const team = S.teams[S.possession], other = S.teams[1 - S.possession];
   const o = sn.o != null ? S.players[sn.o] : null, d = sn.d != null ? S.players[sn.d] : null;
   if (o) o.st.yds += Math.max(0, res.gain);
+  const qbP = S.qb != null ? S.players[S.qb] : null; // the quarterback is one of the players (Nick, 2026-10-05): passing yards are theirs, and a scramble is their run
+  if (qbP && o && o.id !== qbP.id && ["pass", "deep", "inc"].includes(res.ok)) qbP.st.pass += Math.max(0, res.gain);
+  if (qbP && !o && res.ok === "scramble") qbP.st.yds += Math.max(0, res.gain);
   if (d && (res.stop || res.turnover)) d.st.stops++;
   if (d && res.int) d.st.ints++;
   const before = team.drive;
@@ -2686,7 +2689,25 @@ function buildField() {
   setBall(FX(losNow()), 50, 0);
   camNow(CAM.c, CAM.z, CAM.l);
 }
-function sizeVars() { const cam = $("#plane").parentElement; document.documentElement.style.setProperty("--pw", cam.clientWidth + "px"); }
+const FIELD_TOP = 80, FIELD_BOTTOM = 12, BELOW_STADIUM = 190, SIZED = { top: -1 }; // px kept above the far sideline for the captions, under the near sideline, and under the stadium for the result bar and the play-by-play line
+function sizeVars() {
+  // The result bar sits under the stadium (Nick: it must not block the end-zone names), so the stadium takes the window height that is left and the field shrinks to fit above the bar instead of scrolling.
+  const cam = $("#plane").parentElement, st = cam.parentElement;
+  st.style.height = ""; cam.style.width = "";
+  if (!phone()) {
+    const top = Math.round(st.getBoundingClientRect().top + window.scrollY); SIZED.top = top;
+    st.style.height = Math.round(Math.max(380, Math.min(620, innerHeight - top - BELOW_STADIUM))) + "px";
+    const avail = st.clientHeight - FIELD_TOP - FIELD_BOTTOM;
+    let w = 100;
+    for (let i = 0; i < 3; i++) { const h = cam.getBoundingClientRect().height; if (h <= avail + 0.5) break; w = Math.max(40, w * avail / h); cam.style.width = w.toFixed(1) + "%"; }
+  }
+  st.style.setProperty("--far", Math.round(st.clientHeight - FIELD_BOTTOM - cam.getBoundingClientRect().height) + "px");
+  document.documentElement.style.setProperty("--pw", cam.clientWidth + "px");
+}
+function fitStadium() { // the scoreboard above the field is rendered after the field is built and can change height, so re-fit the stadium when it has moved
+  const st = stadium(); if (!st || phone()) return;
+  if (Math.round(st.getBoundingClientRect().top + window.scrollY) !== SIZED.top) { sizeVars(); camNow(CAM.c, CAM.z, CAM.l); }
+}
 function benchSpot(p) {
   const mates = S.players.filter(q => q.team === p.team);
   const b = mates.indexOf(p);
@@ -2697,10 +2718,11 @@ function inLine(p) { return S.line[p.team].includes(p.id); }
 function lineSpot(p) {
   const i = S.line[p.team].indexOf(p.id);
   const n = Math.max(S.line[0].length, S.line[1].length, 1);
-  const lane = 20 + (i + 0.5) * (58 / n);
+  const lane = 18 + (i + 0.5) * (72 / n); // the line uses most of the field's depth
   const dir = dirOf(), lx = FX(losNow());
   const isOff = p.team === S.possession;
-  return { x: lx + (isOff ? -dir : dir) * 2.4, y: lane };
+  const back = n >= 3 && i % 2 ? 3 : 0; // every second player stands three yards further back, so a long line is a zigzag and nobody hides the face behind
+  return { x: lx + (isOff ? -dir : dir) * (2.4 + back), y: lane };
 }
 function spotlight() { return { x: Math.max(14, Math.min(86, FX(losNow()))), y: 84 }; }
 function homeSpot(p) { return inLine(p) ? lineSpot(p) : benchSpot(p); }
@@ -2722,6 +2744,9 @@ function moveTok(p, pos, ms, path) {
 }
 const ballShadowAt = h => ({ opacity: String(Math.max(.2, 1 - h / 140)), transform: `scale(${Math.max(.5, 1 - h / 300)})` });
 function setBall(x, y, h) { const b = $("#ball"); if (!b) return; b.style.left = XP(x) + "%"; b.style.top = y + "%"; $("#ballImg").style.transform = `translateY(${-(h || 0)}px)`; const sh = $("#ballShadow"); if (sh) Object.assign(sh.style, ballShadowAt(h || 0)); b._x = x; b._y = y; b._h = h || 0; }
+// handH(): how high a carried ball sits, about the figure's hands (Nick, 2026-10-05: a caught ball rested at the receiver's feet); groundBall() drops it where it is
+const handH = () => Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tw")) * 0.55) || 36;
+function groundBall() { const b = $("#ball"); return b && b._h ? moveBall(b._x, b._y + 1, 250, 6, 0) : Promise.resolve(); }
 function moveBall(x, y, ms, arcH, endH) {
   const b = $("#ball"), img = $("#ballImg"); if (!b) return Promise.resolve();
   const fx = b._x ?? x, fy = b._y ?? y, fh = b._h || 0; endH = endH || 0;
@@ -2751,7 +2776,7 @@ function camNow(c, z, lane) {
   const f = Math.max(0.28, Math.min(0.5, 0.5 - (z - 1) * 0.14)); // zoomed in, the focus lane sits above the ticker
   const tx = (W / 2 - camEl.offsetLeft) - px * z, ty = Hp * f - py * z;
   pl.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale3d(${z}, ${z}, 1)`;
-  document.documentElement.style.setProperty("--ts", Math.pow(z, -0.75).toFixed(3));
+  document.documentElement.style.setProperty("--ts", (FIG * Math.pow(z, -0.75)).toFixed(3));
 }
 
 function layoutLines() {
@@ -2901,7 +2926,8 @@ function readyUp() {
   callPlay();
 }
 function callPlay() {
-  S.cands = S.line[S.possession].slice(); S.target = null; S.guess = null; S.sub = null;
+  S.cands = S.line[S.possession].slice(); if (S.qb != null && S.cands.length >= 2 && S.cands.includes(S.qb)) S.cands = S.cands.filter(id => id !== S.qb); // the quarterback throws; they keep it only when nobody else made the line
+  S.target = null; S.guess = null; S.sub = null;
   if (S.cands.length >= 2) S.phase = "call"; else { S.target = S.cands[0] ?? null; S.phase = "set"; }
   hideCap(); render();
   const qb = S.phase === "call" && S.qb != null ? S.players[S.qb] : null;
@@ -2939,15 +2965,19 @@ async function animateSnap(sn, res, los, token) {
   const lx = FX(los), X = rel => lx + dir * rel;
   const lane = o ? lineSpot(o).y : d ? lineSpot(d).y : 50;
   const Z = zoomFor();
-  // everyone lines up at the ball, camera moves in
-  const moves = S.players.filter(p => inLine(p)).map(p => moveTok(p, lineSpot(p), 600));
+  const ok = res.ok, dk = res.dk; let isPass = ["pass", "deep", "inc"].includes(ok);
+  const qbP = S.qb != null ? S.players[S.qb] : null;
+  if (o && qbP && o.id === qbP.id) isPass = false; // the quarterback kept it: shown as a run from the line
+  const needQb = isPass || !o || res.sackBy != null, realQb = !!(needQb && qbP && !(o && o.id === qbP.id));
+  // everyone lines up at the ball (bench players go back to the sideline), and the quarterback's own character drops back behind the line (Nick, 2026-10-05: the QB is one of the players, not a stand-in)
+  const moves = S.players.map(p => moveTok(p, realQb && p.id === qbP.id ? { x: X(-10), y: lane } : homeSpot(p), 600));
+  if (realQb) $("#tok" + qbP.id).classList.add("qb");
   camNow(X(8), Z, lane);
   setBall(lx, lane, 0);
   await Promise.all([...moves, sleep(900)]); if (!alive()) return;
-  const ok = res.ok, dk = res.dk, isPass = ["pass", "deep", "inc"].includes(ok);
   const base = res.flag ? res.gain - 5 : res.gain;
   const oLane = lane, dLane = lane;
-  const qb = (isPass || !o || res.sackBy != null) ? qbTok(X(-8), lane) : null;
+  const qb = needQb && !realQb ? qbTok(X(-10), lane) : null, qbRef = realQb ? qbP : { id: "qb" }; // the stand-in only when the offense has no quarterback
   if (sn.cands.length >= 2 && o) {
     const g = sn.guess != null ? S.players[sn.guess] : null;
     if (o) $("#tok" + o.id).classList.add("turn");
@@ -2964,36 +2994,36 @@ async function animateSnap(sn, res, los, token) {
   await sleep(1000); if (!alive()) return;
   if (dk === "sack" && res.sackBy != null) { // nobody blocked this rusher
     const r = S.players[res.sackBy];
-    await moveBall(X(-8), lane, 300);
+    await moveBall(X(-10), lane, 300, 0, handH());
     cap("Free rusher!", "bad");
     await moveTok(r, { x: X(-7), y: lane }, 900); if (!alive()) return;
-    sfx.crunch(); pose({ id: "qb" }, "down"); pose(r, "hit"); prop3d("boom", "\u{1F4A5}", X(-7.5), lane - 3); cap("SACK!", "bad"); avSay(r.av, "block", 400);
+    sfx.crunch(); pose(qbRef, "down"); pose(r, "hit"); prop3d("boom", "\u{1F4A5}", X(-7.5), lane - 3); cap("SACK!", "bad"); avSay(r.av, "block", 400);
     await moveBall(X(-9), lane + 5, 300); return;
   }
   if (ok === "scramble") {
-    await moveBall(X(-8), lane, 300);
+    await moveBall(X(-10), lane, 300, 0, handH());
     cap("QB scramble!", "meh"); await sleep(300); if (!alive()) return;
     const gx = X(Math.max(-3, res.gain));
-    await Promise.all([moveTok({ id: "qb" }, { x: gx, y: lane + 8 }, 900, "zig"), moveBall(gx, lane + 8, 900)]);
+    await Promise.all([moveTok(qbRef, { x: gx, y: lane + 8 }, 900, "zig"), moveBall(gx, lane + 8, 900, 0, handH())]);
     if (res.gain <= 0) sfx.crunch();
     cap(res.gain > 0 ? `+${res.gain}` : res.gain < 0 ? "Dragged down!" : "Stopped at the line", res.gain > 0 ? "good" : "bad"); return;
   }
   if (!o && !d) { await moveBall(X(1), lane + 6, 600, 20); cap("Nobody's here!", "meh"); return; }
   if (!o) { // free rusher
-    await moveBall(X(-8), lane, 300);
+    await moveBall(X(-10), lane, 300, 0, handH());
     cap("Free rusher!", "bad");
     await moveTok(d, { x: X(-5), y: lane }, 900);
-    if (dk === "sack") { sfx.crunch(); pose({ id: "qb" }, "down"); pose(d, "hit"); cap("SACK!", "bad"); await moveBall(X(-7), lane + 5, 300); }
+    if (dk === "sack") { sfx.crunch(); pose(qbRef, "down"); pose(d, "hit"); cap("SACK!", "bad"); await moveBall(X(-7), lane + 5, 300); }
     else { await moveBall(X(16), lane - 26, 800, 60, 0); cap("Thrown away", "meh"); }
     return;
   }
   const carry = async (relX, ms, path, camFollow) => {
     const tx = X(relX);
     if (camFollow) camNow(X(Math.max(8, relX - 6)), Z, lane);
-    await Promise.all([moveTok(o, { x: tx, y: oLane }, ms, path), moveBall(tx, oLane, ms)]);
+    await Promise.all([moveTok(o, { x: tx, y: oLane }, ms, path), moveBall(tx, oLane, ms, 0, handH())]);
   };
   if (!isPass) {
-    await moveBall(X(-2.4), lane, 250); // handoff
+    await moveBall(X(-2.4), lane, 250, 0, handH()); // handoff, into the runner's hands
     if (dk === "grass") { cap("Picking grass!", "meh"); pose(d, "sit"); prop3d("flower", "\u{1F33C}", X(3.6), lane + 4); prop3d("flower", "\u{1F33C}", X(2), lane - 5); await sleep(600); }
     if (dk === "open") { cap("Wide open!", "good"); await sleep(400); }
     if (!alive()) return;
@@ -3009,7 +3039,7 @@ async function animateSnap(sn, res, los, token) {
       if (ok === "break") { cap("Breakaway!", "good"); await Promise.all([carry(10, 1000, null, true), moveTok(d, { x: X(10.8), y: lane }, 1050)]); }
       else { cap(label); await Promise.all([carry(0.4, 380), moveTok(d, { x: X(1.2), y: lane }, 380)]); }
       sfx.crunch(); prop3d("boom", "\u{1F4A5}", X(ok === "break" ? 10.5 : 0.8), lane - 3);
-      pose(o, "hit"); pose(d, "hit"); avSay(o.av, "hit"); avSay(d.av, "block", 700); await sleep(400); pose(o, "down");
+      pose(o, "hit"); pose(d, "hit"); avSay(o.av, "hit"); avSay(d.av, "block", 700); await sleep(400); pose(o, "down"); groundBall();
       cap(ok === "break" ? "Tackled!" : "BLOCKED!", "bad"); return;
     }
     cap(dk === "hold" ? "Holding!" : label, dk === "hold" ? "flag" : ""); avSay(o.av, "run", 300);
@@ -3022,7 +3052,7 @@ async function animateSnap(sn, res, los, token) {
     sfx.good(); if (res.gain >= 10) sfx.roar(res.gain >= 20 ? 1.8 : 1.2); cap(`+${res.gain}`, "good"); return;
   }
   // pass plays
-  await moveBall(X(-8), lane, 300);
+  await moveBall(X(-10), lane, 300, 0, handH()); // the quarterback holds it
   const routeTo = ok === "deep" ? 25 : ok === "pass" ? 10 : 12;
   const rx = Math.min(routeTo, 100 - los + 2);
   cap(ok === "deep" ? "Going deep!" : "Pass play!");
@@ -3040,16 +3070,16 @@ async function animateSnap(sn, res, los, token) {
     return;
   }
   if (dk === "int") {
-    await moveBall(X(rx + 1.6), dLane - 2, 800, 60, 0); sfx.groan(); cap("INTERCEPTED!", "bad"); avSay(d.av, "block", 300); avSay(o.av, "hit", 900);
+    await moveBall(X(rx + 1.6), dLane - 2, 800, 60, handH()); sfx.groan(); cap("INTERCEPTED!", "bad"); avSay(d.av, "block", 300); avSay(o.av, "hit", 900);
     camNow(X(rx - 8), Z, lane);
-    await Promise.all([moveTok(d, { x: X(rx - 10), y: dLane + 6 }, 900), moveBall(X(rx - 10), dLane + 6, 900)]);
+    await Promise.all([moveTok(d, { x: X(rx - 10), y: dLane + 6 }, 900), moveBall(X(rx - 10), dLane + 6, 900, 0, handH())]);
     return;
   }
   if (dk === "block") {
     await moveBall(X(rx + 0.8), oLane, 800, 60, 0); sfx.crunch(); prop3d("boom", "✋", X(rx + 1.6), lane - 2); cap(ok === "inc" ? "Batted down!" : "Knocked down!", "bad"); avSay(d.av, "block", 300);
     await moveBall(X(rx + 2), lane + 8, 400, 15, 0); return;
   }
-  await moveBall(X(rx), oLane, ok === "deep" ? 1000 : 750, ok === "deep" ? 90 : 55, 0);
+  await moveBall(X(rx), oLane, ok === "deep" ? 1000 : 750, ok === "deep" ? 90 : 55, handH()); // caught, in the hands
   cap("Caught it!", "good"); sfx.good(); avSay(o.av, "run", 500);
   if (dk === "hold") await dropFlag(X(1), lane - 6);
   if (res.gain > rx) { await sleep(250); await carry(res.gain, Math.min(1800, 400 + (res.gain - rx) * 50), null, true); }
@@ -3245,13 +3275,13 @@ function renderLog() { const l = $("#log"); if (l) l.innerHTML = S.log.slice(0, 
 function render() {
   if (!S || S.screen !== "game") return;
   if ($("#plane").dataset.built !== "1") buildField();
-  renderBoard(); renderChips(); layoutLines(); renderTicker(); renderLog(); syncPick();
+  renderBoard(); fitStadium(); renderChips(); layoutLines(); renderTicker(); renderLog(); syncPick();
   if (S.phase === "playing" && S.sub === "result") finishSnapUI();
   saveGame(); netSync(); botTurn();
 }
 function renderEnd() {
   const t = S.teams, w = t[0].score === t[1].score ? -1 : t[0].score > t[1].score ? 0 : 1;
-  const ranked = S.players.slice().sort((a, b) => (b.st.tds * 30 + b.st.yds + b.st.stops * 8 + b.st.ints * 15 + b.st.right * 5) - (a.st.tds * 30 + a.st.yds + a.st.stops * 8 + a.st.ints * 15 + a.st.right * 5));
+  const ranked = S.players.slice().sort((a, b) => (b.st.tds * 30 + b.st.yds + (b.st.pass || 0) * 0.5 + b.st.stops * 8 + b.st.ints * 15 + b.st.right * 5) - (a.st.tds * 30 + a.st.yds + (a.st.pass || 0) * 0.5 + a.st.stops * 8 + a.st.ints * 15 + a.st.right * 5));
   const mvp = ranked[0];
   refSay(w < 0 ? "tie" : "final", `Final score: ${t[0].name} ${t[0].score}, ${t[1].name} ${t[1].score}. ${w < 0 ? "It's a tie!" : `${t[w].name} win! Game M V P: ${mvp.name}.`}`, { interrupt: true });
   detail(`Final score: ${t[0].name} ${t[0].score}, ${t[1].name} ${t[1].score}. ${w < 0 ? "It's a tie!" : `${t[w].name} win! Game M V P: ${mvp.name}.`}`);
@@ -3264,8 +3294,8 @@ function renderEnd() {
     <div class="row" style="justify-content:center"><button class="btn" id="againBtn" type="button">Rematch</button><button class="btn ghost" id="setupBtn" type="button">Change players</button></div>
   </div>
   <div class="card"><h2>Box score</h2><div class="tablewrap"><table>
-    <thead><tr><th>Player</th><th>Team</th><th>Level</th><th class="n">Correct</th><th class="n">Yards</th><th class="n">TDs</th><th class="n">Stops</th><th class="n">Picks</th></tr></thead>
-    <tbody>${ranked.map(p => `<tr><td><span class="av" style="width:28px;height:28px">${avatarSVG(p.av, null, p.gl)}</span> ${esc(p.name)}</td><td><span class="dot" style="background:var(${p.team ? "--away" : "--home"})"></span> ${esc(t[p.team].name)}</td><td><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span></td><td class="n">${p.st.right}/${p.st.asked}</td><td class="n">${p.st.yds}</td><td class="n">${p.st.tds}</td><td class="n">${p.st.stops}</td><td class="n">${p.st.ints}</td></tr>`).join("")}</tbody>
+    <thead><tr><th>Player</th><th>Team</th><th>Level</th><th class="n">Correct</th><th class="n">Yards</th><th class="n">Passing</th><th class="n">TDs</th><th class="n">Stops</th><th class="n">Picks</th></tr></thead>
+    <tbody>${ranked.map(p => `<tr><td><span class="av" style="width:28px;height:28px">${avatarSVG(p.av, null, p.gl)}</span> ${esc(p.name)}</td><td><span class="dot" style="background:var(${p.team ? "--away" : "--home"})"></span> ${esc(t[p.team].name)}</td><td><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span></td><td class="n">${p.st.right}/${p.st.asked}</td><td class="n">${p.st.yds}</td><td class="n">${p.st.pass || 0}</td><td class="n">${p.st.tds}</td><td class="n">${p.st.stops}</td><td class="n">${p.st.ints}</td></tr>`).join("")}</tbody>
   </table></div></div>`;
   $("#againBtn").addEventListener("click", () => { sfx.whistle(); newGame(); });
   $("#setupBtn").addEventListener("click", () => { S = null; show(); });

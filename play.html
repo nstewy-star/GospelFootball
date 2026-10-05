@@ -144,7 +144,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-052911';</script>
+<script>window.GF_BUILD = '20261005-060236';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -456,7 +456,7 @@ function render() {
   } else if (view === "end") {
     const st = s.st || {};
     h = `<div class="eyebrow">Final</div><div class="head good">${esc(s.final)}</div>
-      <div class="stats"><div><b>${st.right || 0}/${st.asked || 0}</b><span>Correct</span></div><div><b>${st.yds || 0}</b><span>Yards</span></div><div><b>${st.tds || 0}</b><span>TDs</span></div><div><b>${st.stops || 0}</b><span>Stops</span></div><div><b>${st.ints || 0}</b><span>Picks</span></div></div>
+      <div class="stats"><div><b>${st.right || 0}/${st.asked || 0}</b><span>Correct</span></div><div><b>${st.yds || 0}</b><span>Yards</span></div><div><b>${st.pass || 0}</b><span>Passing</span></div><div><b>${st.tds || 0}</b><span>TDs</span></div><div><b>${st.stops || 0}</b><span>Stops</span></div><div><b>${st.ints || 0}</b><span>Picks</span></div></div>
       <p class="note">Stay on this page for the rematch.</p>`;
   } else {
     h = `<div class="eyebrow">${esc(s.play || "")}</div><p class="msg">${esc(s.msg || "Waiting for the big screen…")}</p>`;
