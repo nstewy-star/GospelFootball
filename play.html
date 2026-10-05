@@ -144,7 +144,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-050825';</script>
+<script>window.GF_BUILD = '20261005-051433';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -363,7 +363,7 @@ function onData(d) {
 
 // ---- screens ----
 function showOnly(id) { ["codeScr", "signScr", "main"].forEach(x => $("#" + x).hidden = x !== id); }
-function applyTeams() { const n = (hello && hello.teams) || ["Home", "Away"]; $("#teamSeg [data-v='0']").textContent = n[0]; $("#teamSeg [data-v='1']").textContent = n[1]; applyOpen(); }
+function applyTeams() { const n = (hello && hello.teams) || ["Team A", "Team B"]; $("#teamSeg [data-v='0']").textContent = n[0]; $("#teamSeg [data-v='1']").textContent = n[1]; applyOpen(); }
 // the team choice shows only while the host has the teams open
 function applyOpen() { const open = !!(hello && hello.open); $("#teamLbl").hidden = !open; $("#teamSeg").hidden = !open; $("#teamNote").hidden = open; }
 function renderAvPick() {
@@ -417,8 +417,8 @@ function render() {
   if (editing) return;
   showOnly("main");
   const s = state, m = (s && s.me) || me;
-  const names = (s && s.teams) || (hello && hello.teams) || ["Home", "Away"];
-  const teamOf = t => names[t] || (t ? "Away" : "Home");
+  const names = (s && s.teams) || (hello && hello.teams) || ["Team A", "Team B"];
+  const teamOf = t => names[t] || (t ? "Team B" : "Team A");
   $("#meCard").innerHTML = `<div class="me"><span class="av" style="width:56px;height:56px;border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team), m.gl)}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
     (s && s.score ? `<div class="strip"><div class="t"><b>${s.poss === 0 ? "\u{1F3C8} " : ""}${esc(names[0])}</b><span class="sc">${s.score[0]}</span></div><div class="t r"><b>${esc(names[1])}${s.poss === 1 ? " \u{1F3C8}" : ""}</b><span class="sc">${s.score[1]}</span></div>${s.poss != null && s.view !== "end" ? `<div class="mid">${esc(names[s.poss])} ball \u00b7 ${esc(s.down || "")} \u00b7 ${esc(s.play || "")}</div>` : ""}</div>` : "");
   const v = $("#view");

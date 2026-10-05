@@ -147,6 +147,7 @@ input[type=text], select { font-family: var(--f-ui); font-size: 18px; background
 .seg button[aria-pressed="true"] { background: var(--gold); color: #1d1606; }
 .field-label.name { flex: 1 1 180px; } /* the name box shares its row with the level, the team and Add (Nick, 2026-10-05) */
 #lvlSeg { flex: 0 1 auto; }
+#teamSeg button { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #lvlSeg button { flex: 1; padding-inline: 11px; }
 .avpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding: 4px 2px; flex-basis: 100%; }
 .avpick button { position: relative; width: 100%; aspect-ratio: 1; max-width: 100%; height: auto; padding: 0; border-radius: 50%; border: 3px solid transparent; background: var(--panel-2); overflow: hidden; }
@@ -472,9 +473,9 @@ td.n, th.n { text-align: right; }
       <div class="card" id="teamsCard" hidden>
         <div class="team-cols">
           <label class="field-label" for="team0"><span><span class="dot" style="background:var(--home)"></span> Home team</span>
-            <input type="text" id="team0" maxlength="22" value="Stripling Warriors"></label>
+            <input type="text" id="team0" maxlength="22" value="Team A"></label>
           <label class="field-label" for="team1"><span><span class="dot" style="background:var(--away)"></span> Away team</span>
-            <input type="text" id="team1" maxlength="22" value="Sons of Mosiah"></label>
+            <input type="text" id="team1" maxlength="22" value="Team B"></label>
         </div>
         <div class="team-cols" id="rosterCols"></div>
       </div>
@@ -546,7 +547,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-050825';</script>
+<script>window.GF_BUILD = '20261005-051433';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2234,15 +2235,17 @@ function renderModes() {
 function teamList(t) { return setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t).sort((a, b) => a.p.name.localeCompare(b.p.name, undefined, { sensitivity: "base" }) || a.i - b.i); }
 function renderHeroTeams() {
   const box = $("#heroTeams"); if (!box) return;
-  const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
+  const names = [$("#team0").value || "Team A", $("#team1").value || "Team B"];
   box.innerHTML = [0, 1].map(t => { const list = teamList(t);
     return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
     `<p class="note">${setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move, click to edit, double-click to rename." : "Drag to move a player, click to edit, double-click to rename. Open teams to let phones pick."}</p>`;
+  if (drag && !drag.pending && drag.hero) { const l = box.querySelector(`li[data-i="${drag.i}"]`); if (l) { l.classList.add("dragging"); drag.li = l; } }
 }
 function renderRoster() {
   store.set("gf_roster", setup.roster);
   renderHeroTeams();
-  const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
+  const names = [$("#team0").value || "Team A", $("#team1").value || "Team B"];
+  $("#teamSeg [data-v='0']").textContent = names[0]; $("#teamSeg [data-v='1']").textContent = names[1]; // the sign-up row says the team names
   $("#rosterCols").innerHTML = [0, 1].map(t => {
     const list = teamList(t);
     return `<div class="team-col" data-team="${t}"><h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} (${list.length})</h3>
@@ -2336,12 +2339,18 @@ $("#fillBtn").addEventListener("click", () => {
   $("#setupErr").textContent = ""; renderRoster();
 });
 let drag = null;
+function dropDrag(d) { // take the ghost chip and the drop markers off the page
+  if (d.ghost) d.ghost.remove(); if (d.li) d.li.classList.remove("dragging");
+  document.querySelectorAll(".team-col.over, .hcol.over").forEach(c => c.classList.remove("over")); document.querySelectorAll(".drop-mark").forEach(m => m.remove());
+}
 function startDrag(e) {
   const g = e.target.closest("[data-grip]"); if (!g || e.target.closest("input")) return;
-  e.preventDefault();
+  e.preventDefault(); clearTimeout(editT); // a new press is not a click to edit
+  if (drag) { dropDrag(drag); drag = null; } // a drag whose release never reached us (the chip was left on the screen once) ends here
   const i = +g.dataset.grip, li = g.closest("li"), p = setup.roster[i];
   drag = { i, li, p, team: p.team, before: null, id: e.pointerId, x0: e.clientX, y0: e.clientY, pending: true, hero: !!g.closest("#heroTeams") };
-  try { g.setPointerCapture(e.pointerId); } catch (err) {}
+  // capture on the list box, which survives a redraw of the list; capturing on the row itself loses the pointer when a redraw replaces that row
+  try { (g.closest("#heroTeams, #rosterCols") || g).setPointerCapture(e.pointerId); } catch (err) {}
 }
 $("#rosterCols").addEventListener("pointerdown", startDrag);
 let lastTap = { el: null, t: 0 }, editT = null;
@@ -2358,7 +2367,7 @@ $("#heroTeams").addEventListener("pointerdown", e => {
   if (e.target.closest("input")) return;
   const h = e.target.closest("h3[data-team]"), li = e.target.closest("li[data-i]");
   if (h && doubleTap(h)) { e.preventDefault(); const t = +h.dataset.team; renameBox(h, $("#team" + t).value, v => { $("#team" + t).value = v; renderRoster(); }); return; }
-  if (li && doubleTap(li)) { e.preventDefault(); clearTimeout(editT); if (drag) { drag = null; } const i = +li.dataset.i; renameBox(li.querySelector("span") || li, setup.roster[i].name, v => { setup.roster[i].name = v; if (setup.editing === i) $("#pName").value = v; renderRoster(); }); return; }
+  if (li && doubleTap(li)) { e.preventDefault(); clearTimeout(editT); if (drag) { dropDrag(drag); drag = null; } const i = +li.dataset.i; renameBox(li.querySelector("span") || li, setup.roster[i].name, v => { setup.roster[i].name = v; if (setup.editing === i) $("#pName").value = v; renderRoster(); }); return; }
   startDrag(e); // the team lists on the picture drag too
 });
 function moveDrag(e) {
@@ -2385,11 +2394,11 @@ function moveDrag(e) {
   const ul = col.querySelector("ul");
   if (next) next.before(mark); else if (ul) ul.appendChild(mark); else col.appendChild(mark);
 }
-document.addEventListener("pointermove", e => { if (drag && e.pointerId === drag.id) moveDrag(e); });
+document.addEventListener("pointermove", e => { if (!drag || e.pointerId !== drag.id) return; if (e.pointerType === "mouse" && e.buttons === 0) { endDrag(e, true); return; } moveDrag(e); }); // a mouse moving with no button down means the release was missed
 function endDrag(e, cancel) {
   if (!drag || (e && e.pointerId !== drag.id)) return;
-  const d = drag; drag = null; if (d.ghost) d.ghost.remove();
-  if (d.pending) { if (d.hero && !cancel) { clearTimeout(editT); editT = setTimeout(() => { if (lastTap.el === d.li) startEdit(d.i); }, 480); } return; } // a tap on the picture's list opens the player in the form, unless a second tap (rename) follows
+  const d = drag; drag = null; dropDrag(d);
+  if (d.pending) { if (d.hero && !cancel) { clearTimeout(editT); editT = setTimeout(() => { if (!drag && lastTap.el === d.li) startEdit(d.i); }, 480); } return; } // a tap on the picture's list opens the player in the form, unless a second tap (rename) follows
   if (!cancel && d.over != null) {
     const p = setup.roster.splice(d.i, 1)[0]; p.team = d.over;
     if (d.before == null) setup.roster.push(p);
@@ -2400,6 +2409,9 @@ function endDrag(e, cancel) {
 }
 document.addEventListener("pointerup", e => endDrag(e, false));
 document.addEventListener("pointercancel", e => endDrag(e, true));
+document.addEventListener("mouseup", () => { if (drag) endDrag(null, true); }); // belt and braces: the pointer release was lost but the mouse one arrived
+window.addEventListener("blur", () => { if (drag) endDrag(null, true); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && drag) endDrag(null, true); });
 $("#rosterCols").addEventListener("click", e => {
   const d = e.target.closest("[data-del]"), s = e.target.closest("[data-swap]"), ed = e.target.closest("[data-edit]");
   if (ed) { startEdit(+ed.dataset.edit); return; }
@@ -2450,7 +2462,7 @@ let CAM = { c: 50, z: 1, l: 50 };
 function newGame() {
   S = {
     screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
-    teams: [{ name: $("#team0").value.trim() || "Home", score: 0, drive: START }, { name: $("#team1").value.trim() || "Away", score: 0, drive: START }],
+    teams: [{ name: $("#team0").value.trim() || "Team A", score: 0, drive: START }, { name: $("#team1").value.trim() || "Team B", score: 0, drive: START }],
     players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
     line: [[], []], used: {}, log: [], snaps: [], snapIdx: 0, cur: null, kick: null, cands: [], target: null, guess: null
@@ -3307,7 +3319,7 @@ function playUrl() {
 }
 function shortUrl(u) { return u.replace(/^https?:\/\//, "").replace(/\?.*$/, ""); }
 function makeCode() { const A = "ABCDEFGHJKMNPQRSTUVWXYZ"; let c = ""; for (let i = 0; i < 4; i++) c += A[rnd(A.length)]; return c; }
-function teamNames() { return S && S.screen !== "setup" ? S.teams.map(t => t.name) : [$("#team0").value.trim() || "Home", $("#team1").value.trim() || "Away"]; }
+function teamNames() { return S && S.screen !== "setup" ? S.teams.map(t => t.name) : [$("#team0").value.trim() || "Team A", $("#team1").value.trim() || "Team B"]; }
 function phoneRec(ph) { if (S && S.screen !== "setup") return S.players.find(p => p.pid === ph.pid) || null; return setup.roster.find(p => p.pid === ph.pid) || null; }
 function phoneOf(conn) { return NET.phones.find(ph => ph.conn === conn); }
 function phoneOnline(pid) { const ph = NET.phones.find(p => p.pid === pid); return !!(ph && ph.online); }
