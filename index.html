@@ -47,14 +47,27 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
 .lvl { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--night); color: var(--muted); flex: none; }
 .lvl.pewee { color: #9fe0a9; } .lvl.college { color: #f5c96a; } .lvl.pro { color: #ff9c8a; } .lvl.random { color: #c9b6ff; }
-.av { display: inline-block; border-radius: 50%; overflow: hidden; flex: none; background: var(--panel-2); vertical-align: middle; }
+.av { display: inline-block; position: relative; border-radius: 50%; overflow: hidden; flex: none; background: var(--panel-2); vertical-align: middle; }
+.av .specs, .avpick button .specs, .tfig .specs { position: absolute; height: auto; object-fit: fill; border-radius: 0; transform: translate(-50%, -50%); pointer-events: none; }
+.seg.glstyles button { padding: 4px 8px; } .seg.glstyles img { height: 18px; width: auto; display: block; }
+.glwrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-basis: 100%; }
+#glStyles[hidden] { display: none !important; }
 .av svg, .av img { width: 100%; height: 100%; display: block; object-fit: cover; }
 
 /* Header */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .brand[hidden] { display: none; }
-.top:has(.brand[hidden]) { justify-content: flex-end; }
+.setupbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1 1 100%; min-width: 0; }
+.setupbar[hidden] { display: none; }
+.setupbar .modes { gap: 6px; }
+.setupbar .mode { padding: 6px 13px; border-radius: 999px; }
+.setupbar .mode b { font-size: 15px; }
+.setupbar .mode small { display: none; }
+.barsel { display: flex; align-items: center; gap: 8px; }
+.barsel select { padding: 6px 10px; font-size: 14px; border-radius: 999px; }
+.top-actions .btn { padding: 8px 18px; font-size: 15px; }
+.top-actions .btn[hidden] { display: none; }
 .brand h1 { font-size: clamp(26px, 5vw, 38px); color: var(--chalk); }
 .brand h1 span { color: var(--gold); }
 .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -68,10 +81,36 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .hero h2 { font-size: clamp(22px, 3.6vw, 44px); color: var(--chalk); text-shadow: 0 3px 0 #0a1a22, 0 6px 18px rgba(0,0,0,.5); line-height: 1; }
 .hero h2 span { color: var(--gold); }
 .hero p { margin: 0; font-family: var(--f-read); font-size: clamp(13px, 1.3vw, 16px); color: #e8f0ec; text-shadow: 0 2px 6px rgba(0,0,0,.6); max-width: 34ch; }
+/* phones: the QR code and join code sit on the lower right of the picture, so nobody has to scroll */
+.hero .hero-side { position: absolute; right: 2%; top: 5%; bottom: 5%; width: 44%; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 0; }
+.hero .hero-phones { padding: 10px 12px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 0; gap: 8px; flex: none; }
+/* who is on which team, above the code */
+.hero .hero-teams { flex: 0 1 auto; min-height: 0; overflow: auto; padding: 8px 12px 10px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.hero .hero-teams:empty { display: none; }
+.hero .hero-teams h3 { grid-row: 1; margin: 0; font-family: var(--f-ui); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--chalk); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero .hero-teams h3 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+.hero .hero-teams h3 small { font-weight: 500; color: #b7c6c0; letter-spacing: 0; text-transform: none; }
+.hero .hero-teams ul { grid-row: 2; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hero .hero-teams li { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 1.2; color: #e8f0ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero .hero-teams li span { overflow: hidden; text-overflow: ellipsis; }
+.hero .hero-teams li.none { color: #9fb0aa; font-style: italic; }
+.hero .hero-teams .av { width: 20px; height: 20px; flex: none; }
+.hero .hero-teams .cap { grid-column: 1 / -1; grid-row: 3; font-size: 12px; color: #b7c6c0; margin: 2px 0 0; }
+.hero .hero-phones h2 { font-size: 18px; text-shadow: none; color: var(--chalk); }
+.hero .hero-phones .hint { font-size: 13px; color: #d6e0dc; max-width: 36ch; margin: 0; }
+.hero .hero-phones .qr { width: clamp(96px, 11vw, 150px); height: clamp(96px, 11vw, 150px); padding: 6px; border-radius: 10px; }
+.hero .hero-phones .qr-wrap { gap: 12px; }
+.hero .hero-phones .qr-text { flex-basis: 150px; }
+.hero .hero-phones .qr-text .code { font-size: clamp(30px, 3.6vw, 44px); }
+.hero .hero-phones .btn.ghost { padding: 6px 12px; font-size: 13px; }
+.hero .hero-phones:empty { display: none; }
 @media (max-width: 560px) {
   .hero { background: #4aa6e3; display: flex; flex-direction: column; }
   .hero .hero-text { position: static; max-width: none; padding: 14px 16px 10px; order: -1; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; }
   .hero-art > img { height: auto; }
+  .hero .hero-side { position: static; width: auto; gap: 0; }
+  .hero .hero-phones, .hero .hero-teams { border-radius: 0; background: rgba(6,18,26,.9); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .hero .hero-teams { max-height: 220px; }
 }
 
 /* Setup */
@@ -93,7 +132,7 @@ input[type=text], select { font-family: var(--f-ui); font-size: 18px; background
 #lvlSeg { flex: 1 1 100%; }
 #lvlSeg button { flex: 1; padding-inline: 6px; }
 .avpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding: 4px 2px; flex-basis: 100%; }
-.avpick button { width: 100%; aspect-ratio: 1; max-width: 100%; height: auto; padding: 0; border-radius: 50%; border: 3px solid transparent; background: var(--panel-2); overflow: hidden; }
+.avpick button { position: relative; width: 100%; aspect-ratio: 1; max-width: 100%; height: auto; padding: 0; border-radius: 50%; border: 3px solid transparent; background: var(--panel-2); overflow: hidden; }
 .avpick button svg, .avpick button img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%; }
 .avpick button[aria-pressed="true"] { border-color: var(--gold); transform: scale(1.06); }
 .avgrp { grid-column: 1 / -1; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 4px 0 -2px; }
@@ -349,43 +388,37 @@ td.n, th.n { text-align: right; }
 <div class="wrap" id="app">
   <header class="top">
     <div class="brand"><h1>Gospel <span>Football</span></h1><span class="eyebrow" id="subtitle">A General Conference game</span></div>
+    <div class="setupbar" id="setupBar" hidden>
+      <span class="eyebrow">Playbook</span>
+      <div class="modes" id="modes"></div>
+      <label class="barsel" for="playsSel"><span class="eyebrow">Length</span>
+        <select id="playsSel">
+          <option value="14">14 plays (quick)</option>
+          <option value="20" selected>20 plays</option>
+          <option value="28">28 plays (long)</option>
+        </select>
+      </label>
+    </div>
     <div class="top-actions">
       <button class="icon-btn" id="phoneBtn" type="button" hidden></button>
       <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
       <button class="icon-btn" id="voiceBtn" type="button" hidden>Announcer: plays</button>
       <button class="icon-btn" id="quitBtn" type="button" hidden>New game</button>
+      <button class="btn" id="startTop" type="button" hidden>Kick off</button>
     </div>
   </header>
 
   <div class="hero" id="hero" hidden>
     <div class="hero-art" id="heroArt"></div>
     <div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Pewee, College and Pro levels for the whole family.</p></div>
+    <div class="hero-side"><div class="hero-teams" id="heroTeams"></div><div class="hero-phones phones" id="phoneBox"></div></div>
   </div>
 
 <!-- SETUP -->
   <section id="setup" style="display:flex;flex-direction:column;gap:16px">
     <div class="setup">
       <div class="card">
-        <div><span class="eyebrow">Step 1</span><h2>Pick your playbook</h2></div>
-        <div class="modes" id="modes"></div>
-        <div class="row">
-          <label class="field-label" for="playsSel">Game length
-            <select id="playsSel">
-              <option value="14">14 plays (quick)</option>
-              <option value="20" selected>20 plays</option>
-              <option value="28">28 plays (long)</option>
-            </select>
-          </label>
-        </div>
-        <div class="team-cols">
-          <label class="field-label" for="team0"><span><span class="dot" style="background:var(--home)"></span> Home team</span>
-            <input type="text" id="team0" maxlength="22" value="Stripling Warriors"></label>
-          <label class="field-label" for="team1"><span><span class="dot" style="background:var(--away)"></span> Away team</span>
-            <input type="text" id="team1" maxlength="22" value="Sons of Mosiah"></label>
-        </div>
-      </div>
-      <div class="card">
-        <div><span class="eyebrow">Step 2</span><h2>Sign your players</h2></div>
+        <div><span class="eyebrow">Players</span><h2>Sign your players</h2></div>
         <form id="addForm" class="row" autocomplete="off">
           <div class="editbar" id="editBar" hidden></div>
           <label class="field-label" for="pName" style="flex-basis:100%">Player name
@@ -404,18 +437,29 @@ td.n, th.n { text-align: right; }
           </div>
           <button class="btn" type="submit" id="addBtn">Add</button>
           <button class="btn ghost" type="button" id="cancelEdit" hidden>Cancel</button>
+          <div class="glwrap"><label class="check" for="glChk" style="flex-basis:auto"><input type="checkbox" id="glChk"> Glasses</label><div class="seg glstyles" id="glStyles" role="group" aria-label="Glasses style" hidden><button type="button" data-v="black" aria-pressed="true" title="Black"><img alt="black"></button><button type="button" data-v="brown" aria-pressed="false" title="Brown"><img alt="brown"></button><button type="button" data-v="gold" aria-pressed="false" title="Gold"><img alt="gold"></button><button type="button" data-v="red" aria-pressed="false" title="Red"><img alt="red"></button></div><span class="hint" id="glNote" style="margin:0"></span></div>
           <label class="check" for="crewChk"><input type="checkbox" id="crewChk"> Team player: the whole team answers its questions together</label>
           <label class="check" for="botChk"><input type="checkbox" id="botChk"> Bot: the computer plays this spot (its level sets how often it answers right)</label>
         </form>
-        <p class="hint">Drag a player by the dots to move them to the other team or change their spot. Short a player? Add a team player, or use Fill with team players to even up the sides. Want to play against the computer? Fill with bots puts bots on the smaller team; a Pewee bot gets about 6 in 10 right, a Pro bot about 3 in 4. Random picks a new level for every question.</p>
+        <p class="hint">Random picks a new level for every question. Short a player? Add a team player, or play against the computer with Fill with bots: a Pewee bot gets about 6 in 10 right, a Pro bot about 3 in 4.</p>
+      </div>
+      <div class="card">
+        <div><span class="eyebrow">Teams</span><h2>Line up the teams</h2></div>
+        <div class="team-cols">
+          <label class="field-label" for="team0"><span><span class="dot" style="background:var(--home)"></span> Home team</span>
+            <input type="text" id="team0" maxlength="22" value="Stripling Warriors"></label>
+          <label class="field-label" for="team1"><span><span class="dot" style="background:var(--away)"></span> Away team</span>
+            <input type="text" id="team1" maxlength="22" value="Sons of Mosiah"></label>
+        </div>
         <div class="team-cols" id="rosterCols"></div>
+        <p class="hint">Drag a player by the dots to move them to the other team or change their spot. Phones are placed on the smaller team unless you open the teams, then everyone picks or switches on their own phone.</p>
         <div class="row" style="justify-content:space-between">
+          <button class="btn ghost" type="button" id="openTeamsBtn" aria-pressed="false">Open teams: off</button>
           <button class="btn ghost" type="button" id="balanceBtn">Even out teams</button>
           <button class="btn ghost" type="button" id="fillBtn">Fill with team players</button>
           <button class="btn ghost" type="button" id="botsBtn">Fill with bots</button>
           <button class="btn ghost" type="button" id="clearBtn">Clear roster</button>
         </div>
-        <div class="phones" id="phoneBox"></div>
         <div class="err" id="setupErr"></div>
         <button class="btn" type="button" id="startBtn" style="font-size:20px;padding:14px">Kick off</button>
       </div>
@@ -486,7 +530,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-033709';</script>
+<script>window.GF_BUILD = '20261005-035408';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -1699,10 +1743,10 @@ const ROBO_IMG = { pic: IMG_BASE + "pic-robo.webp", sprite: IMG_BASE + "sp-robo.
 // Picker order: a 7-column table per gender, one row per age (kid, twenties, forties, grandparent), the looks left to right; the stored index never changes
 const AV_GROUPS = [{ label: "Boys", cols: 7, ids: [0, 4, 8, 12, 16, 20, 24, 1, 5, 9, 13, 17, 21, 25, 2, 6, 10, 14, 18, 22, 26, 3, 7, 11, 15, 19, 23, 27] }, { label: "Girls", cols: 7, ids: [28, 32, 36, 40, 44, 48, 52, 29, 33, 37, 41, 45, 49, 53, 30, 34, 38, 42, 46, 50, 54, 31, 35, 39, 43, 47, 51, 55] }];
 // avatarSVG(i, helmetColour): the picture for the roster, phones and results
-function avatarSVG(i, helmet) {
-  if (i === "bot") return ROBO_IMG.ready ? `<img src="${ROBO_IMG.pic}" alt="" draggable="false">` : botSVG(helmet);
+function avatarSVG(i, helmet, gl) {
+  if (i === "bot") return ROBO_IMG.ready ? `<img src="${ROBO_IMG.pic}" alt="" draggable="false">` + (typeof glassesHTML === "function" ? glassesHTML("pic", i, gl) : "") : botSVG(helmet);
   if (i === "team" || i == null || !AVATARS[i]) return `<img src="${TEAM_PIC}" alt="" draggable="false">`;
-  return `<img src="${AV_PIC[i]}" alt="" draggable="false">`;
+  return `<img src="${AV_PIC[i]}" alt="" draggable="false">` + (typeof glassesHTML === "function" ? glassesHTML("pic", i, gl) : "");
 }
 function botSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1727,6 +1771,21 @@ function teamSVG(helmet) {
     ${helmet ? `<path d="M30 30 Q30 4 50 4 Q70 4 70 30 L70 34 L30 34 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.2"/><path d="M34 30 L66 30 M34 25 L66 25" stroke="#d8d8d0" stroke-width="2"/>` : ""}
     <text x="50" y="${helmet ? 46 : 26}" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${helmet ? 15 : 20}" fill="#f2efe4">TEAM</text>
   </svg>`;
+}
+
+// ---------- glasses: an overlay a player can switch on, in four ChatGPT-drawn styles (img/glasses-<style>.webp) ----------
+// Positions are [cx, cy, w] in % of the picture (pic-NN, measured on the Mac) or of the field sprite (sp-NN): the point between the eyes and the glasses width.
+// "has" lists the pictures that already wear glasses (the grandparents), which get no overlay.
+const GLASSES = { styles: ["black", "brown", "gold", "red"], has: [3, 7, 11, 19, 27, 31, 35, 39, 43, 47, 51, 55], pic: { "00": [48.74, 59.15, 42.94], "01": [49.51, 56.53, 40.75], "02": [50.15, 51.26, 38.51], "03": [51.62, 54.59, 40.75], "04": [49.47, 57.43, 43.16], "05": [48.92, 54.65, 41.96], "06": [50.57, 53.74, 39.24], "07": [51.8, 54.5, 41.45], "08": [49.56, 59.4, 43.49], "09": [50.6, 57.7, 40.55], "10": [50.16, 52.94, 38.06], "11": [51.73, 54.11, 39.62], "12": [50.52, 55.12, 46.96], "13": [52.75, 50.5, 45.62], "14": [50.81, 48.62, 38.95], "15": [51.01, 50.35, 43.01], "16": [49.33, 55.68, 43.91], "17": [50.44, 52.57, 41.31], "18": [49.24, 49.69, 36.56], "19": [50.25, 52.63, 39.62], "20": [49.26, 55.72, 44.45], "21": [49.37, 51.38, 40.8], "22": [50.55, 49.37, 38.23], "23": [50.65, 51.22, 39.83], "24": [49.34, 58.17, 47.9], "25": [49.85, 55.55, 44.39], "26": [49.64, 55.59, 42.65], "27": [49.83, 54.31, 44.25], "28": [49.36, 55.46, 47.23], "29": [49.19, 54.76, 49.39], "30": [48.65, 53.96, 47.74], "31": [49.47, 52.58, 43.74], "32": [49.68, 55.46, 51.33], "33": [48.92, 53.51, 50.81], "34": [50.29, 54.44, 49.94], "35": [49.5, 52.25, 44.98], "36": [49.27, 53.26, 47.29], "37": [49.06, 54.13, 50.1], "38": [49.76, 52.93, 47.64], "39": [51.13, 53.25, 42.12], "40": [48.06, 51.49, 48.91], "41": [50.62, 48.44, 44.44], "42": [49.83, 48.53, 48.01], "43": [51.13, 53.25, 44.51], "44": [50.5, 57.91, 46.84], "45": [51.88, 57.81, 46.49], "46": [50.26, 56.46, 47.25], "47": [51.52, 57.08, 44.51], "48": [51.35, 56.68, 46.76], "49": [52.81, 57.81, 49.21], "50": [48.53, 54.35, 48.27], "51": [51.13, 53.25, 44.51], "52": [50.54, 58.34, 47.41], "53": [51.88, 57.81, 45.8], "54": [50.42, 55.64, 47.62], "55": [51.35, 59.84, 46.16], "robo": [50.0, 54.7, 57.5] }, sp: { "00": [53.78, 22.9, 41.34], "01": [50.97, 19.21, 34.67], "02": [52.54, 17.7, 33.18], "03": [52.36, 20.91, 37.68], "04": [53.79, 23.62, 45.05], "05": [51.75, 19.63, 37.23], "06": [52.36, 18.38, 34.42], "07": [51.97, 20.87, 38.48], "08": [52.72, 22.95, 42.65], "09": [48.96, 19.78, 36.7], "10": [53.03, 18.24, 34.27], "11": [51.58, 20.65, 39.03], "12": [54.09, 22.35, 47.44], "13": [50.05, 17.75, 39.18], "14": [52.59, 17.23, 36.51], "15": [51.48, 18.89, 39.24], "16": [51.57, 24.21, 46.94], "17": [50.3, 19.0, 31.0], "18": [52.73, 18.74, 37.21], "19": [54.51, 21.38, 41.17], "20": [51.73, 24.3, 48.59], "21": [48.8, 19.77, 39.44], "22": [52.97, 19.18, 37.57], "23": [55.91, 21.35, 42.93], "24": [52.01, 22.6, 42.35], "25": [49.75, 18.6, 36.74], "26": [51.7, 17.71, 34.36], "27": [45.13, 20.88, 39.22], "28": [53.06, 22.1, 44.77], "29": [51.16, 17.48, 37.01], "30": [49.3, 17.5, 29.4], "31": [57.01, 20.76, 63.74], "32": [52.05, 20.34, 43.69], "33": [50.68, 16.74, 36.56], "34": [51.69, 18.29, 38.55], "35": [51.9, 20.66, 39.85], "36": [53.98, 21.11, 41.65], "37": [49.78, 19.2, 37.51], "38": [53.15, 19.69, 37.96], "39": [46.3, 20.99, 37.74], "40": [52.51, 22.17, 44.97], "41": [51.07, 20.09, 41.18], "42": [49.34, 19.83, 40.86], "43": [52.52, 22.24, 39.85], "44": [54.66, 20.78, 43.06], "45": [49.07, 18.09, 38.18], "46": [53.23, 18.89, 39.98], "47": [48.02, 17.05, 65.6], "48": [52.93, 21.74, 46.13], "49": [50.0, 19.5, 36.0], "50": [51.62, 19.67, 41.8], "51": [51.7, 22.12, 41.1], "52": [52.45, 21.55, 43.49], "53": [49.57, 17.61, 38.1], "54": [49.65, 17.73, 38.36], "55": [47.54, 20.4, 40.43], "robo": [52.27, 21.61, 37.65] } };
+GLASSES.img = s => IMG_BASE + "glasses-" + (GLASSES.styles.includes(s) ? s : "black") + ".webp";
+function glKey(i) { return i === "bot" ? "robo" : Number.isInteger(i) ? String(i).padStart(2, "0") : null; }
+function hasGlasses(i) { return Number.isInteger(i) && GLASSES.has.includes(i); }
+function canGlasses(i) { const k = glKey(i); return !!k && !hasGlasses(i) && !!GLASSES.pic[k]; }
+// glassesHTML(kind, i, style): the overlay for a picture ("pic") or a field figure ("sp"); the field sprite (3:4) sits at the bottom of the figure box (2:3)
+function glassesHTML(kind, i, style) {
+  if (!style || !GLASSES.styles.includes(style)) return ""; const k = glKey(i), p = k && GLASSES[kind] ? GLASSES[kind][k] : null; if (!p || hasGlasses(i)) return "";
+  const cx = p[0], cy = kind === "sp" ? 100 / 9 + p[1] * 8 / 9 : p[1], w = p[2];
+  return `<img class="specs" src="${GLASSES.img(style)}" style="left:${cx}%;top:${cy}%;width:${w}%" alt="" draggable="false">`;
 }
 
 // ChatGPT footballs: flat, tilted spiral, upright, and the ball's ground shadow
@@ -1773,12 +1832,13 @@ function figArms(sleeve, w, hand, puff, top) {
 }
 // figureSVG(av, helmetColour, teamColour): the whole standing figure.
 // Pictured players are full-body ChatGPT sprites (AV_SPRITE); team players, bots and the quarterback stay drawn.
-function figureSVG(i, helmet, team) {
+function figureSVG(i, helmet, team, gl) {
   helmet = helmet || "#777"; team = team || helmet;
-  if (i === "bot") return typeof ROBO_IMG !== "undefined" && ROBO_IMG.ready ? `<img class="sprite" src="${ROBO_IMG.sprite}" alt="" draggable="false">` : botFigure(helmet, team);
+  const specs = typeof glassesHTML === "function" ? glassesHTML("sp", i, gl) : "";
+  if (i === "bot") return typeof ROBO_IMG !== "undefined" && ROBO_IMG.ready ? `<img class="sprite" src="${ROBO_IMG.sprite}" alt="" draggable="false">` + specs : botFigure(helmet, team);
   if (i === "qb") return qbFigure(helmet, team);
   if (i === "team" || i == null || !AVATARS[i]) return teamFigure(helmet, team);
-  return `<img class="sprite" src="${AV_SPRITE[i]}" alt="" draggable="false">`;
+  return `<img class="sprite" src="${AV_SPRITE[i]}" alt="" draggable="false">` + specs;
 }
 // castHTML(av): the player's cast shadow (made from the sprite's outline); the light comes from the viewer, so it falls up the field behind the player. Drawn figures keep the CSS ellipse.
 function castHTML(i) { const u = i === "bot" ? (typeof ROBO_IMG !== "undefined" && ROBO_IMG.ready ? ROBO_IMG.cast : null) : Number.isInteger(i) ? AV_CAST[i] : null; return u ? `<div class="tcast" style="background-image:url(${u})"></div>` : ""; }
@@ -1866,7 +1926,7 @@ const DEF = [
 // ---------- state ----------
 let S = null;
 const setup = {
-  mode: "scramble", level: "pewee", team: 0,
+  mode: "scramble", level: "pewee", team: 0, openTeams: false, // openTeams: phones may pick and switch teams; otherwise the host places them
   roster: store.get("gf_roster") || [
     { name: "Grandpa", level: "pro", team: 0, av: 3 }, { name: "Ben", level: "pewee", team: 0, av: 1 },
     { name: "Ella", level: "college", team: 1, av: 9 }, { name: "Mia", level: "pewee", team: 1, av: 8 }
@@ -1876,16 +1936,19 @@ setup.roster = setup.roster.filter(p => p && typeof p === "object");
 setup.roster.forEach((p, i) => { if (p.av == null) p.av = p.crew ? "team" : p.bot ? "bot" : i % AVATARS.length; else if (Number.isInteger(p.av) && p.av >= AVATARS.length) p.av = p.av % AVATARS.length; });
 setup.av = nextAv();
 function nextAv() { const used = setup.roster.map(p => p.av); for (let k = 0; k < AVATARS.length; k++) if (!used.includes(k)) return k; return rnd(AVATARS.length); }
-const avHTML = (av, size) => `<span class="av" style="width:${size}px;height:${size}px">${avatarSVG(av)}</span>`;
+const avHTML = (av, size, gl) => `<span class="av" style="width:${size}px;height:${size}px">${avatarSVG(av, null, gl)}</span>`;
+setup.gl = "black"; // the glasses style being picked in the editor
 function renderAvPick() {
   const crew = $("#crewChk") && $("#crewChk").checked, bot = !crew && $("#botChk") && $("#botChk").checked;
-  const btn = i => `<button type="button" data-av="${i}" aria-pressed="${!crew && setup.av === i}" aria-label="${esc(AVATARS[i].n)}" title="${esc(AVATARS[i].n)}">${avatarSVG(i)}</button>`;
+  const glOn = !crew && $("#glChk") && $("#glChk").checked ? setup.gl : null; // the picker previews the glasses
+  const btn = i => `<button type="button" data-av="${i}" aria-pressed="${!crew && setup.av === i}" aria-label="${esc(AVATARS[i].n)}" title="${esc(AVATARS[i].n)}">${avatarSVG(i, null, glOn)}</button>`;
   $("#avPick").classList.toggle("grid7", AV_GROUPS.some(g => g.cols === 7));
   $("#avPick").innerHTML = AV_GROUPS.map(g => `<div class="avgrp">${g.label}</div>` + g.ids.map(btn).join("")).join("") + `<div class="avgrp">More</div>` +
     `<button type="button" data-av="team" aria-pressed="${!!crew}" aria-label="Team player" title="Team player">${avatarSVG("team")}</button>` +
-    `<button type="button" data-av="bot" aria-pressed="${!crew && setup.av === "bot"}" aria-label="Robo" title="Robo">${avatarSVG("bot")}</button>`;
+    `<button type="button" data-av="bot" aria-pressed="${!crew && setup.av === "bot"}" aria-label="Robo" title="Robo">${avatarSVG("bot", null, glOn)}</button>`;
   const pic = setup.av === "bot" ? "Robo" : AVATARS[setup.av].n;
   $("#avName").textContent = crew ? "Team player: the whole team answers" : bot ? `Bot: the computer plays as ${pic}` : pic;
+  syncGlasses(crew);
 }
 let sound = store.get("gf_sound") !== false;
 let audioCtx = null, noiseBuf = null;
@@ -2147,13 +2210,21 @@ function syncVoice() {
 function renderModes() {
   $("#modes").innerHTML = MODES.map(m => `<button type="button" class="mode" data-m="${m.id}" aria-pressed="${setup.mode === m.id}"><b>${m.name}</b><small>${m.desc}</small></button>`).join("");
 }
+// the team lists on the picture, above the code; the caption says whether phones pick their team
+function renderHeroTeams() {
+  const box = $("#heroTeams"); if (!box) return;
+  const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
+  box.innerHTML = [0, 1].map(t => { const list = setup.roster.filter(p => p.team === t); return `<h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(p => `<li>${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul>`; }).join("") +
+    `<p class="cap">${setup.openTeams ? "Teams are open: players pick or switch teams on their phones." : "Phones are placed on a team. Open teams to let players pick."}</p>`;
+}
 function renderRoster() {
   store.set("gf_roster", setup.roster);
+  renderHeroTeams();
   const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
   $("#rosterCols").innerHTML = [0, 1].map(t => {
     const list = setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t);
     return `<div class="team-col" data-team="${t}"><h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} (${list.length})</h3>
-      ${list.length ? `<ul class="roster">${list.map(({ p, i }) => `<li class="${setup.editing === i ? "editing" : ""}" data-i="${i}"><span class="grip" data-grip="${i}" title="Drag to move" aria-hidden="true">\u2807\u2807</span><button type="button" class="nm tap" data-edit="${i}" aria-label="Edit ${esc(p.name)}">${avHTML(p.av, 34)}<span>${esc(p.name)}</span>${p.pid ? `<span class="phb ${phoneOnline(p.pid) ? "on" : ""}" title="${phoneOnline(p.pid) ? "Phone connected" : "Phone not connected"}">\u{1F4F1}</span>` : ""}</button><button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(p.name)}" title="Remove">\u00d7</button><span class="meta"><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span>${p.crew ? `<span class="crew">Team</span>` : p.bot ? `<span class="crew">Bot</span>` : ""}<button type="button" class="ed" data-edit="${i}" aria-label="Edit ${esc(p.name)}">Edit</button></span></li>`).join("")}</ul>`
+      ${list.length ? `<ul class="roster">${list.map(({ p, i }) => `<li class="${setup.editing === i ? "editing" : ""}" data-i="${i}"><span class="grip" data-grip="${i}" title="Drag to move" aria-hidden="true">\u2807\u2807</span><button type="button" class="nm tap" data-edit="${i}" aria-label="Edit ${esc(p.name)}">${avHTML(p.av, 34, p.gl)}<span>${esc(p.name)}</span>${p.pid ? `<span class="phb ${phoneOnline(p.pid) ? "on" : ""}" title="${phoneOnline(p.pid) ? "Phone connected" : "Phone not connected"}">\u{1F4F1}</span>` : ""}</button><button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(p.name)}" title="Remove">\u00d7</button><span class="meta"><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span>${p.crew ? `<span class="crew">Team</span>` : p.bot ? `<span class="crew">Bot</span>` : ""}<button type="button" class="ed" data-edit="${i}" aria-label="Edit ${esc(p.name)}">Edit</button></span></li>`).join("")}</ul>`
       : `<div class="empty">No players yet. Add one above or drag one here.</div>`}</div>`;
   }).join("");
   if (typeof netSync === "function") netSync();
@@ -2168,6 +2239,17 @@ $("#avPick").addEventListener("click", e => {
   else { setup.av = +b.dataset.av; $("#crewChk").checked = false; avSay(setup.av, "hello"); } // a bot can wear any picture; the player says hello
   renderAvPick();
 });
+// the Glasses switch: off and greyed for team players and for pictures that already wear glasses; the style row shows while it is on
+function syncGlasses(crew) {
+  const g = $("#glChk"), row = $("#glStyles"), note = $("#glNote"); if (!g) return;
+  const can = !crew && canGlasses(setup.av);
+  g.disabled = !can; if (!can) g.checked = false;
+  row.hidden = !(can && g.checked);
+  note.textContent = !crew && hasGlasses(setup.av) ? "This picture already wears glasses." : "";
+  row.querySelectorAll("button").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.v === setup.gl)); const im = b.querySelector("img"); if (im && !im.getAttribute("src")) im.src = GLASSES.img(b.dataset.v); });
+}
+$("#glChk").addEventListener("change", renderAvPick);
+$("#glStyles").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.gl = b.dataset.v; renderAvPick(); });
 $("#crewChk").addEventListener("change", () => { if ($("#crewChk").checked) { $("#botChk").checked = false; if (setup.av === "bot") setup.av = nextAv(); } renderAvPick(); });
 $("#botChk").addEventListener("change", () => { if ($("#botChk").checked) $("#crewChk").checked = false; else if (setup.av === "bot") setup.av = nextAv(); renderAvPick(); });
 $("#lvlSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.level = b.dataset.v; segSet("lvlSeg", setup.level); });
@@ -2179,6 +2261,7 @@ $("#addForm").addEventListener("submit", e => {
   if (!name) { $("#setupErr").textContent = "Type a player name, then press Add."; return; }
   if (!crew && !bot && setup.av === "bot") setup.av = nextAv(); // Robo is only for computer players
   const rec = { name, level: setup.level, team: setup.team, crew, bot, av: crew ? "team" : setup.av };
+  if (!crew && $("#glChk").checked && canGlasses(setup.av)) rec.gl = setup.gl;
   if (setup.editing != null) {
     const old = setup.roster[setup.editing];
     if (old && old.pid) { if (crew || bot) netKick(old.pid); else rec.pid = old.pid; } // keep the phone linked unless the spot becomes a team player or bot
@@ -2186,13 +2269,14 @@ $("#addForm").addEventListener("submit", e => {
   }
   if (setup.roster.length >= 16) { $("#setupErr").textContent = "The roster is full at 16 players."; return; }
   setup.roster.push(rec);
-  $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; setup.av = nextAv(); renderAvPick(); $("#setupErr").textContent = "";
+  $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; $("#glChk").checked = false; setup.av = nextAv(); renderAvPick(); $("#setupErr").textContent = "";
   setup.team = setup.team ? 0 : 1; segSet("teamSeg", setup.team);
   renderRoster(); $("#pName").focus();
 });
 function startEdit(i) {
   const p = setup.roster[i]; setup.editing = i;
   $("#pName").value = p.name; $("#crewChk").checked = !!p.crew; $("#botChk").checked = !!p.bot && !p.crew;
+  $("#glChk").checked = !!p.gl; if (p.gl) setup.gl = p.gl;
   if (!p.crew) setup.av = p.av;
   setup.level = p.level; setup.team = p.team; segSet("lvlSeg", p.level); segSet("teamSeg", p.team);
   $("#addBtn").textContent = "Save"; $("#cancelEdit").hidden = false;
@@ -2201,7 +2285,7 @@ function startEdit(i) {
   $("#addForm").scrollIntoView({ behavior: "smooth", block: "start" }); $("#pName").focus({ preventScroll: true });
 }
 function endEdit() {
-  setup.editing = null; $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; setup.av = nextAv();
+  setup.editing = null; $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; $("#glChk").checked = false; setup.av = nextAv();
   $("#addBtn").textContent = "Add"; $("#cancelEdit").hidden = true; $("#editBar").hidden = true; $("#setupErr").textContent = "";
   renderAvPick();
 }
@@ -2234,7 +2318,7 @@ $("#rosterCols").addEventListener("pointerdown", e => {
   e.preventDefault();
   const i = +g.dataset.grip, li = g.closest("li"), p = setup.roster[i];
   const ghost = document.createElement("div"); ghost.className = "drag-ghost";
-  ghost.innerHTML = `${avHTML(p.av, 30)}<span>${esc(p.name)}</span>`; document.body.appendChild(ghost);
+  ghost.innerHTML = `${avHTML(p.av, 30, p.gl)}<span>${esc(p.name)}</span>`; document.body.appendChild(ghost);
   li.classList.add("dragging");
   drag = { i, ghost, li, team: p.team, before: null, id: e.pointerId };
   try { g.setPointerCapture(e.pointerId); } catch (err) {}
@@ -2289,14 +2373,20 @@ $("#balanceBtn").addEventListener("click", () => {
   sorted.forEach((p, i) => p.team = i % 2);
   setup.roster = sorted; renderRoster();
 });
-$("#startBtn").addEventListener("click", () => {
+function kickOff() {
   if (setup.editing != null) { endEdit(); renderRoster(); }
   const c = [0, 1].map(t => setup.roster.filter(p => p.team === t).length);
-  if (c[0] < 1 || c[1] < 1) { $("#setupErr").textContent = "Each team needs at least one player."; return; }
+  if (c[0] < 1 || c[1] < 1) { $("#setupErr").textContent = "Each team needs at least one player."; $("#setupErr").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
   $("#setupErr").textContent = "";
   sfx.whistle();
   newGame();
-});
+}
+["team0", "team1"].forEach(id => $("#" + id).addEventListener("input", renderHeroTeams));
+function syncOpenTeams() { const b = $("#openTeamsBtn"); if (!b) return; b.textContent = setup.openTeams ? "Open teams: on" : "Open teams: off"; b.setAttribute("aria-pressed", String(setup.openTeams)); b.title = setup.openTeams ? "Players pick or switch teams on their phones" : "Phones are placed on the smaller team"; }
+$("#openTeamsBtn").addEventListener("click", () => { setup.openTeams = !setup.openTeams; syncOpenTeams(); renderHeroTeams(); if (typeof netHello === "function") netHello(); });
+syncOpenTeams();
+$("#startBtn").addEventListener("click", kickOff);
+$("#startTop").addEventListener("click", kickOff);
 $("#soundBtn").addEventListener("click", () => { sound = !sound; store.set("gf_sound", sound); syncSound(); if (sound) sfx.good(); else hush(); });
 $("#voiceBtn").addEventListener("click", () => {
   voiceMode = voiceMode === "off" ? "plays" : "off"; store.set("gf_voice", voiceMode); syncVoice();
@@ -2317,7 +2407,7 @@ function newGame() {
   S = {
     screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Home", score: 0, drive: START }, { name: $("#team1").value.trim() || "Away", score: 0, drive: START }],
-    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
+    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
     line: [[], []], used: {}, log: [], snaps: [], snapIdx: 0, cur: null, kick: null, cands: [], target: null, guess: null
   };
@@ -2528,7 +2618,7 @@ function buildField() {
   h += `<div class="fdl" id="fdl"></div><div class="los" id="los"></div>`;
   h += `<div class="post" style="left:${XP(-10)}%"><div class="post-body">${postSVG()}</div></div><div class="post" style="left:${XP(110)}%"><div class="post-body">${postSVG()}</div></div>`;
   h += `<div class="ball" id="ball"><div class="bshadow" id="ballShadow"><img src="${BALL_IMG.shadow}" alt="" draggable="false"></div><div class="ball-body"><div class="ball-img" id="ballImg">${ballHTML()}</div></div></div>`;
-  h += S.players.map(p => `<div class="tok t${p.team}${p.crew ? " crewtok" : ""}${hasCast(p.av) ? " cast" : ""}" id="tok${p.id}"><div class="tshadow"></div>${castHTML(p.av)}<div class="tok-body"><div class="tsay" hidden></div><div class="tname">${esc(p.name)}</div><div class="tfig">${figureSVG(p.av, teamColor(p.team, true), teamColor(p.team))}</div></div></div>`).join("");
+  h += S.players.map(p => `<div class="tok t${p.team}${p.crew ? " crewtok" : ""}${hasCast(p.av) ? " cast" : ""}" id="tok${p.id}"><div class="tshadow"></div>${castHTML(p.av)}<div class="tok-body"><div class="tsay" hidden></div><div class="tname">${esc(p.name)}</div><div class="tfig">${figureSVG(p.av, teamColor(p.team, true), teamColor(p.team), p.gl)}</div></div></div>`).join("");
   pl.innerHTML = h;
   pl.dataset.built = "1";
   S.players.forEach(p => $("#tok" + p.id).addEventListener("click", () => tokTap(p.id)));
@@ -2695,7 +2785,7 @@ function renderBubble() {
   const last = S.qi === S.order.length - 1;
   const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
-  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true))}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span><button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button></div>
+  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span><button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button></div>
     <div class="q">${esc(q.text)}</div>
     <div class="opts">${q.options.map((o, i) => { let cls = ""; if (a) { if (o === q.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>
     ${a ? `<div class="foot"><span class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</span>
@@ -3034,14 +3124,14 @@ function renderChips() {
 }
 function rollChip(p, label, role, fallback) {
   const name = p ? esc(p.name) : fallback || "Empty spot";
-  return `<span class="roll"><span class="av" style="width:24px;height:24px">${p ? avatarSVG(p.av, teamColor(p.team, true)) : ""}</span><b>${name}</b> ${role}: <em>${esc(p || fallback ? (label || "Blocking") : "nobody lined up")}</em></span>`;
+  return `<span class="roll"><span class="av" style="width:24px;height:24px">${p ? avatarSVG(p.av, teamColor(p.team, true), p.gl) : ""}</span><b>${name}</b> ${role}: <em>${esc(p || fallback ? (label || "Blocking") : "nobody lined up")}</em></span>`;
 }
 function renderTicker() {
   const tk = $("#ticker"); if (!tk) return;
   const off = S.possession, offT = S.teams[off], defT = S.teams[1 - off];
   let html = "";
   if (S.phase === "questions") { tk.hidden = true; tk.innerHTML = ""; return; }
-  const candBtn = (id, k) => { const p = S.players[id]; return `<button type="button" class="btn ghost cand" data-c="${id}" data-k="${k}"><span class="av">${avatarSVG(p.av, teamColor(p.team, true))}</span>${esc(p.name)}</button>`; };
+  const candBtn = (id, k) => { const p = S.players[id]; return `<button type="button" class="btn ghost cand" data-c="${id}" data-k="${k}"><span class="av">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)}</button>`; };
   const lead = id => { const p = id != null ? S.players[id] : null; return p ? { p, ph: !!(p.pid && phoneOnline(p.pid)) } : null; };
   if (S.phase === "call") {
     const qb = lead(S.qb);
@@ -3109,12 +3199,12 @@ function renderEnd() {
     <h2>${w < 0 ? "It's a tie!" : `${esc(t[w].name)} win!`}</h2>
     <div class="score">${t[0].score} – ${t[1].score}</div>
     <p style="font-family:var(--f-read);margin:0">${esc(t[0].name)} vs ${esc(t[1].name)}. Game MVP: <b>${esc(mvp.name)}</b> (${LVL_NAME[mvp.level]}).</p>
-    <span class="av" style="width:96px;height:96px;border:4px solid var(${mvp.team ? "--away" : "--home"})">${avatarSVG(mvp.av, teamColor(mvp.team, true))}</span>
+    <span class="av" style="width:96px;height:96px;border:4px solid var(${mvp.team ? "--away" : "--home"})">${avatarSVG(mvp.av, teamColor(mvp.team, true), mvp.gl)}</span>
     <div class="row" style="justify-content:center"><button class="btn" id="againBtn" type="button">Rematch</button><button class="btn ghost" id="setupBtn" type="button">Change players</button></div>
   </div>
   <div class="card"><h2>Box score</h2><div class="tablewrap"><table>
     <thead><tr><th>Player</th><th>Team</th><th>Level</th><th class="n">Correct</th><th class="n">Yards</th><th class="n">TDs</th><th class="n">Stops</th><th class="n">Picks</th></tr></thead>
-    <tbody>${ranked.map(p => `<tr><td><span class="av" style="width:28px;height:28px">${avatarSVG(p.av)}</span> ${esc(p.name)}</td><td><span class="dot" style="background:var(${p.team ? "--away" : "--home"})"></span> ${esc(t[p.team].name)}</td><td><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span></td><td class="n">${p.st.right}/${p.st.asked}</td><td class="n">${p.st.yds}</td><td class="n">${p.st.tds}</td><td class="n">${p.st.stops}</td><td class="n">${p.st.ints}</td></tr>`).join("")}</tbody>
+    <tbody>${ranked.map(p => `<tr><td><span class="av" style="width:28px;height:28px">${avatarSVG(p.av, null, p.gl)}</span> ${esc(p.name)}</td><td><span class="dot" style="background:var(${p.team ? "--away" : "--home"})"></span> ${esc(t[p.team].name)}</td><td><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span></td><td class="n">${p.st.right}/${p.st.asked}</td><td class="n">${p.st.yds}</td><td class="n">${p.st.tds}</td><td class="n">${p.st.stops}</td><td class="n">${p.st.ints}</td></tr>`).join("")}</tbody>
   </table></div></div>`;
   $("#againBtn").addEventListener("click", () => { sfx.whistle(); newGame(); });
   $("#setupBtn").addEventListener("click", () => { S = null; show(); });
@@ -3128,6 +3218,7 @@ function show() {
   $("#end").style.flexDirection = "column"; $("#end").style.gap = "16px";
   $("#quitBtn").hidden = scr === "setup"; $("#quitBtn").textContent = "New game";
   $(".brand").hidden = scr === "setup"; // the start page carries the title in its picture (Nick: not twice)
+  $("#setupBar").hidden = scr !== "setup"; $("#startTop").hidden = scr !== "setup"; // playbook and game length live in the top bar on the start page
   $("#subtitle").textContent = scr === "setup" ? "" : (S.mode === "scramble" ? "Scramble" : CAT_NAME[S.mode]);
   hideBubble(); DIR.token++;
   if (scr === "setup") { NET.pend.splice(0).forEach(r => { if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push(r); }); if (!$("#heroArt").innerHTML) $("#heroArt").innerHTML = `<img src="${HERO_IMG}" alt="Gospel Football: a brother and sister in church clothes and helmets on the field">`; renderModes(); renderRoster(); renderAvPick(); }
@@ -3196,7 +3287,7 @@ function netStart(code) {
   });
   peer.on("disconnected", () => { if (NET.peer !== peer) return; NET.status = "reconnecting"; renderPhones(); setTimeout(() => { try { if (NET.peer === peer && !peer.destroyed) peer.reconnect(); } catch (x) {} }, 1500); });
   peer.on("connection", conn => {
-    conn.on("open", () => { try { conn.send({ t: "hello", code: NET.code, teams: teamNames(), started: !!S && S.screen !== "setup" }); } catch (e) {} });
+    conn.on("open", () => { try { conn.send(helloMsg()); } catch (e) {} });
     conn.on("data", d => netMsg(conn, d));
     conn.on("close", () => netDrop(conn));
     conn.on("error", () => netDrop(conn));
@@ -3214,14 +3305,23 @@ function netDrop(conn) {
   renderPhones();
   if (S && S.screen === "game") { if (!checkVotes()) render(); } else if (!S) renderRoster();
 }
+function helloMsg() { return { t: "hello", code: NET.code, teams: teamNames(), started: !!S && S.screen !== "setup", open: !!setup.openTeams }; }
+// netHello(): tell every phone the current settings (teams open or not)
+function netHello() { NET.phones.forEach(ph => { try { if (ph.conn && ph.conn.open) ph.conn.send(helloMsg()); } catch (e) {} }); }
+// autoTeam(inGame): the team a new phone player lands on when the teams are not open: the smaller one, or either when even
+function autoTeam(inGame) { const src = inGame ? S.players.concat(NET.pend) : setup.roster; const c = [0, 1].map(t => src.filter(p => p.team === t).length); return c[0] === c[1] ? rnd(2) : c[0] < c[1] ? 0 : 1; }
 function netJoin(conn, d) {
   const pid = String(d.pid || "").replace(/[^\w-]/g, "").slice(0, 40); if (!pid) return;
   const name = String(d.name || "").trim().slice(0, 24) || "Player";
   const av = Number.isInteger(d.av) && d.av >= 0 && d.av < AVATARS.length ? d.av : rnd(AVATARS.length);
   const level = ["pewee", "college", "pro", "random"].includes(d.level) ? d.level : "pewee";
-  const team = d.team === 1 ? 1 : 0;
+  const wantTeam = d.team === 1 ? 1 : 0, gl = typeof GLASSES !== "undefined" && GLASSES.styles.includes(d.gl) ? d.gl : null;
   const inGame = !!S && S.screen !== "setup";
   const rec = phoneRec({ pid });
+  // teams open: the phone's choice counts; otherwise a new player lands on the smaller team and a known player keeps the host's placement
+  const open = !!setup.openTeams;
+  const pend0 = inGame ? NET.pend.find(p => p.pid === pid) : null;
+  const team = rec ? (open && d.edit ? wantTeam : rec.team) : pend0 ? (open && d.edit ? wantTeam : pend0.team) : open ? wantTeam : autoTeam(inGame);
   if (!rec) { // a new player: is there room?
     const n = inGame ? S.players.length + NET.pend.filter(p => p.pid !== pid).length : setup.roster.length;
     if (n >= 16) { try { conn.send({ t: "full" }); } catch (e) {} setTimeout(() => { try { conn.close(); } catch (e) {} }, 300); return; }
@@ -3234,17 +3334,17 @@ function netJoin(conn, d) {
   delete NET.last[pid];
   if (rec) {
     if (d.edit) { // only a Save on the phone changes the record; an automatic rejoin never undoes what the host set here
-      rec.name = name; rec.av = av; rec.level = level;
+      rec.name = name; rec.av = av; rec.level = level; rec.gl = gl;
       if (!inGame) rec.team = team;
-      else { const el = $("#tok" + rec.id + " .tname"); if (el) el.textContent = name; const f = $("#tok" + rec.id + " .tfig"); if (f) f.innerHTML = figureSVG(av, teamColor(rec.team, true), teamColor(rec.team)); const tk = $("#tok" + rec.id); if (tk) { const old = tk.querySelector(".tcast"); if (old) old.remove(); tk.classList.toggle("cast", hasCast(av)); const cst = castHTML(av); if (cst) tk.querySelector(".tshadow").insertAdjacentHTML("afterend", cst); } const r2 = setup.roster.find(p => p.pid === pid); if (r2) Object.assign(r2, { name, av, level }); }
+      else { const el = $("#tok" + rec.id + " .tname"); if (el) el.textContent = name; const f = $("#tok" + rec.id + " .tfig"); if (f) f.innerHTML = figureSVG(av, teamColor(rec.team, true), teamColor(rec.team), gl); const tk = $("#tok" + rec.id); if (tk) { const old = tk.querySelector(".tcast"); if (old) old.remove(); tk.classList.toggle("cast", hasCast(av)); const cst = castHTML(av); if (cst) tk.querySelector(".tshadow").insertAdjacentHTML("afterend", cst); } const r2 = setup.roster.find(p => p.pid === pid); if (r2) Object.assign(r2, { name, av, level }); }
     }
   } else if (!inGame) {
-    setup.roster.push({ name, level, team, av, pid });
+    setup.roster.push({ name, level, team, av, gl, pid });
   } else {
     const pd = NET.pend.find(p => p.pid === pid);
-    if (pd) Object.assign(pd, { name, av, level, team }); else NET.pend.push({ name, level, team, av, pid });
+    if (pd) Object.assign(pd, { name, av, level, team, gl }); else NET.pend.push({ name, level, team, av, gl, pid });
   }
-  try { conn.send({ t: "joined", pid }); } catch (e) {}
+  try { conn.send({ t: "joined", pid, team }); } catch (e) {}
   renderPhones(); if (inGame) render(); else renderRoster();
   netSync();
 }
@@ -3260,8 +3360,8 @@ function netAdmit() {
   NET.pend.splice(0).forEach(r => {
     if (S.players.some(p => p.pid === r.pid)) return;
     if (S.players.length >= 16) { const ph = NET.phones.find(p => p.pid === r.pid); if (ph) { try { ph.conn && ph.conn.send({ t: "full" }); } catch (e) {} NET.phones.splice(NET.phones.indexOf(ph), 1); } return; }
-    S.players.push({ id: S.players.length, name: r.name, level: r.level, team: r.team, crew: false, av: r.av, pid: r.pid, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } });
-    if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push({ name: r.name, level: r.level, team: r.team, av: r.av, pid: r.pid });
+    S.players.push({ id: S.players.length, name: r.name, level: r.level, team: r.team, crew: false, av: r.av, gl: r.gl || null, pid: r.pid, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } });
+    if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push({ name: r.name, level: r.level, team: r.team, av: r.av, gl: r.gl || null, pid: r.pid });
     S.log.unshift({ t: r.team, text: `<b>${esc(r.name)}</b> joins ${esc(S.teams[r.team].name)} from the bench.` });
   });
   store.set("gf_roster", setup.roster);
@@ -3312,19 +3412,19 @@ function qrHTML() {
   const local = location.protocol === "file:" || /^(localhost|127\.|0\.0\.0\.0|\[::1\]|)$/.test(location.hostname);
   const site = typeof window.GF_SITE_URL === "string" ? window.GF_SITE_URL : "";
   const warn = local && site && !new URLSearchParams(location.search).get("ps") ? `<p class="err">Phones can't open this page from ${location.protocol === "file:" ? "a file on this computer" : location.hostname}. Open the game at <b>${esc(shortUrl(site))}</b> and the code will work on their phones.</p>` : "";
-  return `<div class="qr-wrap"><div class="qr">${qr}</div><div class="qr-text"><div class="code">${NET.code}</div><p class="hint">Scan this with your phone camera, or go to <b>${esc(shortUrl(url))}</b> and type the code. Sign up with your name and picture, then answer your questions and call plays from your phone.</p>${warn}<p class="hint stat">${stat}</p></div></div>`;
+  return `<div class="qr-wrap"><div class="qr">${qr}</div><div class="qr-text"><div class="code">${NET.code}</div><p class="hint">Scan with your phone camera, or go to <b>${esc(shortUrl(url))}</b> and type the code.</p>${warn}<p class="hint stat">${stat}</p></div></div>`;
 }
 function renderPhones() {
   const btn = $("#phoneBtn"), n = NET.phones.filter(p => p.online).length;
   if (btn) { btn.hidden = !NET.peer; btn.textContent = NET.peer ? `\u{1F4F1} ${NET.code} · ${n}` : ""; }
   const box = $("#phoneBox");
-  if (box && window.GF_NO_PHONES) { box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Play on your phones</h2></div><p class="hint">Open the game from its own website and everyone can join on their phones: scan a code, answer your own questions and call plays. In this version everyone plays on this screen.</p>`; }
+  if (box && window.GF_NO_PHONES) { box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Play on your phones</h2></div><p class="hint">Open the game from its website and everyone joins on their phones. Here everyone plays on this screen.</p>`; }
   else if (box) {
     if (!NET.peer) {
-      box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Play on your phones</h2></div><p class="hint">Turn this on and everyone scans a code to join: they answer their own questions and call plays on their phones while the big screen shows the field. Or skip it and play on one screen.</p><div class="row"><button class="btn ghost" type="button" id="phoneOn">Turn on phones</button></div>${NET.status === "nolib" ? `<div class="err">The phone link didn't load. Check the internet connection and reload the page.</div>` : NET.status === "error" ? `<div class="err">Phone link problem (${esc(NET.err)}). Try again.</div>` : ""}`;
+      box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Play on your phones</h2></div><p class="hint">Everyone scans a code to join and answers on their own phone. Or play on this screen.</p><div class="row"><button class="btn ghost" type="button" id="phoneOn">Turn on phones</button></div>${NET.status === "nolib" ? `<div class="err">The phone link didn't load. Check the internet connection and reload the page.</div>` : NET.status === "error" ? `<div class="err">Phone link problem (${esc(NET.err)}). Try again.</div>` : ""}`;
       const b = $("#phoneOn"); if (b) b.addEventListener("click", () => netStart(store.get("gf_code")));
     } else {
-      box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Join on your phone</h2></div>${qrHTML()}<div class="row"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button></div>`;
+      box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Scan to join</h2></div>${qrHTML()}<div class="row"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button></div>`;
       const b = $("#phoneOff"); if (b) b.addEventListener("click", netStop);
     }
   }
@@ -3333,10 +3433,10 @@ function renderPhones() {
 }
 function stateFor(ph) {
   const rec = phoneRec(ph);
-  const base = { t: "state", build: GF_BUILD, code: NET.code, teams: teamNames(), me: rec ? { name: rec.name, av: rec.av, level: rec.level, team: rec.team } : null, nPhones: NET.phones.filter(p => p.online).length };
+  const base = { t: "state", build: GF_BUILD, code: NET.code, teams: teamNames(), open: !!setup.openTeams, started: !!S && S.screen !== "setup", me: rec ? { name: rec.name, av: rec.av, level: rec.level, team: rec.team, gl: rec.gl || null } : null, nPhones: NET.phones.filter(p => p.online).length };
   if (!S || S.screen === "setup") {
     base.screen = "lobby"; base.view = "lobby";
-    base.roster = setup.roster.map(p => ({ name: p.name, av: p.av, team: p.team, phone: !!p.pid, on: !!p.pid && phoneOnline(p.pid) }));
+    base.roster = setup.roster.map(p => ({ name: p.name, av: p.av, gl: p.gl || null, team: p.team, phone: !!p.pid, on: !!p.pid && phoneOnline(p.pid) }));
     return base;
   }
   base.screen = S.screen; base.score = [S.teams[0].score, S.teams[1].score];
@@ -3348,7 +3448,7 @@ function stateFor(ph) {
     const cur = S.players[S.order[S.qi]], q = S.q, a = S.answered;
     const asker = cur.pid === ph.pid || (cur.crew && cur.team === rec.team);
     base.view = asker ? "question" : "watch";
-    base.q = { who: cur.name, av: cur.av, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: q.options, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
+    base.q = { who: cur.name, av: cur.av, gl: cur.gl || null, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: q.options, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
     if (a) base.answered = { opt: a.opt, ok: a.ok, answer: q.answer, note: q.note || "" };
     if (asker && cur.crew) { const v = voteInfo(); base.vote = v ? { got: v.got, need: v.need, mine: NET.qvotes[ph.pid] ?? null } : null; }
     return base;

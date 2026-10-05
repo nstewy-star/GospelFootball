@@ -39,12 +39,16 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 .seg.team button[data-v="0"][aria-pressed="true"] { background: var(--home); }
 .seg.team button[data-v="1"][aria-pressed="true"] { background: var(--away); }
 .avpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; }
-.avpick button { background: var(--panel-2); border: 3px solid transparent; border-radius: 14px; padding: 4px; aspect-ratio: 1; }
+.avpick button { position: relative; background: var(--panel-2); border: 3px solid transparent; border-radius: 14px; padding: 4px; aspect-ratio: 1; }
 .avpick button svg, .avpick button img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%; }
 .avpick button[aria-pressed="true"] { border-color: var(--gold); transform: scale(1.06); }
 .avgrp { grid-column: 1 / -1; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted, #9fb3b0); margin: 6px 0 -2px; }
 .avpick.grid7 { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
-.av { display: inline-block; border-radius: 50%; overflow: hidden; background: #fff; flex: none; }
+.av { display: inline-block; position: relative; border-radius: 50%; overflow: hidden; background: #fff; flex: none; }
+.av .specs, .avpick button .specs { position: absolute; height: auto; object-fit: fill; border-radius: 0; transform: translate(-50%, -50%); pointer-events: none; }
+.seg.glstyles button { padding: 4px 8px; } .seg.glstyles img { height: 18px; width: auto; display: block; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+#teamSeg[hidden], #glStyles[hidden], #teamLbl[hidden], #teamNote[hidden], #glNote[hidden] { display: none !important; }
 .av svg, .av img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .me { display: flex; align-items: center; gap: 12px; }
 .me .nm { font-size: 24px; font-weight: 700; line-height: 1.1; }
@@ -113,6 +117,9 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
       <label class="f" for="nameIn">Your name<input type="text" id="nameIn" maxlength="24" placeholder="Type your name" required></label>
       <label class="f">Your picture</label>
       <div class="avpick" id="avPick" role="group" aria-label="Pick a picture"></div>
+      <label class="chk" for="glChk"><input type="checkbox" id="glChk"> Glasses on my picture</label>
+      <div class="seg glstyles" id="glStyles" role="group" aria-label="Glasses style" hidden><button type="button" data-v="black" aria-pressed="true" title="Black"><img alt="black"></button><button type="button" data-v="brown" aria-pressed="false" title="Brown"><img alt="brown"></button><button type="button" data-v="gold" aria-pressed="false" title="Gold"><img alt="gold"></button><button type="button" data-v="red" aria-pressed="false" title="Red"><img alt="red"></button></div>
+      <p class="note" id="glNote" hidden>This picture already wears glasses.</p>
       <label class="f">Level</label>
       <div class="seg" id="lvlSeg" role="group" aria-label="Level">
         <button type="button" data-v="pewee" aria-pressed="true">Pewee</button>
@@ -120,7 +127,8 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
         <button type="button" data-v="pro" aria-pressed="false">Pro</button>
         <button type="button" data-v="random" aria-pressed="false">Random</button>
       </div>
-      <label class="f">Team</label>
+      <label class="f" id="teamLbl">Team</label>
+      <p class="note" id="teamNote" hidden>The big screen puts you on a team. You can switch once the host opens the teams.</p>
       <div class="seg team" id="teamSeg" role="group" aria-label="Team">
         <button type="button" data-v="0" aria-pressed="true">Home</button>
         <button type="button" data-v="1" aria-pressed="false">Away</button>
@@ -136,7 +144,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-033709';</script>
+<script>window.GF_BUILD = '20261005-035408';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -206,10 +214,10 @@ const ROBO_IMG = { pic: IMG_BASE + "pic-robo.webp", sprite: IMG_BASE + "sp-robo.
 // Picker order: a 7-column table per gender, one row per age (kid, twenties, forties, grandparent), the looks left to right; the stored index never changes
 const AV_GROUPS = [{ label: "Boys", cols: 7, ids: [0, 4, 8, 12, 16, 20, 24, 1, 5, 9, 13, 17, 21, 25, 2, 6, 10, 14, 18, 22, 26, 3, 7, 11, 15, 19, 23, 27] }, { label: "Girls", cols: 7, ids: [28, 32, 36, 40, 44, 48, 52, 29, 33, 37, 41, 45, 49, 53, 30, 34, 38, 42, 46, 50, 54, 31, 35, 39, 43, 47, 51, 55] }];
 // avatarSVG(i, helmetColour): the picture for the roster, phones and results
-function avatarSVG(i, helmet) {
-  if (i === "bot") return ROBO_IMG.ready ? `<img src="${ROBO_IMG.pic}" alt="" draggable="false">` : botSVG(helmet);
+function avatarSVG(i, helmet, gl) {
+  if (i === "bot") return ROBO_IMG.ready ? `<img src="${ROBO_IMG.pic}" alt="" draggable="false">` + (typeof glassesHTML === "function" ? glassesHTML("pic", i, gl) : "") : botSVG(helmet);
   if (i === "team" || i == null || !AVATARS[i]) return `<img src="${TEAM_PIC}" alt="" draggable="false">`;
-  return `<img src="${AV_PIC[i]}" alt="" draggable="false">`;
+  return `<img src="${AV_PIC[i]}" alt="" draggable="false">` + (typeof glassesHTML === "function" ? glassesHTML("pic", i, gl) : "");
 }
 function botSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -236,6 +244,21 @@ function teamSVG(helmet) {
   </svg>`;
 }
 
+// ---------- glasses: an overlay a player can switch on, in four ChatGPT-drawn styles (img/glasses-<style>.webp) ----------
+// Positions are [cx, cy, w] in % of the picture (pic-NN, measured on the Mac) or of the field sprite (sp-NN): the point between the eyes and the glasses width.
+// "has" lists the pictures that already wear glasses (the grandparents), which get no overlay.
+const GLASSES = { styles: ["black", "brown", "gold", "red"], has: [3, 7, 11, 19, 27, 31, 35, 39, 43, 47, 51, 55], pic: { "00": [48.74, 59.15, 42.94], "01": [49.51, 56.53, 40.75], "02": [50.15, 51.26, 38.51], "03": [51.62, 54.59, 40.75], "04": [49.47, 57.43, 43.16], "05": [48.92, 54.65, 41.96], "06": [50.57, 53.74, 39.24], "07": [51.8, 54.5, 41.45], "08": [49.56, 59.4, 43.49], "09": [50.6, 57.7, 40.55], "10": [50.16, 52.94, 38.06], "11": [51.73, 54.11, 39.62], "12": [50.52, 55.12, 46.96], "13": [52.75, 50.5, 45.62], "14": [50.81, 48.62, 38.95], "15": [51.01, 50.35, 43.01], "16": [49.33, 55.68, 43.91], "17": [50.44, 52.57, 41.31], "18": [49.24, 49.69, 36.56], "19": [50.25, 52.63, 39.62], "20": [49.26, 55.72, 44.45], "21": [49.37, 51.38, 40.8], "22": [50.55, 49.37, 38.23], "23": [50.65, 51.22, 39.83], "24": [49.34, 58.17, 47.9], "25": [49.85, 55.55, 44.39], "26": [49.64, 55.59, 42.65], "27": [49.83, 54.31, 44.25], "28": [49.36, 55.46, 47.23], "29": [49.19, 54.76, 49.39], "30": [48.65, 53.96, 47.74], "31": [49.47, 52.58, 43.74], "32": [49.68, 55.46, 51.33], "33": [48.92, 53.51, 50.81], "34": [50.29, 54.44, 49.94], "35": [49.5, 52.25, 44.98], "36": [49.27, 53.26, 47.29], "37": [49.06, 54.13, 50.1], "38": [49.76, 52.93, 47.64], "39": [51.13, 53.25, 42.12], "40": [48.06, 51.49, 48.91], "41": [50.62, 48.44, 44.44], "42": [49.83, 48.53, 48.01], "43": [51.13, 53.25, 44.51], "44": [50.5, 57.91, 46.84], "45": [51.88, 57.81, 46.49], "46": [50.26, 56.46, 47.25], "47": [51.52, 57.08, 44.51], "48": [51.35, 56.68, 46.76], "49": [52.81, 57.81, 49.21], "50": [48.53, 54.35, 48.27], "51": [51.13, 53.25, 44.51], "52": [50.54, 58.34, 47.41], "53": [51.88, 57.81, 45.8], "54": [50.42, 55.64, 47.62], "55": [51.35, 59.84, 46.16], "robo": [50.0, 54.7, 57.5] }, sp: { "00": [53.78, 22.9, 41.34], "01": [50.97, 19.21, 34.67], "02": [52.54, 17.7, 33.18], "03": [52.36, 20.91, 37.68], "04": [53.79, 23.62, 45.05], "05": [51.75, 19.63, 37.23], "06": [52.36, 18.38, 34.42], "07": [51.97, 20.87, 38.48], "08": [52.72, 22.95, 42.65], "09": [48.96, 19.78, 36.7], "10": [53.03, 18.24, 34.27], "11": [51.58, 20.65, 39.03], "12": [54.09, 22.35, 47.44], "13": [50.05, 17.75, 39.18], "14": [52.59, 17.23, 36.51], "15": [51.48, 18.89, 39.24], "16": [51.57, 24.21, 46.94], "17": [50.3, 19.0, 31.0], "18": [52.73, 18.74, 37.21], "19": [54.51, 21.38, 41.17], "20": [51.73, 24.3, 48.59], "21": [48.8, 19.77, 39.44], "22": [52.97, 19.18, 37.57], "23": [55.91, 21.35, 42.93], "24": [52.01, 22.6, 42.35], "25": [49.75, 18.6, 36.74], "26": [51.7, 17.71, 34.36], "27": [45.13, 20.88, 39.22], "28": [53.06, 22.1, 44.77], "29": [51.16, 17.48, 37.01], "30": [49.3, 17.5, 29.4], "31": [57.01, 20.76, 63.74], "32": [52.05, 20.34, 43.69], "33": [50.68, 16.74, 36.56], "34": [51.69, 18.29, 38.55], "35": [51.9, 20.66, 39.85], "36": [53.98, 21.11, 41.65], "37": [49.78, 19.2, 37.51], "38": [53.15, 19.69, 37.96], "39": [46.3, 20.99, 37.74], "40": [52.51, 22.17, 44.97], "41": [51.07, 20.09, 41.18], "42": [49.34, 19.83, 40.86], "43": [52.52, 22.24, 39.85], "44": [54.66, 20.78, 43.06], "45": [49.07, 18.09, 38.18], "46": [53.23, 18.89, 39.98], "47": [48.02, 17.05, 65.6], "48": [52.93, 21.74, 46.13], "49": [50.0, 19.5, 36.0], "50": [51.62, 19.67, 41.8], "51": [51.7, 22.12, 41.1], "52": [52.45, 21.55, 43.49], "53": [49.57, 17.61, 38.1], "54": [49.65, 17.73, 38.36], "55": [47.54, 20.4, 40.43], "robo": [52.27, 21.61, 37.65] } };
+GLASSES.img = s => IMG_BASE + "glasses-" + (GLASSES.styles.includes(s) ? s : "black") + ".webp";
+function glKey(i) { return i === "bot" ? "robo" : Number.isInteger(i) ? String(i).padStart(2, "0") : null; }
+function hasGlasses(i) { return Number.isInteger(i) && GLASSES.has.includes(i); }
+function canGlasses(i) { const k = glKey(i); return !!k && !hasGlasses(i) && !!GLASSES.pic[k]; }
+// glassesHTML(kind, i, style): the overlay for a picture ("pic") or a field figure ("sp"); the field sprite (3:4) sits at the bottom of the figure box (2:3)
+function glassesHTML(kind, i, style) {
+  if (!style || !GLASSES.styles.includes(style)) return ""; const k = glKey(i), p = k && GLASSES[kind] ? GLASSES[kind][k] : null; if (!p || hasGlasses(i)) return "";
+  const cx = p[0], cy = kind === "sp" ? 100 / 9 + p[1] * 8 / 9 : p[1], w = p[2];
+  return `<img class="specs" src="${GLASSES.img(style)}" style="left:${cx}%;top:${cy}%;width:${w}%" alt="" draggable="false">`;
+}
+
 (function () {
 "use strict";
 const $ = s => document.querySelector(s);
@@ -249,7 +272,7 @@ const teamColor = t => t ? "#2f7fb8" : "#b8482c";
 const LVL = { pewee: "Pewee", college: "College", pro: "Pro", random: "Random" };
 let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", sentPick = null, sentHike = false, myAns = null, editing = false;
 let pending = null, stopped = false, misses = 0, lastMsg = 0;
-const form = { av: 0, level: "pewee", team: 0, avSet: false };
+const form = { av: 0, level: "pewee", team: 0, avSet: false, gl: "black" };
 const key = () => "gfme_" + code;
 function loadMe() { try { return JSON.parse(localStorage.getItem(key())); } catch (e) { return null; } }
 function saveMe(m) { try { localStorage.setItem(key(), JSON.stringify(m)); } catch (e) {} }
@@ -315,6 +338,7 @@ function onData(d) {
   lastMsg = Date.now();
   if (d.t === "pong") return;
   if (d.t === "hello") { hello = d; applyTeams(); if (!me) { if ($("#signScr").hidden) showSign(); else $("#signNote").textContent = signNote(); } else render(); }
+  else if (d.t === "joined") { if (me && (d.team === 0 || d.team === 1) && me.team !== d.team) { me.team = d.team; form.team = d.team; saveMe(me); render(); } }
   else if (d.t === "replaced") { // this player is open in a newer tab or on another phone: stop fighting over the spot
     stopped = true; clearTimeout(retryT); const c = conn; conn = null; try { c && c.close(); } catch (e) {}
     setStatus("This player is open in another tab or phone. Close this one, or reload to take over.", true);
@@ -330,21 +354,33 @@ function onData(d) {
       const m = { ...me, name: d.me.name, av: d.me.av, level: d.me.level, team: d.me.team };
       if (JSON.stringify(m) !== JSON.stringify(me)) { me = m; saveMe(me); }
     }
+    if (d.me && me && (d.me.team === 0 || d.me.team === 1) && me.team !== d.me.team) { me.team = d.me.team; form.team = d.me.team; saveMe(me); } // the host's placement wins
+    if (!hello) hello = { teams: d.teams, started: !!d.started }; if (hello.open !== !!d.open || !hello.teams) { hello.open = !!d.open; hello.teams = d.teams || hello.teams; applyTeams(); }
     state = d; render();
   }
 }
 
 // ---- screens ----
 function showOnly(id) { ["codeScr", "signScr", "main"].forEach(x => $("#" + x).hidden = x !== id); }
-function applyTeams() { const n = (hello && hello.teams) || ["Home", "Away"]; $("#teamSeg [data-v='0']").textContent = n[0]; $("#teamSeg [data-v='1']").textContent = n[1]; }
-function renderAvPick() { $("#avPick").classList.toggle("grid7", AV_GROUPS.some(g => g.cols === 7)); $("#avPick").innerHTML = AV_GROUPS.map(g => `<div class="avgrp">${g.label}</div>` + g.ids.map(i => `<button type="button" data-av="${i}" aria-pressed="${form.av === i}" aria-label="${esc(AVATARS[i].n)}" title="${esc(AVATARS[i].n)}">${avatarSVG(i)}</button>`).join("")).join(""); }
+function applyTeams() { const n = (hello && hello.teams) || ["Home", "Away"]; $("#teamSeg [data-v='0']").textContent = n[0]; $("#teamSeg [data-v='1']").textContent = n[1]; applyOpen(); }
+// the team choice shows only while the host has the teams open
+function applyOpen() { const open = !!(hello && hello.open); $("#teamLbl").hidden = !open; $("#teamSeg").hidden = !open; $("#teamNote").hidden = open; }
+function renderAvPick() {
+  const glOn = $("#glChk").checked ? form.gl : null;
+  $("#avPick").classList.toggle("grid7", AV_GROUPS.some(g => g.cols === 7)); $("#avPick").innerHTML = AV_GROUPS.map(g => `<div class="avgrp">${g.label}</div>` + g.ids.map(i => `<button type="button" data-av="${i}" aria-pressed="${form.av === i}" aria-label="${esc(AVATARS[i].n)}" title="${esc(AVATARS[i].n)}">${avatarSVG(i, null, glOn)}</button>`).join("")).join("");
+  const can = canGlasses(form.av), g = $("#glChk"); g.disabled = !can; if (!can) g.checked = false;
+  $("#glStyles").hidden = !(can && g.checked); $("#glNote").hidden = !hasGlasses(form.av);
+  $("#glStyles").querySelectorAll("button").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.v === form.gl)); const im = b.querySelector("img"); if (im && !im.getAttribute("src")) im.src = GLASSES.img(b.dataset.v); });
+}
+$("#glChk").addEventListener("change", renderAvPick);
+$("#glStyles").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; form.gl = b.dataset.v; renderAvPick(); });
 function segSet(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(v)))); }
 function showSign(note) {
   editing = !!me;
   showOnly("signScr");
   $("#signCode").textContent = code;
   $("#signNote").textContent = note || signNote();
-  if (me) { $("#nameIn").value = me.name; form.av = me.av; form.level = me.level; form.team = me.team; }
+  if (me) { $("#nameIn").value = me.name; form.av = me.av; form.level = me.level; form.team = me.team; $("#glChk").checked = !!me.gl; if (me.gl) form.gl = me.gl; }
   else if (!form.avSet) { form.av = Math.floor(Math.random() * AVATARS.length); form.avSet = true; }
   renderAvPick(); segSet("lvlSeg", form.level); segSet("teamSeg", form.team);
   $("#joinBtn").textContent = me ? "Save" : "Join the game";
@@ -361,7 +397,7 @@ $("#signForm").addEventListener("submit", e => {
   const name = $("#nameIn").value.trim().slice(0, 24);
   if (!name) { $("#signErr").textContent = "Type your name first."; return; }
   $("#signErr").textContent = "";
-  me = { pid: (me && me.pid) || newPid(), name, av: form.av, level: form.level, team: form.team };
+  me = { pid: (me && me.pid) || newPid(), name, av: form.av, level: form.level, team: form.team, gl: $("#glChk").checked && canGlasses(form.av) ? form.gl : null };
   saveMe(me); editing = false;
   if (stopped) { stopped = false; ensure(); }
   send({ t: "join", ...me, edit: true });
@@ -382,7 +418,7 @@ function render() {
   const s = state, m = (s && s.me) || me;
   const names = (s && s.teams) || (hello && hello.teams) || ["Home", "Away"];
   const teamOf = t => names[t] || (t ? "Away" : "Home");
-  $("#meCard").innerHTML = `<div class="me"><span class="av" style="width:56px;height:56px;border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team))}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
+  $("#meCard").innerHTML = `<div class="me"><span class="av" style="width:56px;height:56px;border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team), m.gl)}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
     (s && s.score ? `<div class="strip"><div class="t"><b>${s.poss === 0 ? "\u{1F3C8} " : ""}${esc(names[0])}</b><span class="sc">${s.score[0]}</span></div><div class="t r"><b>${esc(names[1])}${s.poss === 1 ? " \u{1F3C8}" : ""}</b><span class="sc">${s.score[1]}</span></div>${s.poss != null && s.view !== "end" ? `<div class="mid">${esc(names[s.poss])} ball \u00b7 ${esc(s.down || "")} \u00b7 ${esc(s.play || "")}</div>` : ""}</div>` : "");
   const v = $("#view");
   if (!s) { v.innerHTML = `<div class="eyebrow">Game ${esc(code)}</div><p class="msg">${conn && conn.open ? "Joining…" : "Connecting to the big screen…"}</p>`; return; }
@@ -393,14 +429,14 @@ function render() {
   if (buzz) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (x) {} }
   let h = "";
   if (view === "lobby") {
-    const list = t => `<div><h3><span class="dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${teamColor(t)};margin-right:6px"></span>${esc(teamOf(t))}</h3><ul class="roster">${(s.roster || []).filter(p => p.team === t).map(p => `<li><span class="av">${avatarSVG(p.av)}</span><span>${esc(p.name)}</span>${p.phone ? `<span style="opacity:${p.on ? 1 : .4}">\u{1F4F1}</span>` : ""}</li>`).join("") || "<li class='note'>Nobody yet</li>"}</ul></div>`;
-    h = `<div class="eyebrow">You're in</div><p class="msg">You're on <b>${esc(teamOf(m.team))}</b>. Waiting for the big screen to kick off.</p><div class="cols">${list(0)}${list(1)}</div><div><button class="btn ghost" type="button" id="editBtn">Change my name, picture or team</button></div>`;
+    const list = t => `<div><h3><span class="dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${teamColor(t)};margin-right:6px"></span>${esc(teamOf(t))}</h3><ul class="roster">${(s.roster || []).filter(p => p.team === t).map(p => `<li><span class="av">${avatarSVG(p.av, null, p.gl)}</span><span>${esc(p.name)}</span>${p.phone ? `<span style="opacity:${p.on ? 1 : .4}">\u{1F4F1}</span>` : ""}</li>`).join("") || "<li class='note'>Nobody yet</li>"}</ul></div>`;
+    h = `<div class="eyebrow">You're in</div><p class="msg">You're on <b>${esc(teamOf(m.team))}</b>. Waiting for the big screen to kick off.</p><div class="cols">${list(0)}${list(1)}</div><div><button class="btn ghost" type="button" id="editBtn">${hello && hello.open ? "Change my name, picture or team" : "Change my name or picture"}</button></div>`;
   } else if (view === "pending") {
     h = `<div class="eyebrow">You're in</div><p class="msg">You'll take the field at the next huddle. Watch the big screen!</p>`;
   } else if (view === "question" || view === "watch") {
     const q = s.q, a = s.answered, mineQ = view === "question";
     const who = q.crew ? `Team question for ${esc(teamOf(q.team))}` : `${esc(q.who)}'s question`;
-    h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team))}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span><span class="tag">${esc(q.cat)}</span></div>
+    h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team), q.gl)}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span><span class="tag">${esc(q.cat)}</span></div>
       <div class="note">${mineQ ? (q.crew ? "Everyone on your team votes. Majority wins." : "It's your turn! Answer on your phone.") : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
       <div class="q">${esc(q.text)}</div>`;
     const voteNote = mineQ && s.vote ? `<div class="note">${s.vote.mine != null ? `Your vote: <b>${esc(s.vote.mine)}</b>. ` : ""}${s.vote.got} of ${s.vote.need} on your team have voted.</div>` : "";
