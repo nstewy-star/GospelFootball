@@ -1,5 +1,5 @@
 {
- "format": "audio/ref/<key>.mp3 for the referee, audio/av/<folder>/<key>.mp3 for each avatar (folder = avatar index 00..15 in picker order, same as the avatars-helmets.png grid)",
+ "format": "audio/ref/<key>.mp3 for the referee, audio/av/<folder>/<key>.mp3 for each avatar (folder = avatar index 00..56: boys 00-27, girls 28-55, Robo 56; within a gender the order is look-major: brunette, blonde, ginger, native, asian, poly, indian, each as kid, young adult, forties, grandparent)",
  "referee": {
   "voice_hint": "stadium announcer / referee, big and clear",
   "lines": {
@@ -37,7 +37,19 @@
    "huddle": "Back to the huddle!",
    "ot": "Tied up! Overtime. Next score wins.",
    "final": "That's the game!",
-   "tie": "It's a tie!"
+   "tie": "It's a tie!",
+   "blocked": "Blocked!",
+   "tackled": "Tackled!",
+   "grass": "Picking grass!",
+   "open": "Wide open!",
+   "juke": "Juke move!",
+   "breakaway": "Breakaway!",
+   "holding": "Holding!",
+   "run": "Run!",
+   "recovered": "Recovered by the defense!",
+   "rusher": "Free rusher!",
+   "touchback": "Touchback!",
+   "whiff": "Whiff!"
   }
  },
  "avatar_keys": {
@@ -51,14 +63,17 @@
   "hit": "tackled, sacked, blocked or intercepted",
   "block": "makes the block, pick or tackle on defense"
  },
+ "voice_casting": "Pick at least three distinct ElevenLabs voices per archetype (boy, girl, young man, young woman, man in his forties, woman in her forties, grandpa, grandma) and cycle them across the seven looks, so two players of the same age never share a voice when they sit next to each other; Robo gets a robot voice.",
  "avatars": [
   {
    "index": 0,
    "folder": "00",
-   "name": "Freckled Freddie",
-   "voice_hint": "boy, about 8, energetic",
+   "name": "Ben",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
    "lines": {
-    "hello": "Hi! I'm Freckled Freddie!",
+    "hello": "Hi! I'm Ben!",
     "field": "Put me in, coach!",
     "right": "Yes! I knew that one!",
     "wrong": "Aw, man. I'll get the next one.",
@@ -72,27 +87,31 @@
   {
    "index": 1,
    "folder": "01",
-   "name": "Curly Clara",
-   "voice_hint": "girl, about 7, sweet",
+   "name": "Tyler",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
    "lines": {
-    "hello": "Hi, I'm Curly Clara!",
-    "field": "Here I come!",
-    "right": "Yay! That's right!",
-    "wrong": "Oops. Next time!",
-    "throw": "Over here! Pass it to me!",
-    "run": "Wheee! Catch me if you can!",
-    "td": "Touchdown! Did you see that?",
-    "hit": "Hey! No fair!",
-    "block": "Got your flag!"
+    "hello": "Hey, I'm Tyler.",
+    "field": "Alright, I'm in.",
+    "right": "Got it. Too easy.",
+    "wrong": "Dang. I should've known that.",
+    "throw": "Up top! I'm open!",
+    "run": "See ya!",
+    "td": "Touchdown! That's what I'm talking about!",
+    "hit": "Oof. Good hit.",
+    "block": "Denied!"
    }
   },
   {
    "index": 2,
    "folder": "02",
-   "name": "Bearded Bart",
-   "voice_hint": "man in his thirties, warm and relaxed",
+   "name": "Brother Mark",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
    "lines": {
-    "hello": "Howdy, I'm Bearded Bart.",
+    "hello": "Howdy, I'm Brother Mark.",
     "field": "Let's do this, team.",
     "right": "That's the one. Nailed it.",
     "wrong": "Hmm, I'll study up on that.",
@@ -106,48 +125,130 @@
   {
    "index": 3,
    "folder": "03",
-   "name": "Lavender Lila",
-   "voice_hint": "teen girl, poised and confident",
+   "name": "Grandpa Walt",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
    "lines": {
-    "hello": "Hey there, I'm Lavender Lila.",
-    "field": "On my way!",
-    "right": "Yes! Easy.",
-    "wrong": "Ugh. So close.",
-    "throw": "I'm wide open!",
-    "run": "Too fast for you!",
-    "td": "Touchdown! Let's go!",
-    "hit": "Oh! Okay, good tackle.",
-    "block": "Blocked! Try again."
+    "hello": "Well, howdy. I'm Grandpa Walt.",
+    "field": "Let an old fella show you how it's done.",
+    "right": "Ha! Still sharp as a tack.",
+    "wrong": "Well, shoot. My memory ain't what it was.",
+    "throw": "Toss it to the old man!",
+    "run": "Back in my day, we ran faster!",
+    "td": "Touchdown! Hot diggity!",
+    "hit": "Whoa, Nelly! Easy on the old bones.",
+    "block": "Not today, sonny!"
    }
   },
   {
    "index": 4,
    "folder": "04",
-   "name": "Grandma Gert",
-   "voice_hint": "jolly grandma",
+   "name": "Jake",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
    "lines": {
-    "hello": "Hello, dears. I'm Grandma Gert.",
-    "field": "Make way, I'm coming!",
-    "right": "Oh, my goodness, I got it right!",
-    "wrong": "Oh dear. Well, bless my heart.",
-    "throw": "Toss it here, sweetie!",
-    "run": "Out of my way, I've got cookies in the oven!",
-    "td": "Touchdown! Goodness gracious!",
-    "hit": "Oh my! Help me up, dear.",
-    "block": "Not so fast, young one!"
+    "hello": "What's up! I'm Jake!",
+    "field": "Let's go, let's go!",
+    "right": "Boom! Got it!",
+    "wrong": "Nooo! I knew that one!",
+    "throw": "I'm open! Throw it!",
+    "run": "Can't catch me!",
+    "td": "Touchdown! Jump for joy!",
+    "hit": "Aw, man! Good one.",
+    "block": "Blocked! Oh yeah!"
    }
   },
   {
    "index": 5,
    "folder": "05",
-   "name": "Tall Tyler",
-   "voice_hint": "teen boy, calm and cool",
+   "name": "Evan",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
    "lines": {
-    "hello": "Hey, I'm Tall Tyler.",
+    "hello": "Hello! I'm Evan.",
+    "field": "Excited to be here, team!",
+    "right": "That's right! I love that one.",
+    "wrong": "Hmm, I'll look that up tonight.",
+    "throw": "I'm open, send it!",
+    "run": "On my way!",
+    "td": "Touchdown! What a blessing!",
+    "hit": "Whoa! Good tackle, friend.",
+    "block": "Not through here!"
+   }
+  },
+  {
+   "index": 6,
+   "folder": "06",
+   "name": "Brother Dave",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
+   "lines": {
+    "hello": "I'm Brother Dave. Let's get to work.",
+    "field": "Alright, I'm in! Let's go!",
+    "right": "That's it! That's the answer!",
+    "wrong": "Hmm. We'll work on that one.",
+    "throw": "Right here, right here!",
+    "run": "Hustle! Hustle!",
+    "td": "Touchdown! That's what we practice for!",
+    "hit": "Good hit! That's how you do it.",
+    "block": "Shut down! Great defense!"
+   }
+  },
+  {
+   "index": 7,
+   "folder": "07",
+   "name": "Grandpa Hal",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello there. I'm Grandpa Hal.",
+    "field": "Make room for Grandpa!",
+    "right": "Yes, sir! I've known that for sixty years.",
+    "wrong": "Hmm. I'll ask your grandma.",
+    "throw": "Over here! I'm wide open!",
+    "run": "Still got the wheels!",
+    "td": "Touchdown! Ha! Call the grandkids!",
+    "hit": "Oof! That'll leave a mark.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 8,
+   "folder": "08",
+   "name": "Freddie",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
+   "lines": {
+    "hello": "Hey! I'm Freddie.",
+    "field": "Freddie's in the game!",
+    "right": "Yes! Right on target.",
+    "wrong": "Aw, just missed it.",
+    "throw": "Pass it! I'll take it to the house!",
+    "run": "Watch this!",
+    "td": "Touchdown! Kick it up!",
+    "hit": "Oof! That one hurt.",
+    "block": "Blocked! Boom!"
+   }
+  },
+  {
+   "index": 9,
+   "folder": "09",
+   "name": "Liam",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
+   "lines": {
+    "hello": "Hey, I'm Liam.",
     "field": "Alright, I'm in.",
     "right": "Got it. Too easy.",
     "wrong": "Dang. I should've known that.",
-    "throw": "Up top! I'm the tallest!",
+    "throw": "Up top! I'm open!",
     "run": "See ya!",
     "td": "Touchdown! That's what I'm talking about!",
     "hit": "Oof. Good hit.",
@@ -155,27 +256,31 @@
    }
   },
   {
-   "index": 6,
-   "folder": "06",
-   "name": "Sunny Sally",
-   "voice_hint": "girl, about 8, bubbly",
+   "index": 10,
+   "folder": "10",
+   "name": "Brother Sean",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
    "lines": {
-    "hello": "Hi, hi! I'm Sunny Sally!",
-    "field": "Yay, my turn!",
-    "right": "I got it right! I got it right!",
-    "wrong": "Aww. That's okay!",
-    "throw": "Me, me, me! Pick me!",
-    "run": "Sunshine coming through!",
-    "td": "Touchdown! Best day ever!",
-    "hit": "Whoa! Ouchie.",
-    "block": "Ha! Got your flag!"
+    "hello": "Howdy, I'm Brother Sean.",
+    "field": "Let's do this, team.",
+    "right": "That's the one. Nailed it.",
+    "wrong": "Hmm, I'll study up on that.",
+    "throw": "Hit me, I've got room.",
+    "run": "Comin' through!",
+    "td": "Touchdown! Ha-ha! Still got it.",
+    "hit": "Whoa! Nice stop.",
+    "block": "Nope. Not on my watch."
    }
   },
   {
-   "index": 7,
-   "folder": "07",
+   "index": 11,
+   "folder": "11",
    "name": "Grandpa Gus",
-   "voice_hint": "folksy Southern grandpa",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
    "lines": {
     "hello": "Well, howdy. I'm Grandpa Gus.",
     "field": "Let an old fella show you how it's done.",
@@ -189,12 +294,90 @@
    }
   },
   {
-   "index": 8,
-   "folder": "08",
-   "name": "Jumping Jamal",
-   "voice_hint": "boy, about 9, playful",
+   "index": 12,
+   "folder": "12",
+   "name": "Koda",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
    "lines": {
-    "hello": "What's up! I'm Jumping Jamal!",
+    "hello": "Hi! I'm Koda!",
+    "field": "Put me in, coach!",
+    "right": "Yes! I knew that one!",
+    "wrong": "Aw, man. I'll get the next one.",
+    "throw": "Throw it to me! I'm open!",
+    "run": "Go, go, go!",
+    "td": "Touchdown! Woo-hoo!",
+    "hit": "Oof! You got me.",
+    "block": "Gotcha! Not today!"
+   }
+  },
+  {
+   "index": 13,
+   "folder": "13",
+   "name": "Dakota",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
+   "lines": {
+    "hello": "Hello! I'm Dakota.",
+    "field": "Excited to be here, team!",
+    "right": "That's right! I love that one.",
+    "wrong": "Hmm, I'll look that up tonight.",
+    "throw": "I'm open, send it!",
+    "run": "On my way!",
+    "td": "Touchdown! What a blessing!",
+    "hit": "Whoa! Good tackle, friend.",
+    "block": "Not through here!"
+   }
+  },
+  {
+   "index": 14,
+   "folder": "14",
+   "name": "Brother Joseph",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
+   "lines": {
+    "hello": "I'm Brother Joseph. Let's get to work.",
+    "field": "Alright, I'm in! Let's go!",
+    "right": "That's it! That's the answer!",
+    "wrong": "Hmm. We'll work on that one.",
+    "throw": "Right here, right here!",
+    "run": "Hustle! Hustle!",
+    "td": "Touchdown! That's what we practice for!",
+    "hit": "Good hit! That's how you do it.",
+    "block": "Shut down! Great defense!"
+   }
+  },
+  {
+   "index": 15,
+   "folder": "15",
+   "name": "Grandpa Eli",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello there. I'm Grandpa Eli.",
+    "field": "Make room for Grandpa!",
+    "right": "Yes, sir! I've known that for sixty years.",
+    "wrong": "Hmm. I'll ask your grandma.",
+    "throw": "Over here! I'm wide open!",
+    "run": "Still got the wheels!",
+    "td": "Touchdown! Ha! Call the grandkids!",
+    "hit": "Oof! That'll leave a mark.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 16,
+   "folder": "16",
+   "name": "Kenji",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
+   "lines": {
+    "hello": "What's up! I'm Kenji!",
     "field": "Let's go, let's go!",
     "right": "Boom! Got it!",
     "wrong": "Nooo! I knew that one!",
@@ -206,30 +389,91 @@
    }
   },
   {
-   "index": 9,
-   "folder": "09",
-   "name": "Smiling Mei",
-   "voice_hint": "teen girl, cheerful",
+   "index": 17,
+   "folder": "17",
+   "name": "Daniel",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
    "lines": {
-    "hello": "Hi, I'm Smiling Mei!",
-    "field": "Okay, I've got this.",
-    "right": "Yes! I studied that one.",
-    "wrong": "Oh no. I'll remember next time.",
-    "throw": "Right here! Pass it!",
-    "run": "Here I go!",
-    "td": "Touchdown! I can't stop smiling!",
-    "hit": "Oof! Okay, you got me.",
-    "block": "Got your flag! Sorry!"
+    "hello": "Hey, I'm Daniel.",
+    "field": "Alright, I'm in.",
+    "right": "Got it. Too easy.",
+    "wrong": "Dang. I should've known that.",
+    "throw": "Up top! I'm open!",
+    "run": "See ya!",
+    "td": "Touchdown! That's what I'm talking about!",
+    "hit": "Oof. Good hit.",
+    "block": "Denied!"
    }
   },
   {
-   "index": 10,
-   "folder": "10",
-   "name": "Elder Evan",
-   "voice_hint": "young man, earnest missionary",
+   "index": 18,
+   "folder": "18",
+   "name": "Brother Jun",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
    "lines": {
-    "hello": "Hello! I'm Elder Evan.",
-    "field": "Excited to serve, team!",
+    "hello": "Howdy, I'm Brother Jun.",
+    "field": "Let's do this, team.",
+    "right": "That's the one. Nailed it.",
+    "wrong": "Hmm, I'll study up on that.",
+    "throw": "Hit me, I've got room.",
+    "run": "Comin' through!",
+    "td": "Touchdown! Ha-ha! Still got it.",
+    "hit": "Whoa! Nice stop.",
+    "block": "Nope. Not on my watch."
+   }
+  },
+  {
+   "index": 19,
+   "folder": "19",
+   "name": "Grandpa Hiro",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
+   "lines": {
+    "hello": "Well, howdy. I'm Grandpa Hiro.",
+    "field": "Let an old fella show you how it's done.",
+    "right": "Ha! Still sharp as a tack.",
+    "wrong": "Well, shoot. My memory ain't what it was.",
+    "throw": "Toss it to the old man!",
+    "run": "Back in my day, we ran faster!",
+    "td": "Touchdown! Hot diggity!",
+    "hit": "Whoa, Nelly! Easy on the old bones.",
+    "block": "Not today, sonny!"
+   }
+  },
+  {
+   "index": 20,
+   "folder": "20",
+   "name": "Sione",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
+   "lines": {
+    "hello": "Hey! I'm Sione.",
+    "field": "Sione's in the game!",
+    "right": "Yes! Right on target.",
+    "wrong": "Aw, just missed it.",
+    "throw": "Pass it! I'll take it to the house!",
+    "run": "Watch this!",
+    "td": "Touchdown! Kick it up!",
+    "hit": "Oof! That one hurt.",
+    "block": "Blocked! Boom!"
+   }
+  },
+  {
+   "index": 21,
+   "folder": "21",
+   "name": "Tavita",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
+   "lines": {
+    "hello": "Hello! I'm Tavita.",
+    "field": "Excited to be here, team!",
     "right": "That's right! I love that one.",
     "wrong": "Hmm, I'll look that up tonight.",
     "throw": "I'm open, send it!",
@@ -240,29 +484,166 @@
    }
   },
   {
-   "index": 11,
-   "folder": "11",
-   "name": "Red Rosie",
-   "voice_hint": "girl, about 7, feisty",
+   "index": 22,
+   "folder": "22",
+   "name": "Brother Manu",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
    "lines": {
-    "hello": "I'm Red Rosie, and I'm fast!",
-    "field": "Finally, my turn!",
-    "right": "Ha! Told you I knew it!",
-    "wrong": "Hmph. That was a trick question.",
-    "throw": "Throw it to Rosie!",
-    "run": "Zoom! Zoom!",
-    "td": "Touchdown! Rosie rules!",
-    "hit": "Hey! I'll get you back!",
-    "block": "Nope! Flag's mine!"
+    "hello": "I'm Brother Manu. Let's get to work.",
+    "field": "Alright, I'm in! Let's go!",
+    "right": "That's it! That's the answer!",
+    "wrong": "Hmm. We'll work on that one.",
+    "throw": "Right here, right here!",
+    "run": "Hustle! Hustle!",
+    "td": "Touchdown! That's what we practice for!",
+    "hit": "Good hit! That's how you do it.",
+    "block": "Shut down! Great defense!"
    }
   },
   {
-   "index": 12,
-   "folder": "12",
-   "name": "Sister Sadie",
-   "voice_hint": "young woman, kind",
+   "index": 23,
+   "folder": "23",
+   "name": "Grandpa Tevita",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
    "lines": {
-    "hello": "Hi, everyone. I'm Sister Sadie.",
+    "hello": "Hello there. I'm Grandpa Tevita.",
+    "field": "Make room for Grandpa!",
+    "right": "Yes, sir! I've known that for sixty years.",
+    "wrong": "Hmm. I'll ask your grandma.",
+    "throw": "Over here! I'm wide open!",
+    "run": "Still got the wheels!",
+    "td": "Touchdown! Ha! Call the grandkids!",
+    "hit": "Oof! That'll leave a mark.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 24,
+   "folder": "24",
+   "name": "Arjun",
+   "g": "b",
+   "age": 0,
+   "voice_hint": "boy a kid about 9 years old",
+   "lines": {
+    "hello": "Hi! I'm Arjun!",
+    "field": "Put me in, coach!",
+    "right": "Yes! I knew that one!",
+    "wrong": "Aw, man. I'll get the next one.",
+    "throw": "Throw it to me! I'm open!",
+    "run": "Go, go, go!",
+    "td": "Touchdown! Woo-hoo!",
+    "hit": "Oof! You got me.",
+    "block": "Gotcha! Not today!"
+   }
+  },
+  {
+   "index": 25,
+   "folder": "25",
+   "name": "Rohan",
+   "g": "b",
+   "age": 1,
+   "voice_hint": "man, a young adult in their twenties",
+   "lines": {
+    "hello": "Hey, I'm Rohan.",
+    "field": "Alright, I'm in.",
+    "right": "Got it. Too easy.",
+    "wrong": "Dang. I should've known that.",
+    "throw": "Up top! I'm open!",
+    "run": "See ya!",
+    "td": "Touchdown! That's what I'm talking about!",
+    "hit": "Oof. Good hit.",
+    "block": "Denied!"
+   }
+  },
+  {
+   "index": 26,
+   "folder": "26",
+   "name": "Brother Raj",
+   "g": "b",
+   "age": 2,
+   "voice_hint": "man, an adult in their forties",
+   "lines": {
+    "hello": "Howdy, I'm Brother Raj.",
+    "field": "Let's do this, team.",
+    "right": "That's the one. Nailed it.",
+    "wrong": "Hmm, I'll study up on that.",
+    "throw": "Hit me, I've got room.",
+    "run": "Comin' through!",
+    "td": "Touchdown! Ha-ha! Still got it.",
+    "hit": "Whoa! Nice stop.",
+    "block": "Nope. Not on my watch."
+   }
+  },
+  {
+   "index": 27,
+   "folder": "27",
+   "name": "Grandpa Dev",
+   "g": "b",
+   "age": 3,
+   "voice_hint": "man, a grandparent in their seventies",
+   "lines": {
+    "hello": "Well, howdy. I'm Grandpa Dev.",
+    "field": "Let an old fella show you how it's done.",
+    "right": "Ha! Still sharp as a tack.",
+    "wrong": "Well, shoot. My memory ain't what it was.",
+    "throw": "Toss it to the old man!",
+    "run": "Back in my day, we ran faster!",
+    "td": "Touchdown! Hot diggity!",
+    "hit": "Whoa, Nelly! Easy on the old bones.",
+    "block": "Not today, sonny!"
+   }
+  },
+  {
+   "index": 28,
+   "folder": "28",
+   "name": "Clara",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "Hi, I'm Clara!",
+    "field": "Here I come!",
+    "right": "Yay! That's right!",
+    "wrong": "Oops. Next time!",
+    "throw": "Over here! Pass it to me!",
+    "run": "Wheee! Catch me if you can!",
+    "td": "Touchdown! Did you see that?",
+    "hit": "Hey! No fair!",
+    "block": "Got your flag!"
+   }
+  },
+  {
+   "index": 29,
+   "folder": "29",
+   "name": "Emma",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hey there, I'm Emma.",
+    "field": "On my way!",
+    "right": "Yes! Easy.",
+    "wrong": "Ugh. So close.",
+    "throw": "I'm wide open!",
+    "run": "Too fast for you!",
+    "td": "Touchdown! Let's go!",
+    "hit": "Oh! Okay, good tackle.",
+    "block": "Blocked! Try again."
+   }
+  },
+  {
+   "index": 30,
+   "folder": "30",
+   "name": "Sister Beth",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hi, everyone. I'm Sister Beth.",
     "field": "Here I come, team!",
     "right": "Yes, that's the one!",
     "wrong": "Oh, so close. Good question, though.",
@@ -274,32 +655,131 @@
    }
   },
   {
-   "index": 13,
-   "folder": "13",
-   "name": "Kicker Kenji",
-   "voice_hint": "boy, about 8, confident",
+   "index": 31,
+   "folder": "31",
+   "name": "Grandma Ruth",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
    "lines": {
-    "hello": "Hey! I'm Kicker Kenji.",
-    "field": "Kenji's in the game!",
-    "right": "Yes! Right on target.",
-    "wrong": "Aw, just missed it.",
-    "throw": "Pass it! I'll take it to the house!",
-    "run": "Watch this!",
-    "td": "Touchdown! Kick it up!",
-    "hit": "Oof! That one hurt.",
-    "block": "Blocked! Boom!"
+    "hello": "Hello, dears. I'm Grandma Ruth.",
+    "field": "Make way, I'm coming!",
+    "right": "Oh, my goodness, I got it right!",
+    "wrong": "Oh dear. Well, bless my heart.",
+    "throw": "Toss it here, sweetie!",
+    "run": "Out of my way, I've got cookies in the oven!",
+    "td": "Touchdown! Goodness gracious!",
+    "hit": "Oh my! Help me up, dear.",
+    "block": "Not so fast, young one!"
    }
   },
   {
-   "index": 14,
-   "folder": "14",
-   "name": "Twirly Tia",
-   "voice_hint": "teen girl, dancer energy",
+   "index": 32,
+   "folder": "32",
+   "name": "Sally",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
    "lines": {
-    "hello": "Hi! I'm Twirly Tia!",
+    "hello": "Hi, hi! I'm Sally!",
+    "field": "Yay, my turn!",
+    "right": "I got it right! I got it right!",
+    "wrong": "Aww. That's okay!",
+    "throw": "Me, me, me! Pick me!",
+    "run": "Coming through!",
+    "td": "Touchdown! Best day ever!",
+    "hit": "Whoa! Ouchie.",
+    "block": "Ha! Got your flag!"
+   }
+  },
+  {
+   "index": 33,
+   "folder": "33",
+   "name": "Kaylee",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hi, I'm Kaylee!",
+    "field": "Okay, I've got this.",
+    "right": "Yes! I studied that one.",
+    "wrong": "Oh no. I'll remember next time.",
+    "throw": "Right here! Pass it!",
+    "run": "Here I go!",
+    "td": "Touchdown! I can't stop smiling!",
+    "hit": "Oof! Okay, you got me.",
+    "block": "Got your flag! Sorry!"
+   }
+  },
+  {
+   "index": 34,
+   "folder": "34",
+   "name": "Sister Jen",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hello! I'm Sister Jen.",
+    "field": "Okay, team, here I go!",
+    "right": "That's right! I taught that lesson.",
+    "wrong": "Oh dear, I knew that one.",
+    "throw": "Over here, I'm open!",
+    "run": "Make way!",
+    "td": "Touchdown! Who's bringing the treats?",
+    "hit": "Oh my! Good tackle.",
+    "block": "Not today! Got your flag."
+   }
+  },
+  {
+   "index": 35,
+   "folder": "35",
+   "name": "Grandma June",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, sweethearts. I'm Grandma June.",
+    "field": "Grandma's turn!",
+    "right": "Yes! I've read that one many times.",
+    "wrong": "Oh, fiddlesticks.",
+    "throw": "Right here, honey!",
+    "run": "Coming through, dear!",
+    "td": "Touchdown! Oh, my heart!",
+    "hit": "Oh! Somebody help Grandma up.",
+    "block": "Got your flag, dearie!"
+   }
+  },
+  {
+   "index": 36,
+   "folder": "36",
+   "name": "Rosie",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "I'm Rosie, and I'm fast!",
+    "field": "Finally, my turn!",
+    "right": "Ha! Told you I knew it!",
+    "wrong": "Hmph. That was a trick question.",
+    "throw": "Throw it to me!",
+    "run": "Zoom! Zoom!",
+    "td": "Touchdown! I rule!",
+    "hit": "Hey! I'll get you back!",
+    "block": "Nope! Flag's mine!"
+   }
+  },
+  {
+   "index": 37,
+   "folder": "37",
+   "name": "Molly",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hi! I'm Molly!",
     "field": "Spinning into action!",
     "right": "Yes! Nailed it!",
-    "wrong": "Oops, I twirled right past that one.",
+    "wrong": "Oops, I went right past that one.",
     "throw": "Over here! I'm open!",
     "run": "Twirl and go!",
     "td": "Touchdown! Take a bow!",
@@ -308,20 +788,364 @@
    }
   },
   {
-   "index": 15,
-   "folder": "15",
-   "name": "Coach Carlos",
-   "voice_hint": "man in his forties, coach energy",
+   "index": 38,
+   "folder": "38",
+   "name": "Sister Maggie",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
    "lines": {
-    "hello": "I'm Coach Carlos. Let's get to work.",
-    "field": "Coach is in! Let's go!",
-    "right": "That's it! That's the answer!",
-    "wrong": "Hmm. We'll work on that one.",
-    "throw": "Right here, right here!",
-    "run": "Hustle! Hustle!",
-    "td": "Touchdown! That's what we practice for!",
-    "hit": "Good hit! That's how you do it.",
-    "block": "Shut down! Great defense!"
+    "hello": "Hi, everyone. I'm Sister Maggie.",
+    "field": "Here I come, team!",
+    "right": "Yes, that's the one!",
+    "wrong": "Oh, so close. Good question, though.",
+    "throw": "I'm open on the left!",
+    "run": "Excuse me, coming through!",
+    "td": "Touchdown! Oh, that was fun!",
+    "hit": "Oh! Well played.",
+    "block": "Got your flag. Nice try!"
+   }
+  },
+  {
+   "index": 39,
+   "folder": "39",
+   "name": "Grandma Gert",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, dears. I'm Grandma Gert.",
+    "field": "Make way, I'm coming!",
+    "right": "Oh, my goodness, I got it right!",
+    "wrong": "Oh dear. Well, bless my heart.",
+    "throw": "Toss it here, sweetie!",
+    "run": "Out of my way, I've got cookies in the oven!",
+    "td": "Touchdown! Goodness gracious!",
+    "hit": "Oh my! Help me up, dear.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 40,
+   "folder": "40",
+   "name": "Kaya",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "Hi, I'm Kaya!",
+    "field": "Here I come!",
+    "right": "Yay! That's right!",
+    "wrong": "Oops. Next time!",
+    "throw": "Over here! Pass it to me!",
+    "run": "Wheee! Catch me if you can!",
+    "td": "Touchdown! Did you see that?",
+    "hit": "Hey! No fair!",
+    "block": "Got your flag!"
+   }
+  },
+  {
+   "index": 41,
+   "folder": "41",
+   "name": "Winona",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hey there, I'm Winona.",
+    "field": "On my way!",
+    "right": "Yes! Easy.",
+    "wrong": "Ugh. So close.",
+    "throw": "I'm wide open!",
+    "run": "Too fast for you!",
+    "td": "Touchdown! Let's go!",
+    "hit": "Oh! Okay, good tackle.",
+    "block": "Blocked! Try again."
+   }
+  },
+  {
+   "index": 42,
+   "folder": "42",
+   "name": "Sister Tala",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hello! I'm Sister Tala.",
+    "field": "Okay, team, here I go!",
+    "right": "That's right! I taught that lesson.",
+    "wrong": "Oh dear, I knew that one.",
+    "throw": "Over here, I'm open!",
+    "run": "Make way!",
+    "td": "Touchdown! Who's bringing the treats?",
+    "hit": "Oh my! Good tackle.",
+    "block": "Not today! Got your flag."
+   }
+  },
+  {
+   "index": 43,
+   "folder": "43",
+   "name": "Grandma Nina",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, sweethearts. I'm Grandma Nina.",
+    "field": "Grandma's turn!",
+    "right": "Yes! I've read that one many times.",
+    "wrong": "Oh, fiddlesticks.",
+    "throw": "Right here, honey!",
+    "run": "Coming through, dear!",
+    "td": "Touchdown! Oh, my heart!",
+    "hit": "Oh! Somebody help Grandma up.",
+    "block": "Got your flag, dearie!"
+   }
+  },
+  {
+   "index": 44,
+   "folder": "44",
+   "name": "Mei",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "Hi, hi! I'm Mei!",
+    "field": "Yay, my turn!",
+    "right": "I got it right! I got it right!",
+    "wrong": "Aww. That's okay!",
+    "throw": "Me, me, me! Pick me!",
+    "run": "Coming through!",
+    "td": "Touchdown! Best day ever!",
+    "hit": "Whoa! Ouchie.",
+    "block": "Ha! Got your flag!"
+   }
+  },
+  {
+   "index": 45,
+   "folder": "45",
+   "name": "Hana",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hi, I'm Hana!",
+    "field": "Okay, I've got this.",
+    "right": "Yes! I studied that one.",
+    "wrong": "Oh no. I'll remember next time.",
+    "throw": "Right here! Pass it!",
+    "run": "Here I go!",
+    "td": "Touchdown! I can't stop smiling!",
+    "hit": "Oof! Okay, you got me.",
+    "block": "Got your flag! Sorry!"
+   }
+  },
+  {
+   "index": 46,
+   "folder": "46",
+   "name": "Sister Yuna",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hi, everyone. I'm Sister Yuna.",
+    "field": "Here I come, team!",
+    "right": "Yes, that's the one!",
+    "wrong": "Oh, so close. Good question, though.",
+    "throw": "I'm open on the left!",
+    "run": "Excuse me, coming through!",
+    "td": "Touchdown! Oh, that was fun!",
+    "hit": "Oh! Well played.",
+    "block": "Got your flag. Nice try!"
+   }
+  },
+  {
+   "index": 47,
+   "folder": "47",
+   "name": "Grandma Lin",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, dears. I'm Grandma Lin.",
+    "field": "Make way, I'm coming!",
+    "right": "Oh, my goodness, I got it right!",
+    "wrong": "Oh dear. Well, bless my heart.",
+    "throw": "Toss it here, sweetie!",
+    "run": "Out of my way, I've got cookies in the oven!",
+    "td": "Touchdown! Goodness gracious!",
+    "hit": "Oh my! Help me up, dear.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 48,
+   "folder": "48",
+   "name": "Moana",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "I'm Moana, and I'm fast!",
+    "field": "Finally, my turn!",
+    "right": "Ha! Told you I knew it!",
+    "wrong": "Hmph. That was a trick question.",
+    "throw": "Throw it to me!",
+    "run": "Zoom! Zoom!",
+    "td": "Touchdown! I rule!",
+    "hit": "Hey! I'll get you back!",
+    "block": "Nope! Flag's mine!"
+   }
+  },
+  {
+   "index": 49,
+   "folder": "49",
+   "name": "Leilani",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hi! I'm Leilani!",
+    "field": "Spinning into action!",
+    "right": "Yes! Nailed it!",
+    "wrong": "Oops, I went right past that one.",
+    "throw": "Over here! I'm open!",
+    "run": "Twirl and go!",
+    "td": "Touchdown! Take a bow!",
+    "hit": "Whoa! Dizzy!",
+    "block": "Got you! Flag's mine!"
+   }
+  },
+  {
+   "index": 50,
+   "folder": "50",
+   "name": "Sister Ana",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hello! I'm Sister Ana.",
+    "field": "Okay, team, here I go!",
+    "right": "That's right! I taught that lesson.",
+    "wrong": "Oh dear, I knew that one.",
+    "throw": "Over here, I'm open!",
+    "run": "Make way!",
+    "td": "Touchdown! Who's bringing the treats?",
+    "hit": "Oh my! Good tackle.",
+    "block": "Not today! Got your flag."
+   }
+  },
+  {
+   "index": 51,
+   "folder": "51",
+   "name": "Grandma Mele",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, sweethearts. I'm Grandma Mele.",
+    "field": "Grandma's turn!",
+    "right": "Yes! I've read that one many times.",
+    "wrong": "Oh, fiddlesticks.",
+    "throw": "Right here, honey!",
+    "run": "Coming through, dear!",
+    "td": "Touchdown! Oh, my heart!",
+    "hit": "Oh! Somebody help Grandma up.",
+    "block": "Got your flag, dearie!"
+   }
+  },
+  {
+   "index": 52,
+   "folder": "52",
+   "name": "Priya",
+   "g": "g",
+   "age": 0,
+   "voice_hint": "girl a kid about 9 years old",
+   "lines": {
+    "hello": "Hi, I'm Priya!",
+    "field": "Here I come!",
+    "right": "Yay! That's right!",
+    "wrong": "Oops. Next time!",
+    "throw": "Over here! Pass it to me!",
+    "run": "Wheee! Catch me if you can!",
+    "td": "Touchdown! Did you see that?",
+    "hit": "Hey! No fair!",
+    "block": "Got your flag!"
+   }
+  },
+  {
+   "index": 53,
+   "folder": "53",
+   "name": "Anika",
+   "g": "g",
+   "age": 1,
+   "voice_hint": "woman, a young adult in their twenties",
+   "lines": {
+    "hello": "Hey there, I'm Anika.",
+    "field": "On my way!",
+    "right": "Yes! Easy.",
+    "wrong": "Ugh. So close.",
+    "throw": "I'm wide open!",
+    "run": "Too fast for you!",
+    "td": "Touchdown! Let's go!",
+    "hit": "Oh! Okay, good tackle.",
+    "block": "Blocked! Try again."
+   }
+  },
+  {
+   "index": 54,
+   "folder": "54",
+   "name": "Sister Meera",
+   "g": "g",
+   "age": 2,
+   "voice_hint": "woman, an adult in their forties",
+   "lines": {
+    "hello": "Hi, everyone. I'm Sister Meera.",
+    "field": "Here I come, team!",
+    "right": "Yes, that's the one!",
+    "wrong": "Oh, so close. Good question, though.",
+    "throw": "I'm open on the left!",
+    "run": "Excuse me, coming through!",
+    "td": "Touchdown! Oh, that was fun!",
+    "hit": "Oh! Well played.",
+    "block": "Got your flag. Nice try!"
+   }
+  },
+  {
+   "index": 55,
+   "folder": "55",
+   "name": "Grandma Lata",
+   "g": "g",
+   "age": 3,
+   "voice_hint": "woman, a grandparent in their seventies",
+   "lines": {
+    "hello": "Hello, dears. I'm Grandma Lata.",
+    "field": "Make way, I'm coming!",
+    "right": "Oh, my goodness, I got it right!",
+    "wrong": "Oh dear. Well, bless my heart.",
+    "throw": "Toss it here, sweetie!",
+    "run": "Out of my way, I've got cookies in the oven!",
+    "td": "Touchdown! Goodness gracious!",
+    "hit": "Oh my! Help me up, dear.",
+    "block": "Not so fast, young one!"
+   }
+  },
+  {
+   "index": 56,
+   "folder": "56",
+   "name": "Robo",
+   "g": "r",
+   "age": -1,
+   "voice_hint": "friendly cartoon robot",
+   "lines": {
+    "hello": "Beep boop. I am Robo.",
+    "field": "Robo, entering the field.",
+    "right": "Correct. As calculated.",
+    "wrong": "Error. Recalculating.",
+    "throw": "Target acquired. Throw the ball.",
+    "run": "Engaging run mode.",
+    "td": "Touchdown. Celebration protocol activated.",
+    "hit": "Ouch. Systems rebooting.",
+    "block": "Blocked. Access denied."
    }
   }
  ]

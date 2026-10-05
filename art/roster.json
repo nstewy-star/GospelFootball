@@ -1,0 +1,572 @@
+{
+ "looks": [
+  {
+   "key": "brunette",
+   "description": "Caucasian with brown hair",
+   "helmet": "red"
+  },
+  {
+   "key": "blonde",
+   "description": "Caucasian with blonde hair",
+   "helmet": "gold"
+  },
+  {
+   "key": "ginger",
+   "description": "Caucasian with red hair and freckles",
+   "helmet": "green"
+  },
+  {
+   "key": "native",
+   "description": "Native American",
+   "helmet": "turquoise"
+  },
+  {
+   "key": "asian",
+   "description": "East Asian",
+   "helmet": "blue"
+  },
+  {
+   "key": "poly",
+   "description": "Polynesian",
+   "helmet": "orange"
+  },
+  {
+   "key": "indian",
+   "description": "Indian (South Asian)",
+   "helmet": "purple"
+  }
+ ],
+ "ages": [
+  {
+   "key": "kid",
+   "description": "a kid about 9 years old"
+  },
+  {
+   "key": "young",
+   "description": "a young adult in their twenties"
+  },
+  {
+   "key": "forties",
+   "description": "an adult in their forties"
+  },
+  {
+   "key": "grand",
+   "description": "a grandparent in their seventies"
+  }
+ ],
+ "avatars": [
+  {
+   "index": 0,
+   "name": "Ben",
+   "g": "b",
+   "look": "brunette",
+   "age": 0,
+   "helmet": "red",
+   "description": "boy, Caucasian with brown hair, a kid about 9 years old"
+  },
+  {
+   "index": 1,
+   "name": "Tyler",
+   "g": "b",
+   "look": "brunette",
+   "age": 1,
+   "helmet": "red",
+   "description": "boy, Caucasian with brown hair, a young adult in their twenties"
+  },
+  {
+   "index": 2,
+   "name": "Brother Mark",
+   "g": "b",
+   "look": "brunette",
+   "age": 2,
+   "helmet": "red",
+   "description": "boy, Caucasian with brown hair, an adult in their forties"
+  },
+  {
+   "index": 3,
+   "name": "Grandpa Walt",
+   "g": "b",
+   "look": "brunette",
+   "age": 3,
+   "helmet": "red",
+   "description": "boy, Caucasian with brown hair, a grandparent in their seventies"
+  },
+  {
+   "index": 4,
+   "name": "Jake",
+   "g": "b",
+   "look": "blonde",
+   "age": 0,
+   "helmet": "gold",
+   "description": "boy, Caucasian with blonde hair, a kid about 9 years old"
+  },
+  {
+   "index": 5,
+   "name": "Evan",
+   "g": "b",
+   "look": "blonde",
+   "age": 1,
+   "helmet": "gold",
+   "description": "boy, Caucasian with blonde hair, a young adult in their twenties"
+  },
+  {
+   "index": 6,
+   "name": "Brother Dave",
+   "g": "b",
+   "look": "blonde",
+   "age": 2,
+   "helmet": "gold",
+   "description": "boy, Caucasian with blonde hair, an adult in their forties"
+  },
+  {
+   "index": 7,
+   "name": "Grandpa Hal",
+   "g": "b",
+   "look": "blonde",
+   "age": 3,
+   "helmet": "gold",
+   "description": "boy, Caucasian with blonde hair, a grandparent in their seventies"
+  },
+  {
+   "index": 8,
+   "name": "Freddie",
+   "g": "b",
+   "look": "ginger",
+   "age": 0,
+   "helmet": "green",
+   "description": "boy, Caucasian with red hair and freckles, a kid about 9 years old"
+  },
+  {
+   "index": 9,
+   "name": "Liam",
+   "g": "b",
+   "look": "ginger",
+   "age": 1,
+   "helmet": "green",
+   "description": "boy, Caucasian with red hair and freckles, a young adult in their twenties"
+  },
+  {
+   "index": 10,
+   "name": "Brother Sean",
+   "g": "b",
+   "look": "ginger",
+   "age": 2,
+   "helmet": "green",
+   "description": "boy, Caucasian with red hair and freckles, an adult in their forties"
+  },
+  {
+   "index": 11,
+   "name": "Grandpa Gus",
+   "g": "b",
+   "look": "ginger",
+   "age": 3,
+   "helmet": "green",
+   "description": "boy, Caucasian with red hair and freckles, a grandparent in their seventies"
+  },
+  {
+   "index": 12,
+   "name": "Koda",
+   "g": "b",
+   "look": "native",
+   "age": 0,
+   "helmet": "turquoise",
+   "description": "boy, Native American, a kid about 9 years old"
+  },
+  {
+   "index": 13,
+   "name": "Dakota",
+   "g": "b",
+   "look": "native",
+   "age": 1,
+   "helmet": "turquoise",
+   "description": "boy, Native American, a young adult in their twenties"
+  },
+  {
+   "index": 14,
+   "name": "Brother Joseph",
+   "g": "b",
+   "look": "native",
+   "age": 2,
+   "helmet": "turquoise",
+   "description": "boy, Native American, an adult in their forties"
+  },
+  {
+   "index": 15,
+   "name": "Grandpa Eli",
+   "g": "b",
+   "look": "native",
+   "age": 3,
+   "helmet": "turquoise",
+   "description": "boy, Native American, a grandparent in their seventies"
+  },
+  {
+   "index": 16,
+   "name": "Kenji",
+   "g": "b",
+   "look": "asian",
+   "age": 0,
+   "helmet": "blue",
+   "description": "boy, East Asian, a kid about 9 years old"
+  },
+  {
+   "index": 17,
+   "name": "Daniel",
+   "g": "b",
+   "look": "asian",
+   "age": 1,
+   "helmet": "blue",
+   "description": "boy, East Asian, a young adult in their twenties"
+  },
+  {
+   "index": 18,
+   "name": "Brother Jun",
+   "g": "b",
+   "look": "asian",
+   "age": 2,
+   "helmet": "blue",
+   "description": "boy, East Asian, an adult in their forties"
+  },
+  {
+   "index": 19,
+   "name": "Grandpa Hiro",
+   "g": "b",
+   "look": "asian",
+   "age": 3,
+   "helmet": "blue",
+   "description": "boy, East Asian, a grandparent in their seventies"
+  },
+  {
+   "index": 20,
+   "name": "Sione",
+   "g": "b",
+   "look": "poly",
+   "age": 0,
+   "helmet": "orange",
+   "description": "boy, Polynesian, a kid about 9 years old"
+  },
+  {
+   "index": 21,
+   "name": "Tavita",
+   "g": "b",
+   "look": "poly",
+   "age": 1,
+   "helmet": "orange",
+   "description": "boy, Polynesian, a young adult in their twenties"
+  },
+  {
+   "index": 22,
+   "name": "Brother Manu",
+   "g": "b",
+   "look": "poly",
+   "age": 2,
+   "helmet": "orange",
+   "description": "boy, Polynesian, an adult in their forties"
+  },
+  {
+   "index": 23,
+   "name": "Grandpa Tevita",
+   "g": "b",
+   "look": "poly",
+   "age": 3,
+   "helmet": "orange",
+   "description": "boy, Polynesian, a grandparent in their seventies"
+  },
+  {
+   "index": 24,
+   "name": "Arjun",
+   "g": "b",
+   "look": "indian",
+   "age": 0,
+   "helmet": "purple",
+   "description": "boy, Indian (South Asian), a kid about 9 years old"
+  },
+  {
+   "index": 25,
+   "name": "Rohan",
+   "g": "b",
+   "look": "indian",
+   "age": 1,
+   "helmet": "purple",
+   "description": "boy, Indian (South Asian), a young adult in their twenties"
+  },
+  {
+   "index": 26,
+   "name": "Brother Raj",
+   "g": "b",
+   "look": "indian",
+   "age": 2,
+   "helmet": "purple",
+   "description": "boy, Indian (South Asian), an adult in their forties"
+  },
+  {
+   "index": 27,
+   "name": "Grandpa Dev",
+   "g": "b",
+   "look": "indian",
+   "age": 3,
+   "helmet": "purple",
+   "description": "boy, Indian (South Asian), a grandparent in their seventies"
+  },
+  {
+   "index": 28,
+   "name": "Clara",
+   "g": "g",
+   "look": "brunette",
+   "age": 0,
+   "helmet": "red",
+   "description": "girl, Caucasian with brown hair, a kid about 9 years old"
+  },
+  {
+   "index": 29,
+   "name": "Emma",
+   "g": "g",
+   "look": "brunette",
+   "age": 1,
+   "helmet": "red",
+   "description": "girl, Caucasian with brown hair, a young adult in their twenties"
+  },
+  {
+   "index": 30,
+   "name": "Sister Beth",
+   "g": "g",
+   "look": "brunette",
+   "age": 2,
+   "helmet": "red",
+   "description": "girl, Caucasian with brown hair, an adult in their forties"
+  },
+  {
+   "index": 31,
+   "name": "Grandma Ruth",
+   "g": "g",
+   "look": "brunette",
+   "age": 3,
+   "helmet": "red",
+   "description": "girl, Caucasian with brown hair, a grandparent in their seventies"
+  },
+  {
+   "index": 32,
+   "name": "Sally",
+   "g": "g",
+   "look": "blonde",
+   "age": 0,
+   "helmet": "gold",
+   "description": "girl, Caucasian with blonde hair, a kid about 9 years old"
+  },
+  {
+   "index": 33,
+   "name": "Kaylee",
+   "g": "g",
+   "look": "blonde",
+   "age": 1,
+   "helmet": "gold",
+   "description": "girl, Caucasian with blonde hair, a young adult in their twenties"
+  },
+  {
+   "index": 34,
+   "name": "Sister Jen",
+   "g": "g",
+   "look": "blonde",
+   "age": 2,
+   "helmet": "gold",
+   "description": "girl, Caucasian with blonde hair, an adult in their forties"
+  },
+  {
+   "index": 35,
+   "name": "Grandma June",
+   "g": "g",
+   "look": "blonde",
+   "age": 3,
+   "helmet": "gold",
+   "description": "girl, Caucasian with blonde hair, a grandparent in their seventies"
+  },
+  {
+   "index": 36,
+   "name": "Rosie",
+   "g": "g",
+   "look": "ginger",
+   "age": 0,
+   "helmet": "green",
+   "description": "girl, Caucasian with red hair and freckles, a kid about 9 years old"
+  },
+  {
+   "index": 37,
+   "name": "Molly",
+   "g": "g",
+   "look": "ginger",
+   "age": 1,
+   "helmet": "green",
+   "description": "girl, Caucasian with red hair and freckles, a young adult in their twenties"
+  },
+  {
+   "index": 38,
+   "name": "Sister Maggie",
+   "g": "g",
+   "look": "ginger",
+   "age": 2,
+   "helmet": "green",
+   "description": "girl, Caucasian with red hair and freckles, an adult in their forties"
+  },
+  {
+   "index": 39,
+   "name": "Grandma Gert",
+   "g": "g",
+   "look": "ginger",
+   "age": 3,
+   "helmet": "green",
+   "description": "girl, Caucasian with red hair and freckles, a grandparent in their seventies"
+  },
+  {
+   "index": 40,
+   "name": "Kaya",
+   "g": "g",
+   "look": "native",
+   "age": 0,
+   "helmet": "turquoise",
+   "description": "girl, Native American, a kid about 9 years old"
+  },
+  {
+   "index": 41,
+   "name": "Winona",
+   "g": "g",
+   "look": "native",
+   "age": 1,
+   "helmet": "turquoise",
+   "description": "girl, Native American, a young adult in their twenties"
+  },
+  {
+   "index": 42,
+   "name": "Sister Tala",
+   "g": "g",
+   "look": "native",
+   "age": 2,
+   "helmet": "turquoise",
+   "description": "girl, Native American, an adult in their forties"
+  },
+  {
+   "index": 43,
+   "name": "Grandma Nina",
+   "g": "g",
+   "look": "native",
+   "age": 3,
+   "helmet": "turquoise",
+   "description": "girl, Native American, a grandparent in their seventies"
+  },
+  {
+   "index": 44,
+   "name": "Mei",
+   "g": "g",
+   "look": "asian",
+   "age": 0,
+   "helmet": "blue",
+   "description": "girl, East Asian, a kid about 9 years old"
+  },
+  {
+   "index": 45,
+   "name": "Hana",
+   "g": "g",
+   "look": "asian",
+   "age": 1,
+   "helmet": "blue",
+   "description": "girl, East Asian, a young adult in their twenties"
+  },
+  {
+   "index": 46,
+   "name": "Sister Yuna",
+   "g": "g",
+   "look": "asian",
+   "age": 2,
+   "helmet": "blue",
+   "description": "girl, East Asian, an adult in their forties"
+  },
+  {
+   "index": 47,
+   "name": "Grandma Lin",
+   "g": "g",
+   "look": "asian",
+   "age": 3,
+   "helmet": "blue",
+   "description": "girl, East Asian, a grandparent in their seventies"
+  },
+  {
+   "index": 48,
+   "name": "Moana",
+   "g": "g",
+   "look": "poly",
+   "age": 0,
+   "helmet": "orange",
+   "description": "girl, Polynesian, a kid about 9 years old"
+  },
+  {
+   "index": 49,
+   "name": "Leilani",
+   "g": "g",
+   "look": "poly",
+   "age": 1,
+   "helmet": "orange",
+   "description": "girl, Polynesian, a young adult in their twenties"
+  },
+  {
+   "index": 50,
+   "name": "Sister Ana",
+   "g": "g",
+   "look": "poly",
+   "age": 2,
+   "helmet": "orange",
+   "description": "girl, Polynesian, an adult in their forties"
+  },
+  {
+   "index": 51,
+   "name": "Grandma Mele",
+   "g": "g",
+   "look": "poly",
+   "age": 3,
+   "helmet": "orange",
+   "description": "girl, Polynesian, a grandparent in their seventies"
+  },
+  {
+   "index": 52,
+   "name": "Priya",
+   "g": "g",
+   "look": "indian",
+   "age": 0,
+   "helmet": "purple",
+   "description": "girl, Indian (South Asian), a kid about 9 years old"
+  },
+  {
+   "index": 53,
+   "name": "Anika",
+   "g": "g",
+   "look": "indian",
+   "age": 1,
+   "helmet": "purple",
+   "description": "girl, Indian (South Asian), a young adult in their twenties"
+  },
+  {
+   "index": 54,
+   "name": "Sister Meera",
+   "g": "g",
+   "look": "indian",
+   "age": 2,
+   "helmet": "purple",
+   "description": "girl, Indian (South Asian), an adult in their forties"
+  },
+  {
+   "index": 55,
+   "name": "Grandma Lata",
+   "g": "g",
+   "look": "indian",
+   "age": 3,
+   "helmet": "purple",
+   "description": "girl, Indian (South Asian), a grandparent in their seventies"
+  },
+  {
+   "index": 56,
+   "name": "Robo",
+   "g": "r",
+   "look": "robot",
+   "age": -1,
+   "helmet": "silver",
+   "description": "a friendly cartoon robot football player"
+  }
+ ]
+}
