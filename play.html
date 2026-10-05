@@ -51,6 +51,12 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 #teamSeg[hidden], #glStyles[hidden], #teamLbl[hidden], #teamNote[hidden], #glNote[hidden] { display: none !important; }
 .av svg, .av img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .me { display: flex; align-items: center; gap: 12px; }
+.me .av { width: 56px; height: 56px; }
+/* While this phone has to act (its own question, a pick, the hike), the question comes first and the player card with the score drops below it, so the question is never pushed off the screen (Nick) */
+#main.act #meCard { order: 2; padding: 12px 14px; gap: 8px; }
+#main.act .me { gap: 10px; } #main.act .me .av { width: 36px; height: 36px; } #main.act .me .nm { font-size: 18px; } #main.act .me .tm { font-size: 12px; }
+#main.act .strip { padding: 8px 12px; } #main.act .strip .t .sc { font-size: 22px; } #main.act .strip .mid { font-size: 14px; padding-top: 4px; }
+@media (max-height: 760px) { .q { font-size: 19px; } .opt { min-height: 54px; padding: 10px 12px; font-size: 18px; } .opts { gap: 8px; } #view.card { padding: 14px; gap: 10px; } .who { gap: 8px; } }
 .me .nm { font-size: 24px; font-weight: 700; line-height: 1.1; }
 .me .tm { font-size: 14px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .strip { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4px 10px; background: var(--panel-2); border-radius: 14px; padding: 10px 14px; }
@@ -144,7 +150,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-060236';</script>
+<script>window.GF_BUILD = '20261005-062446';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -419,15 +425,17 @@ function render() {
   const s = state, m = (s && s.me) || me;
   const names = (s && s.teams) || (hello && hello.teams) || ["Team A", "Team B"];
   const teamOf = t => names[t] || (t ? "Team B" : "Team A");
-  $("#meCard").innerHTML = `<div class="me"><span class="av" style="width:56px;height:56px;border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team), m.gl)}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
+  $("#meCard").innerHTML = `<div class="me"><span class="av" style="border:3px solid ${teamColor(m.team)}">${avatarSVG(m.av, teamColor(m.team), m.gl)}</span><div><div class="nm">${esc(m.name)}</div><div class="tm">${esc(teamOf(m.team))} · ${LVL[m.level] || ""}</div></div></div>` +
     (s && s.score ? `<div class="strip"><div class="t"><b>${s.poss === 0 ? "\u{1F3C8} " : ""}${esc(names[0])}</b><span class="sc">${s.score[0]}</span></div><div class="t r"><b>${esc(names[1])}${s.poss === 1 ? " \u{1F3C8}" : ""}</b><span class="sc">${s.score[1]}</span></div>${s.poss != null && s.view !== "end" ? `<div class="mid">${esc(names[s.poss])} ball \u00b7 ${esc(s.down || "")} \u00b7 ${esc(s.play || "")}</div>` : ""}</div>` : "");
   const v = $("#view");
-  if (!s) { v.innerHTML = `<div class="eyebrow">Game ${esc(code)}</div><p class="msg">${conn && conn.open ? "Joining…" : "Connecting to the big screen…"}</p>`; return; }
+  if (!s) { $("#main").classList.remove("act"); v.innerHTML = `<div class="eyebrow">Game ${esc(code)}</div><p class="msg">${conn && conn.open ? "Joining…" : "Connecting to the big screen…"}</p>`; return; }
   const view = s.view;
-  const buzz = (view === "question" || view === "pick" || view === "hike") && view !== lastView;
+  const act = view === "question" || view === "pick" || view === "hike";
+  $("#main").classList.toggle("act", act);
+  const buzz = act && view !== lastView;
   if (view !== lastView) { sentPick = null; sentHike = false; if (view !== "question") myAns = null; }
   lastView = view;
-  if (buzz) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (x) {} }
+  if (buzz) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (x) {} try { window.scrollTo({ top: 0 }); } catch (x) {} }
   let h = "";
   if (view === "lobby") {
     const list = t => `<div><h3><span class="dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${teamColor(t)};margin-right:6px"></span>${esc(teamOf(t))}</h3><ul class="roster">${(s.roster || []).filter(p => p.team === t).map(p => `<li><span class="av">${avatarSVG(p.av, null, p.gl)}</span><span>${esc(p.name)}</span>${p.phone ? `<span style="opacity:${p.on ? 1 : .4}">\u{1F4F1}</span>` : ""}</li>`).join("") || "<li class='note'>Nobody yet</li>"}</ul></div>`;
@@ -438,7 +446,7 @@ function render() {
     const q = s.q, a = s.answered, mineQ = view === "question";
     const who = q.crew ? `Team question for ${esc(teamOf(q.team))}` : `${esc(q.who)}'s question`;
     h = `<div class="who"><span class="av" style="width:40px;height:40px;border:3px solid ${teamColor(q.team)}">${avatarSVG(q.av, teamColor(q.team), q.gl)}</span><span>${who}</span><span class="lvl ${esc(q.level)}">${esc(q.level)}</span><span class="tag">${esc(q.cat)}</span></div>
-      <div class="note">${mineQ ? (q.crew ? "Everyone on your team votes. Majority wins." : "It's your turn! Answer on your phone.") : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
+      <div class="note">${mineQ ? (q.crew ? "Everyone on your team votes. Majority wins." : "Your turn! Tap an answer.") : `${esc(q.who)} is on ${esc(q.side)}. Question ${q.n} of ${q.of} in this huddle.`}</div>
       <div class="q">${esc(q.text)}</div>`;
     const voteNote = mineQ && s.vote ? `<div class="note">${s.vote.mine != null ? `Your vote: <b>${esc(s.vote.mine)}</b>. ` : ""}${s.vote.got} of ${s.vote.need} on your team have voted.</div>` : "";
     const canTap = mineQ && !a;
