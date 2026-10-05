@@ -144,8 +144,9 @@ input[type=text], select { font-family: var(--f-ui); font-size: 18px; background
 .seg { display: inline-flex; border-radius: 999px; overflow: hidden; background: var(--panel); }
 .seg button { background: transparent; border: 0; padding: 8px 14px; font-weight: 600; font-size: 16px; }
 .seg button[aria-pressed="true"] { background: var(--gold); color: #1d1606; }
-#lvlSeg { flex: 1 1 100%; }
-#lvlSeg button { flex: 1; padding-inline: 6px; }
+.field-label.name { flex: 1 1 180px; } /* the name box shares its row with the level, the team and Add (Nick, 2026-10-05) */
+#lvlSeg { flex: 0 1 auto; }
+#lvlSeg button { flex: 1; padding-inline: 11px; }
 .avpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding: 4px 2px; flex-basis: 100%; }
 .avpick button { position: relative; width: 100%; aspect-ratio: 1; max-width: 100%; height: auto; padding: 0; border-radius: 50%; border: 3px solid transparent; background: var(--panel-2); overflow: hidden; }
 .avpick button svg, .avpick button img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%; }
@@ -445,10 +446,7 @@ td.n, th.n { text-align: right; }
         <div><span class="eyebrow">Players</span><h2>Sign your players</h2></div>
         <form id="addForm" class="row" autocomplete="off">
           <div class="editbar" id="editBar" hidden></div>
-          <label class="field-label" for="pName" style="flex-basis:100%">Player name
-            <input type="text" id="pName" maxlength="24" placeholder="Type a name"></label>
-          <div class="avpick" id="avPick" role="group" aria-label="Pick a picture"></div>
-          <div class="avname" id="avName"></div>
+          <label class="field-label name" for="pName"><input type="text" id="pName" maxlength="24" placeholder="Type a name" aria-label="Player name"></label>
           <div class="seg" id="lvlSeg" role="group" aria-label="Level">
             <button type="button" data-v="pewee" aria-pressed="true">Pewee</button>
             <button type="button" data-v="college" aria-pressed="false">College</button>
@@ -462,6 +460,8 @@ td.n, th.n { text-align: right; }
           <button class="btn" type="submit" id="addBtn">Add</button>
           <button class="btn ghost" type="button" id="cancelEdit" hidden>Cancel</button>
           <button class="btn ghost" type="button" id="removeBtn" hidden>Remove player</button>
+          <div class="avpick" id="avPick" role="group" aria-label="Pick a picture"></div>
+          <div class="avname" id="avName"></div>
           <div class="glwrap"><label class="check" for="glChk" style="flex-basis:auto"><input type="checkbox" id="glChk"> Glasses</label><div class="seg glstyles" id="glStyles" role="group" aria-label="Glasses style" hidden><button type="button" data-v="black" aria-pressed="true" title="Black"><img alt="black"></button><button type="button" data-v="brown" aria-pressed="false" title="Brown"><img alt="brown"></button><button type="button" data-v="gold" aria-pressed="false" title="Gold"><img alt="gold"></button><button type="button" data-v="red" aria-pressed="false" title="Red"><img alt="red"></button></div><span class="hint" id="glNote" style="margin:0"></span></div>
           <label class="check" for="crewChk"><input type="checkbox" id="crewChk"> Team player: the whole team answers its questions together</label>
           <label class="check" for="botChk"><input type="checkbox" id="botChk"> Bot: the computer plays this spot (its level sets how often it answers right)</label>
@@ -545,7 +545,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-045238';</script>
+<script>window.GF_BUILD = '20261005-045723';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2229,10 +2229,12 @@ function renderModes() {
   $("#modeSel").innerHTML = MODES.map(m => `<option value="${m.id}" title="${m.desc}"${setup.mode === m.id ? " selected" : ""}>${m.name}</option>`).join("");
 }
 // the team lists on the picture, above the code; the caption says whether phones pick their team
+// teamList(t): a team's players in alphabetical order (Nick, 2026-10-05: "alphabetical order per team"); i is the roster index, so drags and edits still work
+function teamList(t) { return setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t).sort((a, b) => a.p.name.localeCompare(b.p.name, undefined, { sensitivity: "base" }) || a.i - b.i); }
 function renderHeroTeams() {
   const box = $("#heroTeams"); if (!box) return;
   const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
-  box.innerHTML = [0, 1].map(t => { const list = setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t);
+  box.innerHTML = [0, 1].map(t => { const list = teamList(t);
     return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
     `<p class="note">${setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move, click to edit, double-click to rename." : "Drag to move a player, click to edit, double-click to rename. Open teams to let phones pick."}</p>`;
 }
@@ -2241,7 +2243,7 @@ function renderRoster() {
   renderHeroTeams();
   const names = [$("#team0").value || "Home", $("#team1").value || "Away"];
   $("#rosterCols").innerHTML = [0, 1].map(t => {
-    const list = setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t);
+    const list = teamList(t);
     return `<div class="team-col" data-team="${t}"><h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} (${list.length})</h3>
       ${list.length ? `<ul class="roster">${list.map(({ p, i }) => `<li class="${setup.editing === i ? "editing" : ""}" data-i="${i}"><span class="grip" data-grip="${i}" title="Drag to move" aria-hidden="true">\u2807\u2807</span><button type="button" class="nm tap" data-edit="${i}" aria-label="Edit ${esc(p.name)}">${avHTML(p.av, 34, p.gl)}<span>${esc(p.name)}</span>${p.pid ? `<span class="phb ${phoneOnline(p.pid) ? "on" : ""}" title="${phoneOnline(p.pid) ? "Phone connected" : "Phone not connected"}">\u{1F4F1}</span>` : ""}</button><button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(p.name)}" title="Remove">\u00d7</button><span class="meta"><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span>${p.crew ? `<span class="crew">Team</span>` : p.bot ? `<span class="crew">Bot</span>` : ""}<button type="button" class="ed" data-edit="${i}" aria-label="Edit ${esc(p.name)}">Edit</button></span></li>`).join("")}</ul>`
       : `<div class="empty">No players yet. Add one above or drag one here.</div>`}</div>`;
