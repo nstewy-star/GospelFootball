@@ -364,12 +364,14 @@ td.n, th.n { text-align: right; }
           <button class="btn" type="submit" id="addBtn">Add</button>
           <button class="btn ghost" type="button" id="cancelEdit" hidden>Cancel</button>
           <label class="check" for="crewChk"><input type="checkbox" id="crewChk"> Team player: the whole team answers its questions together</label>
+          <label class="check" for="botChk"><input type="checkbox" id="botChk"> Bot: the computer plays this spot (its level sets how often it answers right)</label>
         </form>
-        <p class="hint">Drag a player by the dots to move them to the other team or change their spot. Short a player? Add a team player, or use Fill with team players to even up the sides. Random picks a new level for every question.</p>
+        <p class="hint">Drag a player by the dots to move them to the other team or change their spot. Short a player? Add a team player, or use Fill with team players to even up the sides. Want to play against the computer? Fill with bots puts bots on the smaller team; a Pewee bot gets about 6 in 10 right, a Pro bot about 3 in 4. Random picks a new level for every question.</p>
         <div class="team-cols" id="rosterCols"></div>
         <div class="row" style="justify-content:space-between">
           <button class="btn ghost" type="button" id="balanceBtn">Even out teams</button>
           <button class="btn ghost" type="button" id="fillBtn">Fill with team players</button>
+          <button class="btn ghost" type="button" id="botsBtn">Fill with bots</button>
           <button class="btn ghost" type="button" id="clearBtn">Clear roster</button>
         </div>
         <div class="phones" id="phoneBox"></div>
@@ -383,7 +385,7 @@ td.n, th.n { text-align: right; }
         <div>
           <h4>The huddle</h4>
           <ul>
-            <li>In each huddle, every player answers one question. A team player's question is answered by the whole team together. Pewee questions are easiest, College are harder, Pro are toughest.</li>
+            <li>In each huddle, every player answers one question. A team player's question is answered by the whole team together. Bots answer their own questions (Pewee bots about 60% right, College 68%, Pro 76%) and call their own plays. Pewee questions are easiest, College are harder, Pro are toughest.</li>
             <li>Answer right and you sprint onto the field and join your team's line of scrimmage. Miss it and you watch this play from the sideline.</li>
             <li>Like real football, the offense keeps the ball and drives one way. Every huddle is one play and one down, and the offense gets 4 downs to reach the yellow line for a first down.</li>
             <li>Then the offense calls the play: huddle up and pick who gets the ball (tap the player). The defense guesses who it will be. Guess right and the defender reads the play; guess wrong and the receiver has room.</li>
@@ -822,6 +824,7 @@ const AVATARS = [
   { n: "Sister Sadie", g: "g", s: 1, h: "long", hc: "#e0a83a", e: "teeth", x: ["freckles", "bow"], c: "#3d6fd9" }
 ];
 function avatarSVG(i, helmet) {
+  if (i === "bot") return botSVG(helmet);
   if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
   const a = AVATARS[i], sk = AV_SKIN[a.s], hc = a.hc, sh = "#3a2a20";
   let back = "", front = "", body = "", face = "", extra = "";
@@ -901,6 +904,19 @@ function avatarSVG(i, helmet) {
       <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>`;
   }
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${back}${body}${head}${front}${face}${hel}${extra}</svg>`;
+}
+function botSVG(helmet) {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="22" y="70" width="56" height="30" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>
+    ${helmet ? "" : `<line x1="50" y1="8" x2="50" y2="18" stroke="#1d1a17" stroke-width="2.5"/><circle cx="50" cy="7" r="4" fill="#e9b949" stroke="#1d1a17" stroke-width="1.5"/>`}
+    <rect x="22" y="18" width="56" height="46" rx="12" fill="#b9c7ce" stroke="#1d1a17" stroke-width="2"/>
+    <rect x="30" y="30" width="16" height="14" rx="4" fill="#1d1a17"/><rect x="54" y="30" width="16" height="14" rx="4" fill="#1d1a17"/>
+    <circle cx="38" cy="37" r="4" fill="#5fe3ff"/><circle cx="62" cy="37" r="4" fill="#5fe3ff"/>
+    <rect x="34" y="50" width="32" height="8" rx="3" fill="#1d1a17"/>
+    ${[0, 1, 2].map(k => `<rect x="${37 + k * 9}" y="51.5" width="5" height="5" rx="1" fill="#f2efe4"/>`).join("")}
+    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}
+  </svg>`;
 }
 function teamSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1033,15 +1049,16 @@ const setup = {
     { name: "Ella", level: "college", team: 1, av: 9 }, { name: "Mia", level: "pewee", team: 1, av: 8 }
   ]
 };
-setup.roster.forEach((p, i) => { if (p.av == null) p.av = p.crew ? "team" : i % AVATARS.length; });
+setup.roster.forEach((p, i) => { if (p.av == null) p.av = p.crew ? "team" : p.bot ? "bot" : i % AVATARS.length; });
 setup.av = nextAv();
 function nextAv() { const used = setup.roster.map(p => p.av); for (let k = 0; k < AVATARS.length; k++) if (!used.includes(k)) return k; return rnd(AVATARS.length); }
 const avHTML = (av, size) => `<span class="av" style="width:${size}px;height:${size}px">${avatarSVG(av)}</span>`;
 function renderAvPick() {
-  const crew = $("#crewChk") && $("#crewChk").checked;
-  $("#avPick").innerHTML = AVATARS.map((a, i) => `<button type="button" data-av="${i}" aria-pressed="${!crew && setup.av === i}" aria-label="${esc(a.n)}" title="${esc(a.n)}">${avatarSVG(i)}</button>`).join("") +
-    `<button type="button" data-av="team" aria-pressed="${!!crew}" aria-label="Team player" title="Team player">${avatarSVG("team")}</button>`;
-  $("#avName").textContent = crew ? "Team player: the whole team answers" : AVATARS[setup.av].n;
+  const crew = $("#crewChk") && $("#crewChk").checked, bot = !crew && $("#botChk") && $("#botChk").checked;
+  $("#avPick").innerHTML = AVATARS.map((a, i) => `<button type="button" data-av="${i}" aria-pressed="${!crew && !bot && setup.av === i}" aria-label="${esc(a.n)}" title="${esc(a.n)}">${avatarSVG(i)}</button>`).join("") +
+    `<button type="button" data-av="team" aria-pressed="${!!crew}" aria-label="Team player" title="Team player">${avatarSVG("team")}</button>` +
+    `<button type="button" data-av="bot" aria-pressed="${!!bot}" aria-label="Bot" title="Bot">${avatarSVG("bot")}</button>`;
+  $("#avName").textContent = crew ? "Team player: the whole team answers" : bot ? "Bot: the computer plays this spot" : AVATARS[setup.av].n;
 }
 let sound = store.get("gf_sound") !== false;
 let audioCtx = null;
@@ -1077,7 +1094,7 @@ function renderRoster() {
   $("#rosterCols").innerHTML = [0, 1].map(t => {
     const list = setup.roster.map((p, i) => ({ p, i })).filter(x => x.p.team === t);
     return `<div class="team-col" data-team="${t}"><h3><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} (${list.length})</h3>
-      ${list.length ? `<ul class="roster">${list.map(({ p, i }) => `<li class="${setup.editing === i ? "editing" : ""}" data-i="${i}"><span class="grip" data-grip="${i}" title="Drag to move" aria-hidden="true">\u2807\u2807</span><button type="button" class="nm tap" data-edit="${i}" aria-label="Edit ${esc(p.name)}">${avHTML(p.av, 34)}<span>${esc(p.name)}</span>${p.pid ? `<span class="phb ${phoneOnline(p.pid) ? "on" : ""}" title="${phoneOnline(p.pid) ? "Phone connected" : "Phone not connected"}">\u{1F4F1}</span>` : ""}</button><button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(p.name)}" title="Remove">\u00d7</button><span class="meta"><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span>${p.crew ? `<span class="crew">Team</span>` : ""}<button type="button" class="ed" data-edit="${i}" aria-label="Edit ${esc(p.name)}">Edit</button></span></li>`).join("")}</ul>`
+      ${list.length ? `<ul class="roster">${list.map(({ p, i }) => `<li class="${setup.editing === i ? "editing" : ""}" data-i="${i}"><span class="grip" data-grip="${i}" title="Drag to move" aria-hidden="true">\u2807\u2807</span><button type="button" class="nm tap" data-edit="${i}" aria-label="Edit ${esc(p.name)}">${avHTML(p.av, 34)}<span>${esc(p.name)}</span>${p.pid ? `<span class="phb ${phoneOnline(p.pid) ? "on" : ""}" title="${phoneOnline(p.pid) ? "Phone connected" : "Phone not connected"}">\u{1F4F1}</span>` : ""}</button><button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(p.name)}" title="Remove">\u00d7</button><span class="meta"><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span>${p.crew ? `<span class="crew">Team</span>` : p.bot ? `<span class="crew">Bot</span>` : ""}<button type="button" class="ed" data-edit="${i}" aria-label="Edit ${esc(p.name)}">Edit</button></span></li>`).join("")}</ul>`
       : `<div class="empty">No players yet. Add one above or drag one here.</div>`}</div>`;
   }).join("");
   if (typeof netSync === "function") netSync();
@@ -1087,30 +1104,32 @@ function segSet(id, v) { document.querySelectorAll(`#${id} button`).forEach(b =>
 $("#modes").addEventListener("click", e => { const b = e.target.closest(".mode"); if (!b) return; setup.mode = b.dataset.m; renderModes(); });
 $("#avPick").addEventListener("click", e => {
   const b = e.target.closest("[data-av]"); if (!b) return;
-  if (b.dataset.av === "team") { $("#crewChk").checked = true; }
-  else { setup.av = +b.dataset.av; $("#crewChk").checked = false; }
+  if (b.dataset.av === "team") { $("#crewChk").checked = true; $("#botChk").checked = false; }
+  else if (b.dataset.av === "bot") { $("#botChk").checked = true; $("#crewChk").checked = false; }
+  else { setup.av = +b.dataset.av; $("#crewChk").checked = false; $("#botChk").checked = false; }
   renderAvPick();
 });
-$("#crewChk").addEventListener("change", renderAvPick);
+$("#crewChk").addEventListener("change", () => { if ($("#crewChk").checked) $("#botChk").checked = false; renderAvPick(); });
+$("#botChk").addEventListener("change", () => { if ($("#botChk").checked) $("#crewChk").checked = false; renderAvPick(); });
 $("#lvlSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.level = b.dataset.v; segSet("lvlSeg", setup.level); });
 $("#teamSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.team = +b.dataset.v; segSet("teamSeg", setup.team); });
 $("#addForm").addEventListener("submit", e => {
   e.preventDefault();
-  const crew = $("#crewChk").checked;
-  const name = $("#pName").value.trim() || (crew ? crewName() : "");
+  const crew = $("#crewChk").checked, bot = !crew && $("#botChk").checked;
+  const name = $("#pName").value.trim() || (crew ? crewName() : bot ? botName() : "");
   if (!name) { $("#setupErr").textContent = "Type a player name, then press Add."; return; }
-  const rec = { name, level: setup.level, team: setup.team, crew, av: crew ? "team" : setup.av };
+  const rec = { name, level: setup.level, team: setup.team, crew, bot, av: crew ? "team" : bot ? "bot" : setup.av };
   if (setup.editing != null) { setup.roster[setup.editing] = rec; endEdit(); renderRoster(); return; }
   if (setup.roster.length >= 16) { $("#setupErr").textContent = "The roster is full at 16 players."; return; }
   setup.roster.push(rec);
-  $("#pName").value = ""; $("#crewChk").checked = false; setup.av = nextAv(); renderAvPick(); $("#setupErr").textContent = "";
+  $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; setup.av = nextAv(); renderAvPick(); $("#setupErr").textContent = "";
   setup.team = setup.team ? 0 : 1; segSet("teamSeg", setup.team);
   renderRoster(); $("#pName").focus();
 });
 function startEdit(i) {
   const p = setup.roster[i]; setup.editing = i;
-  $("#pName").value = p.name; $("#crewChk").checked = !!p.crew;
-  if (!p.crew) setup.av = p.av;
+  $("#pName").value = p.name; $("#crewChk").checked = !!p.crew; $("#botChk").checked = !!p.bot && !p.crew;
+  if (!p.crew && !p.bot) setup.av = p.av;
   setup.level = p.level; setup.team = p.team; segSet("lvlSeg", p.level); segSet("teamSeg", p.team);
   $("#addBtn").textContent = "Save"; $("#cancelEdit").hidden = false;
   $("#editBar").hidden = false; $("#editBar").textContent = `Editing ${p.name}. Change anything, then press Save.`;
@@ -1118,12 +1137,21 @@ function startEdit(i) {
   $("#addForm").scrollIntoView({ behavior: "smooth", block: "start" }); $("#pName").focus({ preventScroll: true });
 }
 function endEdit() {
-  setup.editing = null; $("#pName").value = ""; $("#crewChk").checked = false; setup.av = nextAv();
+  setup.editing = null; $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; setup.av = nextAv();
   $("#addBtn").textContent = "Add"; $("#cancelEdit").hidden = true; $("#editBar").hidden = true; $("#setupErr").textContent = "";
   renderAvPick();
 }
 $("#cancelEdit").addEventListener("click", () => { endEdit(); renderRoster(); });
 function crewName() { let n = 1; while (setup.roster.some(p => p.name === "Team player " + n)) n++; return "Team player " + n; }
+const BOT_NAMES = ["Gizmo Bot", "Sprocket Bot", "Pixel Bot", "Bolt Bot", "Chip Bot", "Widget Bot", "Zippy Bot", "Rusty Bot", "Beep Bot", "Dynamo Bot"];
+function botName() { const free = BOT_NAMES.find(n => !setup.roster.some(p => p.name === n)); if (free) return free; let n = 1; while (setup.roster.some(p => p.name === "Bot " + n)) n++; return "Bot " + n; }
+$("#botsBtn").addEventListener("click", () => {
+  const c = [0, 1].map(t => setup.roster.filter(p => p.team === t).length);
+  if (c[0] === c[1]) { $("#setupErr").textContent = c[0] ? "The teams are already even. Check Bot above to add a bot anyway." : "Add at least one player first, then bots fill the other team."; return; }
+  const small = c[0] < c[1] ? 0 : 1;
+  for (let i = 0; i < Math.abs(c[0] - c[1]) && setup.roster.length < 16; i++) setup.roster.push({ name: botName(), level: setup.level, team: small, bot: true, av: "bot" });
+  $("#setupErr").textContent = ""; renderRoster();
+});
 $("#fillBtn").addEventListener("click", () => {
   const c = [0, 1].map(t => setup.roster.filter(p => p.team === t).length);
   if (c[0] === c[1]) { $("#setupErr").textContent = c[0] ? "The teams are already even. Check Team player above to add more." : "Add at least one player first."; return; }
@@ -1214,7 +1242,7 @@ function newGame() {
   S = {
     screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Home", score: 0, drive: START }, { name: $("#team1").value.trim() || "Away", score: 0, drive: START }],
-    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, av: p.av, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
+    players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
     line: [[], []], used: {}, log: [], snaps: [], snapIdx: 0, cur: null, kick: null, cands: [], target: null, guess: null
   };
@@ -1515,6 +1543,35 @@ async function stepUp() {
   await moveTok(p, spotlight(), 800);
   if (token !== DIR.token) return;
   showBubble();
+  if (p.bot) botAnswer(p, token);
+}
+const BOT = { key: null, acc: { pewee: 0.6, college: 0.68, pro: 0.76 } };
+function botAnswer(p, token) {
+  setTimeout(() => {
+    if (token !== DIR.token || !S || S.phase !== "questions" || S.answered || !S.q || S.players[S.order[S.qi]] !== p) return;
+    const ok = Math.random() < (BOT.acc[S.q.level] || 0.65);
+    const wrong = S.q.options.filter(o => o !== S.q.answer);
+    answer(ok ? S.q.answer : wrong[rnd(wrong.length)]);
+    setTimeout(() => { if (token === DIR.token && S && S.phase === "questions" && S.answered && S.players[S.order[S.qi]] === p) advance(); }, reduced ? 80 : 1900);
+  }, reduced ? 60 : 1400);
+}
+function botFourth() {
+  const { fg, dr } = fourthInfo(), need = S.ltg - dr;
+  if (fg && fg.chance >= 0.55) kickFG(); else if (need <= 2 || dr >= 62) goForIt(); else punt();
+}
+function botTurn() {
+  if (!S || S.screen !== "game") return;
+  const key = `${S.huddleNo}:${S.phase}:${S.sub || ""}`;
+  if (BOT.key === key) return;
+  const qb = S.qb != null ? S.players[S.qb] : null, cp = S.cap != null ? S.players[S.cap] : null;
+  let fn = null;
+  if (S.phase === "call" && qb && qb.bot) fn = () => pickTarget(S.cands[rnd(S.cands.length)]);
+  else if (S.phase === "guess" && cp && cp.bot) fn = () => pickGuess(S.cands[rnd(S.cands.length)]);
+  else if (S.phase === "set" && qb && qb.bot) fn = hike;
+  else if (S.phase === "fourth" && qb && qb.bot) fn = botFourth;
+  if (!fn) return;
+  BOT.key = key;
+  setTimeout(() => { if (S && S.screen === "game" && `${S.huddleNo}:${S.phase}:${S.sub || ""}` === key) fn(); }, reduced ? 60 : 1200);
 }
 function showBubble() {
   const b = $("#thought"); b.hidden = false; $("#shade").hidden = false;
@@ -1526,7 +1583,7 @@ function renderBubble() {
   const p = S.players[S.order[S.qi]], q = S.q, a = S.answered, off = S.possession;
   const role = p.team === off ? "offense" : "defense";
   const last = S.qi === S.order.length - 1;
-  const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo();
+  const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
   b.innerHTML = `<div class="who"><span class="av" style="width:46px;height:46px;border:3px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true))}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span></div>
     <div class="q">${esc(q.text)}</div>
@@ -1534,7 +1591,7 @@ function renderBubble() {
     ${a ? `<div class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</div>
     <div class="note">${a.ok ? "" : `Answer: <b>${esc(q.answer)}</b>. `}${esc(q.note || "")}</div>
     <div class="actions"><button type="button" class="btn" id="nextBtn">${last ? "Line up!" : "Next player"}</button></div>` :
-    `<div class="note">Question ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} answers on their phone.` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</div>${vi && vi.got ? `<div class="actions"><button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button></div>` : ""}`}`;
+    `<div class="note">Question ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} answers on their phone.` : ""}${isBot ? ` ${esc(p.name)} is thinking…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</div>${vi && vi.got ? `<div class="actions"><button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button></div>` : ""}`}`;
   b.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => answer(q.options[+x.dataset.o])));
   const nb = $("#nextBtn"); if (nb) { nb.addEventListener("click", advance); nb.focus({ preventScroll: true }); }
   const lb = $("#lockBtn"); if (lb) lb.addEventListener("click", () => checkVotes(true));
@@ -1867,13 +1924,13 @@ function renderTicker() {
   if (S.phase === "call") {
     const qb = lead(S.qb);
     html = `<div class="tk-head">${qb ? `${esc(qb.p.name)} is the quarterback` : `${esc(offT.name)}: call the play`}</div>
-      <p class="tk-text">${qb && qb.ph ? `${esc(qb.p.name)} is picking who gets the ball on their phone. Defense, no peeking!` : `${qb ? `${esc(qb.p.name)}, huddle up and pick` : "Offense, huddle up and pick"} who gets the ball. Defense, no peeking! Tap a player here or on the field.`}</p>
-      <div class="tk-btns">${S.cands.map(id => candBtn(id, "target")).join("")}</div>`;
+      <p class="tk-text">${qb && qb.p.bot ? `${esc(qb.p.name)} is picking who gets the ball…` : qb && qb.ph ? `${esc(qb.p.name)} is picking who gets the ball on their phone. Defense, no peeking!` : `${qb ? `${esc(qb.p.name)}, huddle up and pick` : "Offense, huddle up and pick"} who gets the ball. Defense, no peeking! Tap a player here or on the field.`}</p>
+      ${qb && qb.p.bot ? "" : `<div class="tk-btns">${S.cands.map(id => candBtn(id, "target")).join("")}</div>`}`;
   } else if (S.phase === "guess") {
     const cp = lead(S.cap);
     html = `<div class="tk-head">${cp ? `${esc(cp.p.name)} is the defensive captain` : `${esc(defT.name)}: who do you think gets the ball?`}</div>
-      <p class="tk-text">${cp && cp.ph ? `${esc(cp.p.name)} is guessing who gets the ball on their phone.` : `${cp ? `${esc(cp.p.name)}, who do you think gets the ball?` : ""} Guess right and your defender reads the play. Guess wrong and the receiver has room to run.`}</p>
-      <div class="tk-btns">${S.cands.map(id => candBtn(id, "guess")).join("")}</div>`;
+      <p class="tk-text">${cp && cp.p.bot ? `${esc(cp.p.name)} is guessing who gets the ball…` : cp && cp.ph ? `${esc(cp.p.name)} is guessing who gets the ball on their phone.` : `${cp ? `${esc(cp.p.name)}, who do you think gets the ball?` : ""} Guess right and your defender reads the play. Guess wrong and the receiver has room to run.`}</p>
+      ${cp && cp.p.bot ? "" : `<div class="tk-btns">${S.cands.map(id => candBtn(id, "guess")).join("")}</div>`}`;
   } else if (S.phase === "set") {
     const n = S.cands.length, o = S.target != null ? S.players[S.target] : null;
     const unb = Math.max(0, S.line[1 - off].length - S.line[off].length);
@@ -1917,7 +1974,7 @@ function render() {
   if ($("#plane").dataset.built !== "1") buildField();
   renderBoard(); renderChips(); layoutLines(); renderTicker(); renderLog(); syncPick();
   if (S.phase === "playing" && S.sub === "result") finishSnapUI();
-  saveGame(); netSync();
+  saveGame(); netSync(); botTurn();
 }
 function renderEnd() {
   const t = S.teams, w = t[0].score === t[1].score ? -1 : t[0].score > t[1].score ? 0 : 1;
@@ -2145,7 +2202,7 @@ function stateFor(ph) {
     const cur = S.players[S.order[S.qi]], q = S.q, a = S.answered;
     const asker = cur.pid === ph.pid || (cur.crew && cur.team === rec.team);
     base.view = asker ? "question" : "watch";
-    base.q = { who: cur.name, av: cur.av, team: cur.team, crew: !!cur.crew, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: asker ? q.options : null, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
+    base.q = { who: cur.name, av: cur.av, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: asker ? q.options : null, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
     if (a) base.answered = { opt: a.opt, ok: a.ok, answer: q.answer, note: q.note || "" };
     if (asker && cur.crew) { const v = voteInfo(); base.vote = v ? { got: v.got, need: v.need, mine: NET.qvotes[ph.pid] ?? null } : null; }
     return base;

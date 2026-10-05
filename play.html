@@ -155,6 +155,7 @@ const AVATARS = [
   { n: "Sister Sadie", g: "g", s: 1, h: "long", hc: "#e0a83a", e: "teeth", x: ["freckles", "bow"], c: "#3d6fd9" }
 ];
 function avatarSVG(i, helmet) {
+  if (i === "bot") return botSVG(helmet);
   if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
   const a = AVATARS[i], sk = AV_SKIN[a.s], hc = a.hc, sh = "#3a2a20";
   let back = "", front = "", body = "", face = "", extra = "";
@@ -234,6 +235,19 @@ function avatarSVG(i, helmet) {
       <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>`;
   }
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${back}${body}${head}${front}${face}${hel}${extra}</svg>`;
+}
+function botSVG(helmet) {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="22" y="70" width="56" height="30" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>
+    ${helmet ? "" : `<line x1="50" y1="8" x2="50" y2="18" stroke="#1d1a17" stroke-width="2.5"/><circle cx="50" cy="7" r="4" fill="#e9b949" stroke="#1d1a17" stroke-width="1.5"/>`}
+    <rect x="22" y="18" width="56" height="46" rx="12" fill="#b9c7ce" stroke="#1d1a17" stroke-width="2"/>
+    <rect x="30" y="30" width="16" height="14" rx="4" fill="#1d1a17"/><rect x="54" y="30" width="16" height="14" rx="4" fill="#1d1a17"/>
+    <circle cx="38" cy="37" r="4" fill="#5fe3ff"/><circle cx="62" cy="37" r="4" fill="#5fe3ff"/>
+    <rect x="34" y="50" width="32" height="8" rx="3" fill="#1d1a17"/>
+    ${[0, 1, 2].map(k => `<rect x="${37 + k * 9}" y="51.5" width="5" height="5" rx="1" fill="#f2efe4"/>`).join("")}
+    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}
+  </svg>`;
 }
 function teamSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -384,7 +398,7 @@ function render() {
       h += `<div class="opts">${q.options.map((o, i) => { let cls = ""; const chosen = a ? a.opt : (s.vote ? s.vote.mine : myAns); if (a) { if (o === a.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } else if (o === chosen) cls = "mine"; return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>${a ? "" : voteNote}`;
     }
     if (a) h += `<div class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "take" : "takes"} the field.` : `Not quite. ${esc(q.crew ? teamOf(q.team) : q.who)} ${q.crew ? "sit" : "sits"} this one out.`}</div><div class="note">${a.ok ? "" : `Answer: <b>${esc(a.answer)}</b>. `}${esc(a.note || "")}</div>`;
-    else if (!mineQ) h += `<div class="note">Answering on the big screen${q.crew ? "" : " or their phone"}…</div>`;
+    else if (!mineQ) h += `<div class="note">${q.bot ? "The computer is thinking…" : `Answering on the big screen${q.crew ? "" : " or their phone"}…`}</div>`;
   } else if (view === "pick") {
     h = `<div class="eyebrow">${s.kind === "target" ? "Quarterback" : "Defensive captain"}</div><p class="msg">${esc(s.msg)}</p>
       <div class="opts">${s.cands.map(c => `<button type="button" class="opt ${sentPick === c.id ? "mine" : ""}" data-pick="${c.id}" ${sentPick != null ? "disabled" : ""}><span class="av">${avatarSVG(c.av, teamColor(s.kind === "target" ? s.poss : 1 - s.poss))}</span><span>${esc(c.name)}</span></button>`).join("")}</div>
