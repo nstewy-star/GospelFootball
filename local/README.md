@@ -20,13 +20,11 @@ If port 8080 is busy the program picks the next free port and prints it.
 
 ## Building the download
 
-From the repo root, with Node installed:
-
-    cd local && npm install
-    npx @yao-pkg/pkg . --targets node22-macos-arm64,node22-macos-x64,node22-win-x64 --out-path dist/bin
-
-Then put `dist/bin/*`, the two launcher files from `local/launchers/`, this README and a `site` folder (index.html, play.html,
-peerjs.min.js, qrcode.js, img/, audio/ from the repo root) into one folder and zip it. Mac binaries built on another system
-need an ad-hoc signature (`codesign -s - <file>`, or rcodesign) or Apple Silicon refuses to run them.
+Pushing a tag such as `local-1.1` (or running the "Local play download" workflow from the Actions tab) builds the Mac and
+Windows zips and publishes them on the repo's Releases page: `.github/workflows/local-release.yml` packages `local/server.js`
+with @yao-pkg/pkg, ad-hoc signs the Mac programs (Apple Silicon refuses unsigned ones) and runs `local/build-zips.sh`, which
+puts the programs, the launchers, this README and a `site` folder (index.html, play.html, peerjs.min.js, qrcode.js, img/,
+audio/ from the repo root) into the zips. By hand: `cd local && npm ci && npx @yao-pkg/pkg . --targets
+node22-macos-arm64,node22-macos-x64,node22-win-x64 --out-path ../dist/bin`, then `bash local/build-zips.sh dist`.
 
 Run it from a checkout for development: `node local/server.js 8090` serves the repo root.

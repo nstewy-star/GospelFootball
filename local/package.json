@@ -1,5 +1,5 @@
 {
-  "name": "gospel-football-local",
+  "name": "gospel-football",
   "version": "1.0.0",
   "description": "Runs Gospel Football on one laptop for a room with no internet: serves the game and connects the phones over the local wifi.",
   "main": "server.js",
