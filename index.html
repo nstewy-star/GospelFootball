@@ -112,6 +112,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 @media (max-width: 1300px) { .hero .hero-text p { display: none; } } /* the blurb goes before the code does */
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .hero-foot[hidden] { display: none; }
+.card[hidden] { display: none; } /* the old Line up the teams card stays in the page for its inputs but never shows (Nick, 2026-10-05 05:07Z) */
 .hero-foot .tools { display: flex; gap: 8px; flex-wrap: wrap; }
 .hero-foot .tools .btn { font-size: 14px; padding: 8px 14px; }
 .hero-foot .err { flex-basis: 100%; }
@@ -545,7 +546,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-045723';</script>
+<script>window.GF_BUILD = '20261005-050825';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
