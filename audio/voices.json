@@ -1,0 +1,234 @@
+{
+ "ref": {
+  "name": "David",
+  "voice_id": "DduhIyyKkOosbP8VefhP"
+ },
+ "00": {
+  "name": "Teddy Twinkle",
+  "voice_id": "XjGYkUkzth8BPs29fmcV"
+ },
+ "01": {
+  "name": "Jay",
+  "voice_id": "anewbHU5WrUjxBZgJstt"
+ },
+ "02": {
+  "name": "Miller",
+  "voice_id": "pCL8Ua4MoAGISUaDmw69"
+ },
+ "03": {
+  "name": "Spuds Oxley",
+  "voice_id": "NOpBlnGInO9m6vDvFkFC"
+ },
+ "04": {
+  "name": "Ryan Quin",
+  "voice_id": "tJHJUEHzOkMoPmJJ5jo2"
+ },
+ "05": {
+  "name": "Eugene",
+  "voice_id": "m0OQuJtWCw1V23P0pQmG"
+ },
+ "06": {
+  "name": "Eugene",
+  "voice_id": "m0OQuJtWCw1V23P0pQmG"
+ },
+ "07": {
+  "name": "Matthew Schmitz",
+  "voice_id": "Q4oILuo4P8VeXtE6FMLI"
+ },
+ "08": {
+  "name": "Don Kim",
+  "voice_id": "UI9arZeSp7bIUhGbx36K"
+ },
+ "09": {
+  "name": "Corey",
+  "voice_id": "IdCemqfjg2Q8UfLLarBW"
+ },
+ "10": {
+  "name": "Christian",
+  "voice_id": "XmUeU0FRyne67Dy7UaT4"
+ },
+ "11": {
+  "name": "Otis",
+  "voice_id": "qE598pWTKNVcF4JNLrNs"
+ },
+ "12": {
+  "name": "Teddy Twinkle",
+  "voice_id": "XjGYkUkzth8BPs29fmcV"
+ },
+ "13": {
+  "name": "Jay",
+  "voice_id": "anewbHU5WrUjxBZgJstt"
+ },
+ "14": {
+  "name": "Miller",
+  "voice_id": "pCL8Ua4MoAGISUaDmw69"
+ },
+ "15": {
+  "name": "Spuds Oxley",
+  "voice_id": "NOpBlnGInO9m6vDvFkFC"
+ },
+ "16": {
+  "name": "Ryan Quin",
+  "voice_id": "tJHJUEHzOkMoPmJJ5jo2"
+ },
+ "17": {
+  "name": "Eugene",
+  "voice_id": "m0OQuJtWCw1V23P0pQmG"
+ },
+ "18": {
+  "name": "Eugene",
+  "voice_id": "m0OQuJtWCw1V23P0pQmG"
+ },
+ "19": {
+  "name": "Matthew Schmitz",
+  "voice_id": "Q4oILuo4P8VeXtE6FMLI"
+ },
+ "20": {
+  "name": "Don Kim",
+  "voice_id": "UI9arZeSp7bIUhGbx36K"
+ },
+ "21": {
+  "name": "Corey",
+  "voice_id": "IdCemqfjg2Q8UfLLarBW"
+ },
+ "22": {
+  "name": "Christian",
+  "voice_id": "XmUeU0FRyne67Dy7UaT4"
+ },
+ "23": {
+  "name": "Otis",
+  "voice_id": "qE598pWTKNVcF4JNLrNs"
+ },
+ "24": {
+  "name": "Teddy Twinkle",
+  "voice_id": "XjGYkUkzth8BPs29fmcV"
+ },
+ "25": {
+  "name": "Jay",
+  "voice_id": "anewbHU5WrUjxBZgJstt"
+ },
+ "26": {
+  "name": "Miller",
+  "voice_id": "pCL8Ua4MoAGISUaDmw69"
+ },
+ "27": {
+  "name": "Spuds Oxley",
+  "voice_id": "NOpBlnGInO9m6vDvFkFC"
+ },
+ "28": {
+  "name": "Candy",
+  "voice_id": "Nggzl2QAXh3OijoXD116"
+ },
+ "29": {
+  "name": "Nora",
+  "voice_id": "iKojuowynDxcQKMFfdNK"
+ },
+ "30": {
+  "name": "Lena",
+  "voice_id": "roYauZ4bOLAKvVZTPLre"
+ },
+ "31": {
+  "name": "Carol",
+  "voice_id": "5u41aNhyCU6hXOcjPPv0"
+ },
+ "32": {
+  "name": "Sunny",
+  "voice_id": "FgiNpTIapnCbaD6xiqIo"
+ },
+ "33": {
+  "name": "Penelope",
+  "voice_id": "JpjuQfOymR78GvGgYe0U"
+ },
+ "34": {
+  "name": "Zoe",
+  "voice_id": "M6ic45wruJGWAxLFEMNK"
+ },
+ "35": {
+  "name": "Grandma Oxley",
+  "voice_id": "vFLqXa8bgbofGarf6fZh"
+ },
+ "36": {
+  "name": "Sunny",
+  "voice_id": "FgiNpTIapnCbaD6xiqIo"
+ },
+ "37": {
+  "name": "Lana",
+  "voice_id": "0zj1iWvloMkAXydIFsJR"
+ },
+ "38": {
+  "name": "Emma",
+  "voice_id": "9HBoEQ8LqyvVZFYDodnr"
+ },
+ "39": {
+  "name": "Grandma Rachel",
+  "voice_id": "0rEo3eAjssGDUCXHYENf"
+ },
+ "40": {
+  "name": "Candy",
+  "voice_id": "Nggzl2QAXh3OijoXD116"
+ },
+ "41": {
+  "name": "Nora",
+  "voice_id": "iKojuowynDxcQKMFfdNK"
+ },
+ "42": {
+  "name": "Lena",
+  "voice_id": "roYauZ4bOLAKvVZTPLre"
+ },
+ "43": {
+  "name": "Carol",
+  "voice_id": "5u41aNhyCU6hXOcjPPv0"
+ },
+ "44": {
+  "name": "Sunny",
+  "voice_id": "FgiNpTIapnCbaD6xiqIo"
+ },
+ "45": {
+  "name": "Penelope",
+  "voice_id": "JpjuQfOymR78GvGgYe0U"
+ },
+ "46": {
+  "name": "Zoe",
+  "voice_id": "M6ic45wruJGWAxLFEMNK"
+ },
+ "47": {
+  "name": "Grandma Oxley",
+  "voice_id": "vFLqXa8bgbofGarf6fZh"
+ },
+ "48": {
+  "name": "Sunny",
+  "voice_id": "FgiNpTIapnCbaD6xiqIo"
+ },
+ "49": {
+  "name": "Lana",
+  "voice_id": "0zj1iWvloMkAXydIFsJR"
+ },
+ "50": {
+  "name": "Emma",
+  "voice_id": "9HBoEQ8LqyvVZFYDodnr"
+ },
+ "51": {
+  "name": "Grandma Rachel",
+  "voice_id": "0rEo3eAjssGDUCXHYENf"
+ },
+ "52": {
+  "name": "Candy",
+  "voice_id": "Nggzl2QAXh3OijoXD116"
+ },
+ "53": {
+  "name": "Nora",
+  "voice_id": "iKojuowynDxcQKMFfdNK"
+ },
+ "54": {
+  "name": "Lena",
+  "voice_id": "roYauZ4bOLAKvVZTPLre"
+ },
+ "55": {
+  "name": "Carol",
+  "voice_id": "5u41aNhyCU6hXOcjPPv0"
+ },
+ "56": {
+  "name": "Retro Robot",
+  "voice_id": "ZEcx3Wdpj4EvM8PltzHY"
+ }
+}
