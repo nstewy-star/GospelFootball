@@ -55,8 +55,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .brand h1 { font-size: clamp(26px, 5vw, 38px); color: var(--chalk); }
 .brand h1 span { color: var(--gold); }
-.top-actions { display: flex; gap: 8px; }
-.icon-btn { background: rgba(242,239,228,.08); border: 0; border-radius: 999px; padding: 7px 14px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; font-size: 14px; }
+.top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.icon-btn { background: rgba(242,239,228,.08); border: 0; border-radius: 999px; padding: 7px 14px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; font-size: 14px; white-space: nowrap; }
 
 /* Hero */
 .hero { position: relative; border-radius: 22px; overflow: hidden; background: #0e2a3a; min-height: 220px; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
@@ -167,12 +167,17 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .post-body svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .tok { position: absolute; width: 0; height: 0; transform-style: preserve-3d; z-index: 2; }
 .tok-body { position: absolute; bottom: 0; left: calc(var(--tw) / -2); width: var(--tw); transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)) scale(var(--ts)); transform-style: preserve-3d; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: filter .3s; }
-.tface { position: relative; width: var(--tw); height: var(--tw); border-radius: 50%; overflow: hidden; border: 3px solid var(--home); background: var(--home); box-shadow: 0 6px 10px rgba(0,0,0,.45); transition: transform .3s; }
-.tok.t1 .tface { border-color: var(--away); background: var(--away); }
-.tok.crewtok .tface { border-style: dashed; }
-.tface svg { width: 100%; height: 100%; display: block; }
+.tfig { position: relative; width: var(--tw); height: calc(var(--tw) * 1.5); transform-origin: 50% 100%; transition: transform .3s; filter: drop-shadow(0 3px 2px rgba(0,0,0,.45)); }
+.tfig svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.tfig .lg, .tfig .arm { transform-box: fill-box; transform-origin: 50% 0; }
+.tok.run .tfig { animation: bob .3s ease-in-out infinite alternate; }
+.tok.run .tfig .lg.a, .tok.run .tfig .arm.b { animation: stepA .3s ease-in-out infinite alternate; }
+.tok.run .tfig .lg.b, .tok.run .tfig .arm.a { animation: stepB .3s ease-in-out infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+@keyframes stepA { from { transform: rotate(-16deg) scaleY(.82); } to { transform: rotate(16deg) scaleY(1); } }
+@keyframes stepB { from { transform: rotate(16deg) scaleY(1); } to { transform: rotate(-16deg) scaleY(.82); } }
 .tname { font-size: 13px; font-weight: 700; background: rgba(7,17,19,.9); color: var(--chalk); padding: 0 7px; border-radius: 999px; white-space: nowrap; line-height: 18px; }
-.tok.t1 .tname { margin-top: 14px; }
+.tok.t1 .tname { margin-bottom: 22px; }
 .tsay { position: absolute; bottom: calc(100% + 8px); left: 50%; z-index: 3; transform: translateX(-50%); background: var(--chalk); color: #0c1a1c; font-weight: 800; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; padding: 5px 11px; border-radius: 12px; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.4); animation: pop .3s ease-out; }
 .tsay::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--chalk); }
 .tsay.o { bottom: calc(100% + 34px); left: 30%; }
@@ -182,18 +187,18 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .tsay.badb { background: var(--bad); color: #fff; } .tsay.badb::after { border-top-color: var(--bad); }
 .tsay[hidden] { display: none; }
 @keyframes pop { from { transform: translateX(-50%) scale(.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-.tok.turn .tface { box-shadow: 0 0 0 4px var(--gold), 0 0 24px var(--gold); }
-.tok.sit .tface { transform: translateY(12px) rotate(-14deg) scale(.92); }
-.tok.down .tface { transform: rotate(80deg) translateY(8px); }
-.tok.hit .tface { animation: shake .4s; }
+.tok.turn .tfig { filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 12px var(--gold)); }
+.tok.turn .tshadow { background: rgba(233,185,73,.45); box-shadow: 0 0 0 3px var(--gold), 0 0 18px var(--gold); }
+.tok.sit .tfig { transform: translateY(12px) rotate(-12deg) scale(.94); }
+.tok.down .tfig { transform: translate(14px, 4px) rotate(84deg); }
+.tok.hit .tfig { animation: shake .4s; }
 @keyframes shake { 0%,100% { translate: 0 0; } 25% { translate: -6px 2px; } 50% { translate: 6px -2px; } 75% { translate: -4px 0; } }
-.tshadow { position: absolute; left: calc(var(--tw) * -.33); top: calc(var(--tw) * -.12); width: calc(var(--tw) * .66); height: calc(var(--tw) * .24); border-radius: 50%; background: rgba(0,0,0,.35); }
+.tshadow { position: absolute; left: calc(var(--tw) * -.38); top: calc(var(--tw) * -.14); width: calc(var(--tw) * .76); height: calc(var(--tw) * .28); border-radius: 50%; background: rgba(0,0,0,.38); }
 .ball { position: absolute; width: 0; height: 0; transform-style: preserve-3d; z-index: 3; }
 .ball-body { position: absolute; bottom: 0; left: -13px; width: 26px; height: 60px; transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)); }
 .ball-img { position: absolute; bottom: 0; left: 1px; width: 24px; height: 15px; border-radius: 50%; background: #8a4b22; border: 1px solid #5d3013; }
 .ball-img::after { content: ""; position: absolute; left: 5px; right: 5px; top: 6px; height: 1.5px; background: #f2efe4; }
 .bshadow { position: absolute; left: -9px; top: -3px; width: 18px; height: 7px; border-radius: 50%; background: rgba(0,0,0,.35); }
-.qbtok .tface { background: #3a3a3a; border-color: #ddd; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; }
 .flower { position: absolute; width: 0; height: 0; transform-style: preserve-3d; }
 .flower span { position: absolute; bottom: 0; left: -10px; font-size: 20px; transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)); }
 .flagp { position: absolute; width: 0; height: 0; transform-style: preserve-3d; z-index: 4; }
@@ -214,9 +219,12 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
 .modal[hidden] { display: none; }
 .modal-card { background: var(--panel); border-radius: 18px; padding: 20px; max-width: 540px; width: 100%; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+#qrBig .qr-wrap { flex-direction: column; align-items: center; text-align: center; }
+#qrBig .qr { width: min(78vw, 400px); height: auto; aspect-ratio: 1; }
 .tok.qb .tname::before { content: "QB "; color: var(--gold); }
 .tok.cap .tname::before { content: "CAPT "; color: var(--gold); }
-.tok.pick .tface { cursor: pointer; animation: pulse .9s ease-in-out infinite alternate; }
+.tok.pick .tfig { cursor: pointer; }
+.tok.pick .tshadow { animation: pulse .9s ease-in-out infinite alternate; }
 @keyframes pulse { from { box-shadow: 0 0 0 3px var(--gold); } to { box-shadow: 0 0 0 7px var(--gold), 0 0 24px var(--gold); } }
 .btn.cand { display: inline-flex; align-items: center; gap: 8px; text-transform: none; letter-spacing: 0; font-size: 17px; padding: 6px 14px 6px 6px; }
 .btn.cand .av { width: 30px; height: 30px; }
@@ -293,6 +301,7 @@ td.n, th.n { text-align: right; }
   :root { --tilt: 48deg; }
   .stadium { height: 400px; perspective-origin: 50% 8%; }
   .cap { top: 11%; font-size: 18px; } .headline { top: 19%; font-size: clamp(22px, 7vw, 34px); }
+  .top { gap: 8px; } .brand { width: 100%; } .icon-btn { font-size: 12px; padding: 6px 10px; }
   .cam { width: 190%; left: -45%; bottom: 2%; }
   .board { padding: 8px 10px; gap: 6px; }
   .tm .nm { white-space: normal; font-size: 12px; line-height: 1.15; }
@@ -313,6 +322,7 @@ td.n, th.n { text-align: right; }
     <div class="top-actions">
       <button class="icon-btn" id="phoneBtn" type="button" hidden></button>
       <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+      <button class="icon-btn" id="voiceBtn" type="button" hidden>Announcer: plays</button>
       <button class="icon-btn" id="quitBtn" type="button" hidden>New game</button>
     </div>
   </header>
@@ -446,9 +456,10 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-002850';</script>
+<script>window.GF_BUILD = '20261005-005131';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
+<script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
 <script>
 // Question bank: [question, correct, wrong, wrong, wrong, note]
 const QB = {
@@ -825,9 +836,7 @@ const AVATARS = [
   { n: "Winky Wendy", g: "g", s: 5, h: "afro", hc: "#140d08", e: "wink", x: ["bow"], c: "#c0392b" },
   { n: "Sister Sadie", g: "g", s: 1, h: "long", hc: "#e0a83a", e: "teeth", x: ["freckles", "bow"], c: "#3d6fd9" }
 ];
-function avatarSVG(i, helmet) {
-  if (i === "bot") return botSVG(helmet);
-  if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
+function avatarParts(i, helmet) {
   const a = AVATARS[i], sk = AV_SKIN[a.s], hc = a.hc, sh = "#3a2a20";
   let back = "", front = "", body = "", face = "", extra = "";
   // body
@@ -905,20 +914,28 @@ function avatarSVG(i, helmet) {
       <path d="M23 50 Q50 57 77 50 M23 58 Q50 65 77 58 M50 53.5 L50 62" stroke="#d8d8d0" stroke-width="3" fill="none" stroke-linecap="round"/>
       <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>`;
   }
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${back}${body}${head}${front}${face}${hel}${extra}</svg>`;
+  return { a, sk, back, body, head, front, face, hel, extra };
+}
+function avatarSVG(i, helmet) {
+  if (i === "bot") return botSVG(helmet);
+  if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
+  const p = avatarParts(i, helmet);
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${p.back}${p.body}${p.head}${p.front}${p.face}${p.hel}${p.extra}</svg>`;
 }
 function botSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <rect x="22" y="70" width="56" height="30" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
-    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>${botHead(helmet)}</svg>`;
+}
+function botHead(helmet) {
+  return `
     ${helmet ? "" : `<line x1="50" y1="8" x2="50" y2="18" stroke="#1d1a17" stroke-width="2.5"/><circle cx="50" cy="7" r="4" fill="#e9b949" stroke="#1d1a17" stroke-width="1.5"/>`}
     <rect x="22" y="18" width="56" height="46" rx="12" fill="#b9c7ce" stroke="#1d1a17" stroke-width="2"/>
     <rect x="30" y="30" width="16" height="14" rx="4" fill="#1d1a17"/><rect x="54" y="30" width="16" height="14" rx="4" fill="#1d1a17"/>
     <circle cx="38" cy="37" r="4" fill="#5fe3ff"/><circle cx="62" cy="37" r="4" fill="#5fe3ff"/>
     <rect x="34" y="50" width="32" height="8" rx="3" fill="#1d1a17"/>
     ${[0, 1, 2].map(k => `<rect x="${37 + k * 9}" y="51.5" width="5" height="5" rx="1" fill="#f2efe4"/>`).join("")}
-    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}
-  </svg>`;
+    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}`;
 }
 function teamSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -928,6 +945,94 @@ function teamSVG(helmet) {
     ${helmet ? `<path d="M30 30 Q30 4 50 4 Q70 4 70 30 L70 34 L30 34 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.2"/><path d="M34 30 L66 30 M34 25 L66 25" stroke="#d8d8d0" stroke-width="2"/>` : ""}
     <text x="50" y="${helmet ? 46 : 26}" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${helmet ? 15 : 20}" fill="#f2efe4">TEAM</text>
   </svg>`;
+}
+
+// ---------- standing figures for the field ----------
+// Big helmeted head, church clothes, a flag-football belt in the team colour, and legs that run.
+const FIG_VB = "0 0 100 150";
+const FIG_SVG = `<svg viewBox="${FIG_VB}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`;
+function figFlags(team, y, x1, x2) {
+  return `<rect x="${x1}" y="${y}" width="${x2 - x1}" height="6" rx="2" fill="${team}" stroke="#1d1a17" stroke-width=".8"/>
+    <path d="M${x1 - 1} ${y + 5} h7 l-1.5 15 h-4 Z M${x2 - 6} ${y + 5} h7 l-1.5 15 h-4 Z" fill="${team}" stroke="#1d1a17" stroke-width=".8"/>`;
+}
+function figLegs(kind, sk) {
+  const leg = (cls, x) => kind === "girl"
+    ? `<g class="lg ${cls}"><rect x="${x + 4}" y="100" width="12" height="36" rx="4" fill="${sk}"/><rect x="${x + 2}" y="128" width="16" height="7" rx="2" fill="#fff"/><rect x="${x - 1}" y="134" width="22" height="12" rx="6" fill="#1b1b1b"/></g>`
+    : kind === "bot"
+    ? `<g class="lg ${cls}"><rect x="${x + 2}" y="92" width="16" height="42" rx="4" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.2"/><rect x="${x - 3}" y="132" width="26" height="14" rx="5" fill="#5b6c75" stroke="#1d1a17" stroke-width="1.2"/></g>`
+    : kind === "team"
+    ? `<g class="lg ${cls}"><path d="M${x + 10} 106 L${x + 10} 136" stroke="#5d3013" stroke-width="7" stroke-linecap="round"/><rect x="${x - 2}" y="134" width="24" height="12" rx="6" fill="#1b1b1b"/></g>`
+    : `<g class="lg ${cls}"><rect x="${x}" y="90" width="20" height="46" rx="5" fill="${kind === "qb" ? "#f2efe4" : "#2b3442"}"${kind === "qb" ? ' stroke="#b9b4a3" stroke-width="1"' : ""}/><rect x="${x - 4}" y="134" width="28" height="12" rx="6" fill="#1b1b1b"/></g>`;
+  return leg("a", 28) + leg("b", 52);
+}
+function figArms(sleeve, w, hand, puff) {
+  const arm = (cls, sx, ex) => `<g class="arm ${cls}">${puff ? `<circle cx="${sx}" cy="60" r="7" fill="${puff}"/>` : ""}<path d="M${sx} ${puff ? 62 : 58} L${ex} 90" stroke="${sleeve}" stroke-width="${w}" stroke-linecap="round"/><circle cx="${ex + (ex < 50 ? -1 : 1)}" cy="93.5" r="5.5" fill="${hand}"/></g>`;
+  return arm("a", 27, 17) + arm("b", 73, 83);
+}
+function figureSVG(i, helmet, team) {
+  helmet = helmet || "#777"; team = team || helmet;
+  if (i === "bot") return botFigure(helmet, team);
+  if (i === "qb") return qbFigure(helmet, team);
+  if (i === "team" || i == null || !AVATARS[i]) return teamFigure(helmet, team);
+  const p = avatarParts(i, helmet), a = p.a, sk = p.sk;
+  const head = `<g transform="translate(17 2) scale(.66)">${p.back}${p.head}${p.front}${p.face}${p.hel}${p.extra}</g>`;
+  let body;
+  if (a.g === "b") {
+    body = figLegs("boy", sk)
+      + `<path d="M24 97 L24 63 Q26 54 36 53 L64 53 Q74 54 76 63 L76 97 Z" fill="#fbfbf8" stroke="#cfcfc8" stroke-width="1"/>`
+      + `<path d="M41 53 L50 62 L45 66 Z M59 53 L50 62 L55 66 Z" fill="#fff" stroke="#bdbdb4" stroke-width="1"/>`
+      + `<path d="M47 60 L53 60 L51 64 L49 64 Z" fill="${a.c}"/><path d="M49 64 L51 64 L55 86 L50 90 L45 86 Z" fill="${a.c}"/>`
+      + figArms("#fbfbf8", 11, sk)
+      + figFlags(team, 92, 24, 76);
+  } else {
+    body = figLegs("girl", sk)
+      + `<path d="M36 53 L64 53 Q74 56 74 72 L84 118 L16 118 L26 72 Q26 56 36 53 Z" fill="${a.c}"/>`
+      + `<path d="M40 53 Q50 65 60 53 Z" fill="#fff"/>`
+      + figArms(sk, 9, sk, a.c)
+      + figFlags(team, 84, 27, 73);
+  }
+  return `${FIG_SVG}${body}<rect x="45" y="44" width="10" height="12" fill="${sk}"/>${head}</svg>`;
+}
+function botFigure(helmet, team) {
+  return `${FIG_SVG}${figLegs("bot")}
+    <rect x="24" y="54" width="52" height="40" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="36" y="62" width="28" height="18" rx="3" fill="#2b3a42"/>
+    ${[0, 1, 2].map(k => `<circle cx="${42 + k * 8}" cy="71" r="2.6" fill="${["#5fe3ff", "#e9b949", "#57c27a"][k]}"/>`).join("")}
+    <g class="arm a"><path d="M25 60 L15 90" stroke="#6f848e" stroke-width="10" stroke-linecap="round"/><circle cx="14" cy="94" r="6" fill="#b9c7ce" stroke="#1d1a17" stroke-width="1.2"/></g>
+    <g class="arm b"><path d="M75 60 L85 90" stroke="#6f848e" stroke-width="10" stroke-linecap="round"/><circle cx="86" cy="94" r="6" fill="#b9c7ce" stroke="#1d1a17" stroke-width="1.2"/></g>
+    ${figFlags(team, 90, 24, 76)}
+    <rect x="44" y="44" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.2"/>
+    <g transform="translate(17 4) scale(.66)">${botHead(helmet)}</g></svg>`;
+}
+function teamFigure(helmet, team) {
+  return `${FIG_SVG}${figLegs("team")}
+    <g class="arm a"><path d="M24 84 L12 104" stroke="#5d3013" stroke-width="6" stroke-linecap="round"/><circle cx="11" cy="106" r="5" fill="#8a4b22" stroke="#5d3013" stroke-width="1.5"/></g>
+    <g class="arm b"><path d="M76 84 L88 104" stroke="#5d3013" stroke-width="6" stroke-linecap="round"/><circle cx="89" cy="106" r="5" fill="#8a4b22" stroke="#5d3013" stroke-width="1.5"/></g>
+    <ellipse cx="50" cy="88" rx="34" ry="24" transform="rotate(-18 50 88)" fill="#8a4b22" stroke="#5d3013" stroke-width="2"/>
+    <path d="M30 98 L70 78" stroke="#fff" stroke-width="3"/>
+    ${[0, 1, 2, 3].map(k => `<path d="M${42 + k * 6} ${89 - k * 3} l4 8" stroke="#fff" stroke-width="2.4"/>`).join("")}
+    <text x="50" y="103" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="13" fill="#f2efe4">TEAM</text>
+    ${figFlags(team, 106, 30, 70)}
+    <path d="M26 68 Q26 30 50 30 Q74 30 74 68 L74 72 L26 72 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>
+    <path d="M30 66 L70 66 M30 60 L70 60" stroke="#d8d8d0" stroke-width="2.4"/>
+    <ellipse cx="40" cy="38" rx="8" ry="4" fill="#fff" opacity=".28" transform="rotate(-20 40 38)"/></svg>`;
+}
+function qbFigure(helmet, team) {
+  const sk = "#e9b48a";
+  return `${FIG_SVG}${figLegs("qb", sk)}
+    <path d="M24 97 L24 63 Q26 54 36 53 L64 53 Q74 54 76 63 L76 97 Z" fill="${team}" stroke="#1d1a17" stroke-width="1"/>
+    <text x="50" y="84" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#fff" stroke="#1d1a17" stroke-width=".6">QB</text>
+    ${figArms(team, 11, sk)}
+    <rect x="24" y="92" width="52" height="6" fill="#1d1a17"/>
+    <rect x="45" y="44" width="10" height="12" fill="${sk}"/>
+    <g transform="translate(17 2) scale(.66)"><ellipse cx="50" cy="42" rx="30" ry="31" fill="${sk}"/>
+      <path d="M11 52 Q8 -2 50 -2 Q92 -2 89 52 L89 56 Q86 62 77 60 L77 44 Q68 31 50 29 Q32 31 23 44 L23 60 Q14 62 11 56 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>
+      <path d="M24 38 Q50 28 76 38 L76 48 Q50 58 24 48 Z" fill="#1d1a17" opacity=".9"/>
+      <path d="M46 0 L54 0 L53 22 L47 22 Z" fill="#f2efe4" opacity=".85"/>
+      <ellipse cx="34" cy="10" rx="9" ry="4" fill="#fff" opacity=".28" transform="rotate(-20 34 10)"/>
+      <path d="M23 50 Q50 57 77 50 M23 58 Q50 65 77 58 M50 53.5 L50 62" stroke="#d8d8d0" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>
+      <path d="M41 67 Q50 73 59 67" stroke="#3a2a20" stroke-width="2.4" fill="none" stroke-linecap="round"/></g></svg>`;
 }
 
 // Cartoon hero scene for the setup page: a stadium, a brother and sister in church clothes wearing helmets, and a football.
@@ -1086,6 +1191,63 @@ const sfx = {
   flag: () => tone([900, 600], 0.1, "square")
 };
 
+// ---------- announcer (the browser's own speech voice) ----------
+const VOICE_MODES = ["plays", "all", "off"];
+let voiceMode = VOICE_MODES.includes(store.get("gf_voice")) ? store.get("gf_voice") : "plays";
+const TTS = { ok: typeof speechSynthesis !== "undefined" && typeof SpeechSynthesisUtterance !== "undefined", voice: null, q: [], busy: false, since: 0 };
+function pickVoice() {
+  let vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
+  if (!vs.length) return null;
+  const en = vs.filter(v => /^en\b/i.test(v.lang || ""));
+  const score = v => (/Google US English/i.test(v.name) ? 60 : 0) + (/\b(Samantha|Alex|Daniel|Aaron|Ava|Allison|Tom|Evan|Nathan|Zoe|Jamie|Oliver)\b/i.test(v.name) ? 40 : 0)
+    + (/natural|enhanced|premium|neural/i.test(v.name) ? 30 : 0) + (/^en[-_]US/i.test(v.lang) ? 20 : 0) + (v.default ? 5 : 0) + (v.localService ? 2 : 0)
+    - (/compact|eloquence|zarvox|whisper|bells|cellos|bad news|good news|organ|trinoids|wobble|boing|bubbles|deranged|hysterical|jester|junior|kathy|ralph|fred|albert|bahh|superstar|grandma|grandpa|rocko|shelley|sandy|flo|eddy|reed|novelty/i.test(v.name) ? 100 : 0);
+  return (en.length ? en : vs).slice().sort((a, b) => score(b) - score(a))[0] || null;
+}
+if (TTS.ok) { try { speechSynthesis.addEventListener("voiceschanged", () => { TTS.voice = pickVoice(); }); } catch (e) {} }
+function cleanSpeech(t) {
+  return String(t == null ? "" : t).replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"')
+    .replace(/[→←]/g, "").replace(/…/g, "...").replace(/\+(\d+)/g, "plus $1").replace(/\s&\s/g, " and ").replace(/\bQB\b/g, "quarterback").replace(/\bTD\b/g, "touchdown").replace(/\bFG\b/g, "field goal").replace(/\bM V P\b/g, "M V P")
+    .replace(/\b[A-Z][A-Z']{2,}\b/g, w => w.toLowerCase()).replace(/\s+/g, " ").trim();
+}
+function speakNow() {
+  if (TTS.busy || !TTS.q.length) return;
+  const it = TTS.q.shift(); TTS.busy = true; TTS.since = Date.now();
+  try {
+    if (!TTS.voice) TTS.voice = pickVoice();
+    const u = new SpeechSynthesisUtterance(it.t);
+    if (TTS.voice) { u.voice = TTS.voice; u.lang = TTS.voice.lang || "en-US"; } else u.lang = "en-US";
+    u.rate = it.rate; u.pitch = it.pitch; u.volume = 1;
+    const done = () => { if (u !== TTS.cur) return; TTS.cur = null; TTS.busy = false; speakNow(); };
+    u.onend = done; u.onerror = done; TTS.cur = u;
+    if (speechSynthesis.paused) speechSynthesis.resume();
+    speechSynthesis.speak(u);
+    setTimeout(() => { if (TTS.cur === u && TTS.busy) done(); }, Math.min(30000, 2500 + it.t.length * 90)); // some browsers never fire onend
+  } catch (e) { TTS.busy = false; TTS.cur = null; }
+}
+// speak(text): queued after whatever is playing. flush: drop the lines still waiting (keep the one playing). interrupt: stop everything and say this now.
+function speak(text, o) {
+  o = o || {};
+  if (!sound || voiceMode === "off" || !TTS.ok) return;
+  const t = cleanSpeech(text); if (!t) return;
+  if (o.interrupt) hush(); else if (o.flush) TTS.q.length = 0;
+  // long lines one sentence at a time, so a browser that cuts long speech short never drops the end
+  const parts = t.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g) || [t];
+  let chunk = "";
+  const push = c => { if (c.trim()) TTS.q.push({ t: c.trim(), rate: o.rate || 1.05, pitch: o.pitch || 1 }); };
+  parts.forEach(p => { if (chunk && (chunk + p).length > 180) { push(chunk); chunk = ""; } chunk += p; });
+  push(chunk);
+  speakNow();
+}
+function hush() { TTS.q.length = 0; TTS.busy = false; TTS.cur = null; try { if (TTS.ok) speechSynthesis.cancel(); } catch (e) {} }
+function syncVoice() {
+  const b = $("#voiceBtn"); if (!b) return;
+  b.hidden = !TTS.ok;
+  b.textContent = voiceMode === "all" ? "Announcer: everything" : voiceMode === "plays" ? "Announcer: plays" : "Announcer: off";
+  b.setAttribute("aria-pressed", String(voiceMode !== "off"));
+  b.title = voiceMode === "all" ? "The announcer calls the plays and reads every question" : voiceMode === "plays" ? "The announcer calls the plays" : "The announcer is off";
+}
+
 // ---------- setup UI ----------
 function renderModes() {
   $("#modes").innerHTML = MODES.map(m => `<button type="button" class="mode" data-m="${m.id}" aria-pressed="${setup.mode === m.id}"><b>${m.name}</b><small>${m.desc}</small></button>`).join("");
@@ -1121,7 +1283,11 @@ $("#addForm").addEventListener("submit", e => {
   const name = $("#pName").value.trim() || (crew ? crewName() : bot ? botName() : "");
   if (!name) { $("#setupErr").textContent = "Type a player name, then press Add."; return; }
   const rec = { name, level: setup.level, team: setup.team, crew, bot, av: crew ? "team" : bot ? "bot" : setup.av };
-  if (setup.editing != null) { setup.roster[setup.editing] = rec; endEdit(); renderRoster(); return; }
+  if (setup.editing != null) {
+    const old = setup.roster[setup.editing];
+    if (old && old.pid) { if (crew || bot) netKick(old.pid); else rec.pid = old.pid; } // keep the phone linked unless the spot becomes a team player or bot
+    setup.roster[setup.editing] = rec; endEdit(); renderRoster(); return;
+  }
   if (setup.roster.length >= 16) { $("#setupErr").textContent = "The roster is full at 16 players."; return; }
   setup.roster.push(rec);
   $("#pName").value = ""; $("#crewChk").checked = false; $("#botChk").checked = false; setup.av = nextAv(); renderAvPick(); $("#setupErr").textContent = "";
@@ -1229,7 +1395,11 @@ $("#startBtn").addEventListener("click", () => {
   sfx.whistle();
   newGame();
 });
-$("#soundBtn").addEventListener("click", () => { sound = !sound; store.set("gf_sound", sound); syncSound(); if (sound) sfx.good(); });
+$("#soundBtn").addEventListener("click", () => { sound = !sound; store.set("gf_sound", sound); syncSound(); if (sound) sfx.good(); else hush(); });
+$("#voiceBtn").addEventListener("click", () => {
+  voiceMode = VOICE_MODES[(VOICE_MODES.indexOf(voiceMode) + 1) % VOICE_MODES.length]; store.set("gf_voice", voiceMode); syncVoice();
+  if (voiceMode === "off") hush(); else speak(voiceMode === "all" ? "I'll call the plays and read the questions." : "I'll call the plays.", { interrupt: true });
+});
 function syncSound() { $("#soundBtn").textContent = sound ? "Sound on" : "Sound off"; $("#soundBtn").setAttribute("aria-pressed", String(sound)); }
 $("#quitBtn").addEventListener("click", () => { if (S && S.screen === "game" && !S.confirmQuit) { S.confirmQuit = true; $("#quitBtn").textContent = "Tap again to quit"; setTimeout(() => { if (S) { S.confirmQuit = false; $("#quitBtn").textContent = "New game"; } }, 2500); return; } S = null; show(); });
 
@@ -1252,6 +1422,7 @@ function newGame() {
   S.log.unshift({ t: S.possession, text: `Coin toss: <b>${esc(S.teams[S.possession].name)}</b> get the ball first and drive ${S.possession === 0 ? "right →" : "← left"}.` });
   startPlay();
   show();
+  speak(`Welcome to Gospel Football! ${S.teams[S.possession].name} get the ball first.`, { interrupt: true });
   stepUp();
 }
 function startPlay() {
@@ -1293,7 +1464,21 @@ function answer(opt) {
   S.answered = { opt, ok };
   p.st.asked++;
   if (ok) { p.st.right++; S.line[p.team].push(p.id); sfx.good(); } else sfx.bad();
+  speak(ok ? "Correct!" : `Not quite. The answer is ${S.q.answer}.`, { interrupt: true });
   renderBubble(); renderChips();
+  if (!p.bot) autoAdvance();
+}
+// After an answer the game moves on by itself after a few seconds; the button still works for anyone in a hurry.
+const AUTO = { t: null };
+function autoAdvance() {
+  clearInterval(AUTO.t);
+  const token = DIR.token, key = `${S.huddleNo}:${S.qi}`, end = Date.now() + (reduced ? 400 : 5000);
+  AUTO.t = setInterval(() => {
+    if (!S || S.screen !== "game" || S.phase !== "questions" || !S.answered || `${S.huddleNo}:${S.qi}` !== key || token !== DIR.token) { clearInterval(AUTO.t); return; }
+    const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+    const nb = $("#nextBtn"); if (nb) nb.textContent = `${nb.dataset.label} \u00b7 ${left}`;
+    if (left <= 0) { clearInterval(AUTO.t); advance(); }
+  }, 250);
 }
 function buildSnaps() {
   const off = S.line[S.possession], def = S.line[1 - S.possession];
@@ -1303,7 +1488,7 @@ function buildSnaps() {
   const fooled = n >= 2 && S.guess !== S.target;
   return [{ o: S.target, d: slot >= 0 && def[slot] != null ? def[slot] : null, slot: Math.max(0, slot), cands: S.cands.slice(), guess: S.guess, keyed, fooled }];
 }
-const KEYED = [{ k: "block", label: "Block", w: 40 }, { k: "grass", label: "Picks grass", w: 20 }, { k: "hold", label: "Holding", w: 14 }, { k: "int", label: "Intercept", w: 16 }];
+const KEYED = [{ k: "block", label: "Block", w: 46 }, { k: "grass", label: "Picks grass", w: 24 }, { k: "hold", label: "Holding", w: 12 }, { k: "int", label: "Intercept", w: 18 }]; // the defense read the play: mostly blocks and picks, fewer flags
 const FOOLED = [{ k: "block", label: "Block", w: 10 }, { k: "grass", label: "Picks grass", w: 70 }, { k: "hold", label: "Holding", w: 14 }, { k: "int", label: "Intercept", w: 6 }];
 const SCRAMBLE = [{ yds: 0, w: 3 }, { yds: 3, w: 3 }, { yds: 6, w: 2 }, { yds: -2, w: 2 }];
 function resolveSnap(sn) {
@@ -1436,7 +1621,7 @@ function buildField() {
   h += `<div class="fdl" id="fdl"></div><div class="los" id="los"></div>`;
   h += `<div class="post" style="left:${XP(-10)}%"><div class="post-body">${postSVG()}</div></div><div class="post" style="left:${XP(110)}%"><div class="post-body">${postSVG()}</div></div>`;
   h += `<div class="ball" id="ball"><div class="bshadow"></div><div class="ball-body"><div class="ball-img" id="ballImg"></div></div></div>`;
-  h += S.players.map(p => `<div class="tok t${p.team}${p.crew ? " crewtok" : ""}" id="tok${p.id}"><div class="tshadow"></div><div class="tok-body"><div class="tsay" hidden></div><div class="tface">${avatarSVG(p.av, teamColor(p.team, true))}</div><div class="tname">${esc(p.name)}</div></div></div>`).join("");
+  h += S.players.map(p => `<div class="tok t${p.team}${p.crew ? " crewtok" : ""}" id="tok${p.id}"><div class="tshadow"></div><div class="tok-body"><div class="tsay" hidden></div><div class="tname">${esc(p.name)}</div><div class="tfig">${figureSVG(p.av, teamColor(p.team, true), teamColor(p.team))}</div></div></div>`).join("");
   pl.innerHTML = h;
   pl.dataset.built = "1";
   S.players.forEach(p => $("#tok" + p.id).addEventListener("click", () => tokTap(p.id)));
@@ -1450,7 +1635,7 @@ function benchSpot(p) {
   const mates = S.players.filter(q => q.team === p.team);
   const b = mates.indexOf(p);
   const step = Math.min(6, 44 / Math.max(1, mates.length));
-  return { x: p.team === 0 ? -2 + b * step : 102 - b * step, y: 6 };
+  return { x: p.team === 0 ? -2 + b * step : 102 - b * step, y: 3 + (b % 2) * 9 }; // two rows, so names stay readable
 }
 function inLine(p) { return S.line[p.team].includes(p.id); }
 function lineSpot(p) {
@@ -1476,7 +1661,8 @@ function moveTok(p, pos, ms, path) {
   let frames = [{ left: XP(from.x) + "%", top: from.y + "%" }, { left: XP(pos.x) + "%", top: pos.y + "%" }];
   if (path === "zig") frames = [frames[0], { left: XP(from.x + (pos.x - from.x) * .3) + "%", top: (from.y - 9) + "%" }, { left: XP(from.x + (pos.x - from.x) * .55) + "%", top: (from.y + 8) + "%" }, frames[1]];
   POS[p.id] = { x: pos.x, y: pos.y };
-  return animLT(el, frames, ms);
+  el.classList.add("run"); el._runs = (el._runs || 0) + 1;
+  return animLT(el, frames, ms).then(() => { if (--el._runs <= 0) { el._runs = 0; el.classList.remove("run"); } });
 }
 function setBall(x, y, h) { const b = $("#ball"); if (!b) return; b.style.left = XP(x) + "%"; b.style.top = y + "%"; $("#ballImg").style.transform = `translateY(${-(h || 0)}px)`; b._x = x; b._y = y; b._h = h || 0; }
 function moveBall(x, y, ms, arcH, endH) {
@@ -1502,7 +1688,7 @@ function camNow(c, z, lane) {
   const f = Math.max(0.28, Math.min(0.5, 0.5 - (z - 1) * 0.14)); // zoomed in, the focus lane sits above the ticker
   const tx = (W / 2 - camEl.offsetLeft) - px * z, ty = Hp * f - py * z;
   pl.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale3d(${z}, ${z}, 1)`;
-  document.documentElement.style.setProperty("--ts", Math.pow(z, -0.65).toFixed(3));
+  document.documentElement.style.setProperty("--ts", Math.pow(z, -0.75).toFixed(3));
 }
 
 function layoutLines() {
@@ -1516,10 +1702,11 @@ function clearSay() { document.querySelectorAll("#plane .tsay").forEach(e => e.h
 function pose(p, cls) { const el = p && $("#tok" + p.id); if (!el) return; el.classList.remove("sit", "down", "hit"); if (cls) el.classList.add(cls); }
 function clearPoses() { document.querySelectorAll("#plane .tok").forEach(e => e.classList.remove("sit", "down", "hit", "turn")); document.querySelectorAll("#plane .flower, #plane .flagp, #plane .boom, #plane .qbtok").forEach(e => e.remove()); }
 function prop3d(cls, emoji, x, y) { const e = document.createElement("div"); e.className = cls; e.innerHTML = `<span>${emoji}</span>`; e.style.left = XP(x) + "%"; e.style.top = y + "%"; $("#plane").appendChild(e); return e; }
-function qbTok(x, y) { const e = document.createElement("div"); e.className = "tok qbtok t" + S.possession; e.id = "tokqb"; e.innerHTML = `<div class="tshadow"></div><div class="tok-body"><div class="tface">QB</div><div class="tname">QB</div></div>`; e.style.left = XP(x) + "%"; e.style.top = y + "%"; $("#plane").appendChild(e); POS.qb = { x, y }; return { id: "qb" }; }
+function qbTok(x, y) { const e = document.createElement("div"); e.className = "tok qbtok t" + S.possession; e.id = "tokqb"; e.innerHTML = `<div class="tshadow"></div><div class="tok-body"><div class="tname">QB</div><div class="tfig">${figureSVG("qb", teamColor(S.possession, true), teamColor(S.possession))}</div></div>`; e.style.left = XP(x) + "%"; e.style.top = y + "%"; $("#plane").appendChild(e); POS.qb = { x, y }; return { id: "qb" }; }
 function cap(text, kind, ms) {
   const c = $("#cap"); if (!c) return;
   c.hidden = false; c.className = "cap show " + (kind || ""); c.textContent = text;
+  speak(text, { flush: true });
   if (ms) setTimeout(() => { if (c.textContent === text) c.hidden = true; }, ms * SLOW());
 }
 function hideCap() { const c = $("#cap"); if (c) c.hidden = true; }
@@ -1546,6 +1733,7 @@ async function stepUp() {
   await moveTok(p, spotlight(), 800);
   if (token !== DIR.token) return;
   showBubble();
+  if (voiceMode === "all" && S.q) speak(`${p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"}. ${S.q.text} ${S.q.options.map((o, i) => `${"ABCD"[i]}, ${o}.`).join(" ")}`);
   if (p.bot) botAnswer(p, token);
 }
 const BOT = { key: null, acc: { pewee: 0.6, college: 0.68, pro: 0.76 } };
@@ -1593,7 +1781,7 @@ function renderBubble() {
     <div class="opts">${q.options.map((o, i) => { let cls = ""; if (a) { if (o === q.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>
     ${a ? `<div class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</div>
     <div class="note">${a.ok ? "" : `Answer: <b>${esc(q.answer)}</b>. `}${esc(q.note || "")}</div>
-    <div class="actions"><button type="button" class="btn" id="nextBtn">${last ? "Line up!" : "Next player"}</button></div>` :
+    <div class="actions"><button type="button" class="btn" id="nextBtn" data-label="${last ? "Line up!" : "Next player"}">${last ? "Line up!" : "Next player"}</button></div>` :
     `<div class="note">Question ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} answers on their phone.` : ""}${isBot ? ` ${esc(p.name)} is thinking…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</div>${vi && vi.got ? `<div class="actions"><button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button></div>` : ""}`}`;
   b.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => answer(q.options[+x.dataset.o])));
   const nb = $("#nextBtn"); if (nb) { nb.addEventListener("click", advance); nb.focus({ preventScroll: true }); }
@@ -1645,8 +1833,10 @@ function callPlay() {
   S.cands = S.line[S.possession].slice(); S.target = null; S.guess = null; S.sub = null;
   if (S.cands.length >= 2) S.phase = "call"; else { S.target = S.cands[0] ?? null; S.phase = "set"; }
   hideCap(); render();
+  const qb = S.phase === "call" && S.qb != null ? S.players[S.qb] : null;
+  if (qb) speak(`${qb.name} is the quarterback. Pick who gets the ball. Defense, no peeking!`, { flush: true });
 }
-function pickTarget(id) { if (!S || S.phase !== "call" || !S.cands.includes(id)) return; S.target = id; S.phase = "guess"; sfx.good(); render(); }
+function pickTarget(id) { if (!S || S.phase !== "call" || !S.cands.includes(id)) return; S.target = id; S.phase = "guess"; sfx.good(); render(); const cp = S.cap != null ? S.players[S.cap] : null; if (cp) speak(`${cp.name}, you're the defensive captain. Who gets the ball?`, { flush: true }); }
 function pickGuess(id) { if (!S || S.phase !== "guess" || !S.cands.includes(id)) return; S.guess = id; S.phase = "set"; sfx.good(); render(); }
 function tokTap(id) { if (!S) return; if (S.phase === "call") pickTarget(id); else if (S.phase === "guess") pickGuess(id); }
 function syncPick() { const on = S.phase === "call" || S.phase === "guess", role = on || S.phase === "set"; S.players.forEach(p => { const el = $("#tok" + p.id); if (el) { el.classList.toggle("pick", on && S.cands.includes(p.id)); el.classList.toggle("qb", role && p.id === S.qb); el.classList.toggle("cap", role && p.id === S.cap); } }); }
@@ -1797,12 +1987,14 @@ function finishSnapUI() {
   const c = S.cur; if (!c) return;
   const h = headlineFor(c.res, c.outcome);
   hideCap(); headline(h.t, h.k);
+  if (c.shown) return; c.shown = true;
   if (c.outcome === "td") { confetti(); sfx.td(); }
+  speak(`${h.t}. ${c.res.text} ${c.res.after || ""}`, { flush: true });
 }
 async function replaySnap() {
   const c = S.cur; if (!c || S.phase !== "playing" || S.sub !== "result") return;
   const token = ++DIR.token;
-  S.sub = "anim"; clearSay(); clearPoses(); headline(null); hideCap(); render();
+  S.sub = "anim"; c.shown = false; clearSay(); clearPoses(); headline(null); hideCap(); hush(); render();
   await animateSnap(c.sn, c.res, c.startDrive, token);
   if (token !== DIR.token) return;
   S.sub = "result"; render();
@@ -1873,6 +2065,7 @@ async function runKick() {
   await sleep(500);
   S.sub = "result"; render();
   hideCap(); headline(k.head, k.kind === "fg" ? (k.good ? "good" : "bad") : "meh");
+  speak(`${k.head}. ${k.msg}`, { flush: true });
 }
 async function afterHuddle() {
   if (S.driveEnd) {
@@ -1892,7 +2085,7 @@ async function afterHuddle() {
 async function startHuddle() {
   const token = ++DIR.token;
   startPlay();
-  clearSay(); clearPoses(); headline(null); hideCap(); hideBubble();
+  clearSay(); clearPoses(); headline(null); hideCap(); hideBubble(); hush();
   render();
   cap("Huddle up!", "", 1200);
   camNow(phone() ? FX(S.teams[S.possession].drive) : 50, 1);
@@ -1983,6 +2176,7 @@ function renderEnd() {
   const t = S.teams, w = t[0].score === t[1].score ? -1 : t[0].score > t[1].score ? 0 : 1;
   const ranked = S.players.slice().sort((a, b) => (b.st.tds * 30 + b.st.yds + b.st.stops * 8 + b.st.ints * 15 + b.st.right * 5) - (a.st.tds * 30 + a.st.yds + a.st.stops * 8 + a.st.ints * 15 + a.st.right * 5));
   const mvp = ranked[0];
+  speak(`Final score: ${t[0].name} ${t[0].score}, ${t[1].name} ${t[1].score}. ${w < 0 ? "It's a tie!" : `${t[w].name} win! Game M V P: ${mvp.name}.`}`, { interrupt: true });
   $("#end").innerHTML = `<div class="card final">
     <span class="eyebrow">Final</span>
     <h2>${w < 0 ? "It's a tie!" : `${esc(t[w].name)} win!`}</h2>
@@ -2013,19 +2207,22 @@ function show() {
     $("#plane").dataset.built = "";
     if (S.phase === "playing" && S.sub === "anim") { if (S.cur) S.sub = "result"; else { S.phase = "set"; S.sub = null; } }
     if (S.phase === "kick" && S.sub === "anim") S.sub = "result";
-    render();
-    if (S.phase === "questions" && S.restored) { S.restored = false; stepUp(); }
+    if (S.phase === "ready") { S.restored = false; render(); readyUp(); } // saved between the last question and the huddle
+    else { render(); if (S.phase === "questions" && S.restored) { S.restored = false; stepUp(); } }
   }
   if (scr === "end") renderEnd();
   saveGame(); renderPhones(); netSync();
 }
 window.addEventListener("resize", () => { if (S && S.screen === "game") { sizeVars(); camNow(CAM.c, CAM.z, CAM.l); positionBubble(); } });
 function start(data) {
+  if (!(data && data.S)) { const g = savedGame(); if (g) data = Object.assign({}, data || {}, { S: g }); } // a plain reload picks the autosave up too
   if (data && data.S) { S = data.S; S.restored = true; }
   if (data && data.setup) Object.assign(setup, data.setup);
-  syncSound(); segSet("lvlSeg", setup.level); segSet("teamSeg", setup.team);
+  syncSound(); syncVoice(); segSet("lvlSeg", setup.level); segSet("teamSeg", setup.team);
   show();
-  if (store.get("gf_phones")) netStart(store.get("gf_code"));
+  // On the website phones are on from the start (the QR is the first thing a family needs); "Turn off phones" is remembered.
+  const auto = !window.GF_NO_PHONES && !window.GF_PLAY_URL && typeof Peer !== "undefined" && store.get("gf_phones") !== false;
+  if (auto || store.get("gf_phones")) netStart(store.get("gf_code"));
 }
 
 // ---------- phones as controllers (peer-to-peer through PeerJS) ----------
@@ -2057,10 +2254,16 @@ function netStart(code) {
   renderPhones();
   const peer = new Peer("gfb-" + NET.code, netCfg());
   NET.peer = peer;
-  peer.on("open", () => { if (NET.peer !== peer) return; NET.status = "on"; renderPhones(); });
+  peer.on("open", () => { if (NET.peer !== peer) return; NET.status = "on"; NET.retry = 0; renderPhones(); });
   peer.on("error", e => {
     if (NET.peer !== peer) return;
-    if (e && e.type === "unavailable-id") { NET.peer = null; try { peer.destroy(); } catch (x) {} netStart(); return; }
+    if (e && e.type === "unavailable-id") { // the old session's id is still registered (a reload or a wifi blip): keep the code the phones know
+      NET.peer = null; try { peer.destroy(); } catch (x) {}
+      NET.retry = (NET.retry || 0) + 1;
+      if (NET.retry <= 8) { NET.status = "starting"; NET.err = ""; renderPhones(); setTimeout(() => { if (!NET.peer) netStart(NET.code); }, 3000); }
+      else { NET.retry = 0; netStart(); }
+      return;
+    }
     NET.status = "error"; NET.err = (e && e.type) || String(e); renderPhones();
   });
   peer.on("disconnected", () => { if (NET.peer !== peer) return; NET.status = "reconnecting"; renderPhones(); setTimeout(() => { try { if (NET.peer === peer && !peer.destroyed) peer.reconnect(); } catch (x) {} }, 1500); });
@@ -2089,25 +2292,32 @@ function netJoin(conn, d) {
   const av = Number.isInteger(d.av) && d.av >= 0 && d.av < AVATARS.length ? d.av : rnd(AVATARS.length);
   const level = ["pewee", "college", "pro", "random"].includes(d.level) ? d.level : "pewee";
   const team = d.team === 1 ? 1 : 0;
-  let ph = NET.phones.find(p => p.pid === pid);
-  if (ph) { if (ph.conn && ph.conn !== conn) { try { ph.conn.close(); } catch (e) {} } ph.conn = conn; ph.online = true; }
-  else { ph = { pid, conn, online: true }; NET.phones.push(ph); }
-  delete NET.last[pid];
   const inGame = !!S && S.screen !== "setup";
-  const rec = phoneRec(ph);
+  const rec = phoneRec({ pid });
+  if (!rec) { // a new player: is there room?
+    const n = inGame ? S.players.length + NET.pend.filter(p => p.pid !== pid).length : setup.roster.length;
+    if (n >= 16) { try { conn.send({ t: "full" }); } catch (e) {} setTimeout(() => { try { conn.close(); } catch (e) {} }, 300); return; }
+  }
+  let ph = NET.phones.find(p => p.pid === pid);
+  if (ph) { // the same player from a new connection (reload, or a second tab): the newest one wins, the old one is told
+    const old = ph.conn; ph.conn = conn; ph.online = true;
+    if (old && old !== conn) { try { old.send({ t: "replaced" }); } catch (e) {} setTimeout(() => { try { old.close(); } catch (e) {} }, 300); }
+  } else { ph = { pid, conn, online: true }; NET.phones.push(ph); }
+  delete NET.last[pid];
   if (rec) {
-    rec.name = name; rec.av = av; rec.level = level;
-    if (!inGame) rec.team = team;
-    else { const el = $("#tok" + rec.id + " .tname"); if (el) el.textContent = name; const f = $("#tok" + rec.id + " .tface"); if (f) f.innerHTML = avatarSVG(av, teamColor(rec.team, true)); const r2 = setup.roster.find(p => p.pid === pid); if (r2) Object.assign(r2, { name, av, level }); }
+    if (d.edit) { // only a Save on the phone changes the record; an automatic rejoin never undoes what the host set here
+      rec.name = name; rec.av = av; rec.level = level;
+      if (!inGame) rec.team = team;
+      else { const el = $("#tok" + rec.id + " .tname"); if (el) el.textContent = name; const f = $("#tok" + rec.id + " .tfig"); if (f) f.innerHTML = figureSVG(av, teamColor(rec.team, true), teamColor(rec.team)); const r2 = setup.roster.find(p => p.pid === pid); if (r2) Object.assign(r2, { name, av, level }); }
+    }
   } else if (!inGame) {
-    if (setup.roster.length >= 16) { try { conn.send({ t: "full" }); } catch (e) {} return; }
     setup.roster.push({ name, level, team, av, pid });
   } else {
     const pd = NET.pend.find(p => p.pid === pid);
     if (pd) Object.assign(pd, { name, av, level, team }); else NET.pend.push({ name, level, team, av, pid });
   }
   try { conn.send({ t: "joined", pid }); } catch (e) {}
-  if (!inGame) renderRoster(); else { renderPhones(); render(); }
+  renderPhones(); if (inGame) render(); else renderRoster();
   netSync();
 }
 function netKick(pid) {
@@ -2120,7 +2330,8 @@ function netKick(pid) {
 function netAdmit() {
   if (!S || !NET.pend.length) return;
   NET.pend.splice(0).forEach(r => {
-    if (S.players.length >= 16 || S.players.some(p => p.pid === r.pid)) return;
+    if (S.players.some(p => p.pid === r.pid)) return;
+    if (S.players.length >= 16) { const ph = NET.phones.find(p => p.pid === r.pid); if (ph) { try { ph.conn && ph.conn.send({ t: "full" }); } catch (e) {} NET.phones.splice(NET.phones.indexOf(ph), 1); } return; }
     S.players.push({ id: S.players.length, name: r.name, level: r.level, team: r.team, crew: false, av: r.av, pid: r.pid, st: { asked: 0, right: 0, yds: 0, stops: 0, tds: 0, ints: 0 } });
     if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push({ name: r.name, level: r.level, team: r.team, av: r.av, pid: r.pid });
     S.log.unshift({ t: r.team, text: `<b>${esc(r.name)}</b> joins ${esc(S.teams[r.team].name)} from the bench.` });
@@ -2132,7 +2343,7 @@ function netMsg(conn, d) {
   if (!d || typeof d !== "object") return;
   if (d.t === "join") return netJoin(conn, d);
   const ph = phoneOf(conn); if (!ph) return;
-  if (d.t === "ping") return;
+  if (d.t === "ping") { try { conn.send({ t: "pong" }); } catch (e) {} return; }
   if (d.t === "leave") { if (!S) { const i = setup.roster.findIndex(p => p.pid === ph.pid); if (i >= 0) setup.roster.splice(i, 1); NET.phones.splice(NET.phones.indexOf(ph), 1); renderRoster(); renderPhones(); } return; }
   if (!S || S.screen !== "game") return;
   const rec = phoneRec(ph); if (!rec) return;
@@ -2170,7 +2381,10 @@ function qrHTML() {
   try { const q = qrcode(0, "M"); q.addData(url); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { qr = ""; }
   const n = NET.phones.filter(p => p.online).length;
   const stat = NET.status === "on" ? `${n} ${n === 1 ? "phone" : "phones"} connected` : NET.status === "starting" ? "Connecting…" : NET.status === "reconnecting" ? "Reconnecting…" : `Problem: ${esc(NET.err)}`;
-  return `<div class="qr-wrap"><div class="qr">${qr}</div><div class="qr-text"><div class="code">${NET.code}</div><p class="hint">Scan this with your phone camera, or go to <b>${esc(shortUrl(url))}</b> and type the code. Sign up with your name and picture, then answer your questions and call plays from your phone.</p><p class="hint stat">${stat}</p></div></div>`;
+  const local = location.protocol === "file:" || /^(localhost|127\.|0\.0\.0\.0|\[::1\]|)$/.test(location.hostname);
+  const site = typeof window.GF_SITE_URL === "string" ? window.GF_SITE_URL : "";
+  const warn = local && site && !new URLSearchParams(location.search).get("ps") ? `<p class="err">Phones can't open this page from ${location.protocol === "file:" ? "a file on this computer" : location.hostname}. Open the game at <b>${esc(shortUrl(site))}</b> and the code will work on their phones.</p>` : "";
+  return `<div class="qr-wrap"><div class="qr">${qr}</div><div class="qr-text"><div class="code">${NET.code}</div><p class="hint">Scan this with your phone camera, or go to <b>${esc(shortUrl(url))}</b> and type the code. Sign up with your name and picture, then answer your questions and call plays from your phone.</p>${warn}<p class="hint stat">${stat}</p></div></div>`;
 }
 function renderPhones() {
   const btn = $("#phoneBtn"), n = NET.phones.filter(p => p.online).length;
@@ -2180,7 +2394,7 @@ function renderPhones() {
   else if (box) {
     if (!NET.peer) {
       box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Play on your phones</h2></div><p class="hint">Turn this on and everyone scans a code to join: they answer their own questions and call plays on their phones while the big screen shows the field. Or skip it and play on one screen.</p><div class="row"><button class="btn ghost" type="button" id="phoneOn">Turn on phones</button></div>${NET.status === "nolib" ? `<div class="err">The phone link didn't load. Check the internet connection and reload the page.</div>` : NET.status === "error" ? `<div class="err">Phone link problem (${esc(NET.err)}). Try again.</div>` : ""}`;
-      const b = $("#phoneOn"); if (b) b.addEventListener("click", () => netStart());
+      const b = $("#phoneOn"); if (b) b.addEventListener("click", () => netStart(store.get("gf_code")));
     } else {
       box.innerHTML = `<div><span class="eyebrow">Phones</span><h2>Join on your phone</h2></div>${qrHTML()}<div class="row"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button></div>`;
       const b = $("#phoneOff"); if (b) b.addEventListener("click", netStop);

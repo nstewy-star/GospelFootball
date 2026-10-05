@@ -99,6 +99,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <p class="note">The four letters are on the big screen next to the QR code.</p>
     <form id="codeForm" autocomplete="off" style="display:flex;flex-direction:column;gap:12px">
       <input type="text" id="codeIn" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;font-family:var(--f-display);font-size:34px;letter-spacing:.3em;text-align:center" autocapitalize="characters" autocorrect="off" spellcheck="false">
+      <div class="err" id="codeErr"></div>
       <button class="btn" type="submit">Join</button>
     </form>
   </section>
@@ -133,7 +134,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261005-002850';</script>
+<script>window.GF_BUILD = '20261005-005131';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Caricature avatars drawn as inline SVG. Girls wear dresses; boys wear white shirts and ties.
@@ -156,9 +157,7 @@ const AVATARS = [
   { n: "Winky Wendy", g: "g", s: 5, h: "afro", hc: "#140d08", e: "wink", x: ["bow"], c: "#c0392b" },
   { n: "Sister Sadie", g: "g", s: 1, h: "long", hc: "#e0a83a", e: "teeth", x: ["freckles", "bow"], c: "#3d6fd9" }
 ];
-function avatarSVG(i, helmet) {
-  if (i === "bot") return botSVG(helmet);
-  if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
+function avatarParts(i, helmet) {
   const a = AVATARS[i], sk = AV_SKIN[a.s], hc = a.hc, sh = "#3a2a20";
   let back = "", front = "", body = "", face = "", extra = "";
   // body
@@ -236,20 +235,28 @@ function avatarSVG(i, helmet) {
       <path d="M23 50 Q50 57 77 50 M23 58 Q50 65 77 58 M50 53.5 L50 62" stroke="#d8d8d0" stroke-width="3" fill="none" stroke-linecap="round"/>
       <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>`;
   }
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${back}${body}${head}${front}${face}${hel}${extra}</svg>`;
+  return { a, sk, back, body, head, front, face, hel, extra };
+}
+function avatarSVG(i, helmet) {
+  if (i === "bot") return botSVG(helmet);
+  if (i === "team" || i == null || !AVATARS[i]) return teamSVG(helmet);
+  const p = avatarParts(i, helmet);
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${p.back}${p.body}${p.head}${p.front}${p.face}${p.hel}${p.extra}</svg>`;
 }
 function botSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <rect x="22" y="70" width="56" height="30" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
-    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="44" y="60" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.5"/>${botHead(helmet)}</svg>`;
+}
+function botHead(helmet) {
+  return `
     ${helmet ? "" : `<line x1="50" y1="8" x2="50" y2="18" stroke="#1d1a17" stroke-width="2.5"/><circle cx="50" cy="7" r="4" fill="#e9b949" stroke="#1d1a17" stroke-width="1.5"/>`}
     <rect x="22" y="18" width="56" height="46" rx="12" fill="#b9c7ce" stroke="#1d1a17" stroke-width="2"/>
     <rect x="30" y="30" width="16" height="14" rx="4" fill="#1d1a17"/><rect x="54" y="30" width="16" height="14" rx="4" fill="#1d1a17"/>
     <circle cx="38" cy="37" r="4" fill="#5fe3ff"/><circle cx="62" cy="37" r="4" fill="#5fe3ff"/>
     <rect x="34" y="50" width="32" height="8" rx="3" fill="#1d1a17"/>
     ${[0, 1, 2].map(k => `<rect x="${37 + k * 9}" y="51.5" width="5" height="5" rx="1" fill="#f2efe4"/>`).join("")}
-    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}
-  </svg>`;
+    ${helmet ? `<path d="M14 40 Q14 2 50 2 Q86 2 86 40 L86 46 Q82 50 76 48 L76 34 Q66 24 50 24 Q34 24 24 34 L24 48 Q18 50 14 46 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>` : ""}`;
 }
 function teamSVG(helmet) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -259,6 +266,94 @@ function teamSVG(helmet) {
     ${helmet ? `<path d="M30 30 Q30 4 50 4 Q70 4 70 30 L70 34 L30 34 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.2"/><path d="M34 30 L66 30 M34 25 L66 25" stroke="#d8d8d0" stroke-width="2"/>` : ""}
     <text x="50" y="${helmet ? 46 : 26}" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${helmet ? 15 : 20}" fill="#f2efe4">TEAM</text>
   </svg>`;
+}
+
+// ---------- standing figures for the field ----------
+// Big helmeted head, church clothes, a flag-football belt in the team colour, and legs that run.
+const FIG_VB = "0 0 100 150";
+const FIG_SVG = `<svg viewBox="${FIG_VB}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`;
+function figFlags(team, y, x1, x2) {
+  return `<rect x="${x1}" y="${y}" width="${x2 - x1}" height="6" rx="2" fill="${team}" stroke="#1d1a17" stroke-width=".8"/>
+    <path d="M${x1 - 1} ${y + 5} h7 l-1.5 15 h-4 Z M${x2 - 6} ${y + 5} h7 l-1.5 15 h-4 Z" fill="${team}" stroke="#1d1a17" stroke-width=".8"/>`;
+}
+function figLegs(kind, sk) {
+  const leg = (cls, x) => kind === "girl"
+    ? `<g class="lg ${cls}"><rect x="${x + 4}" y="100" width="12" height="36" rx="4" fill="${sk}"/><rect x="${x + 2}" y="128" width="16" height="7" rx="2" fill="#fff"/><rect x="${x - 1}" y="134" width="22" height="12" rx="6" fill="#1b1b1b"/></g>`
+    : kind === "bot"
+    ? `<g class="lg ${cls}"><rect x="${x + 2}" y="92" width="16" height="42" rx="4" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.2"/><rect x="${x - 3}" y="132" width="26" height="14" rx="5" fill="#5b6c75" stroke="#1d1a17" stroke-width="1.2"/></g>`
+    : kind === "team"
+    ? `<g class="lg ${cls}"><path d="M${x + 10} 106 L${x + 10} 136" stroke="#5d3013" stroke-width="7" stroke-linecap="round"/><rect x="${x - 2}" y="134" width="24" height="12" rx="6" fill="#1b1b1b"/></g>`
+    : `<g class="lg ${cls}"><rect x="${x}" y="90" width="20" height="46" rx="5" fill="${kind === "qb" ? "#f2efe4" : "#2b3442"}"${kind === "qb" ? ' stroke="#b9b4a3" stroke-width="1"' : ""}/><rect x="${x - 4}" y="134" width="28" height="12" rx="6" fill="#1b1b1b"/></g>`;
+  return leg("a", 28) + leg("b", 52);
+}
+function figArms(sleeve, w, hand, puff) {
+  const arm = (cls, sx, ex) => `<g class="arm ${cls}">${puff ? `<circle cx="${sx}" cy="60" r="7" fill="${puff}"/>` : ""}<path d="M${sx} ${puff ? 62 : 58} L${ex} 90" stroke="${sleeve}" stroke-width="${w}" stroke-linecap="round"/><circle cx="${ex + (ex < 50 ? -1 : 1)}" cy="93.5" r="5.5" fill="${hand}"/></g>`;
+  return arm("a", 27, 17) + arm("b", 73, 83);
+}
+function figureSVG(i, helmet, team) {
+  helmet = helmet || "#777"; team = team || helmet;
+  if (i === "bot") return botFigure(helmet, team);
+  if (i === "qb") return qbFigure(helmet, team);
+  if (i === "team" || i == null || !AVATARS[i]) return teamFigure(helmet, team);
+  const p = avatarParts(i, helmet), a = p.a, sk = p.sk;
+  const head = `<g transform="translate(17 2) scale(.66)">${p.back}${p.head}${p.front}${p.face}${p.hel}${p.extra}</g>`;
+  let body;
+  if (a.g === "b") {
+    body = figLegs("boy", sk)
+      + `<path d="M24 97 L24 63 Q26 54 36 53 L64 53 Q74 54 76 63 L76 97 Z" fill="#fbfbf8" stroke="#cfcfc8" stroke-width="1"/>`
+      + `<path d="M41 53 L50 62 L45 66 Z M59 53 L50 62 L55 66 Z" fill="#fff" stroke="#bdbdb4" stroke-width="1"/>`
+      + `<path d="M47 60 L53 60 L51 64 L49 64 Z" fill="${a.c}"/><path d="M49 64 L51 64 L55 86 L50 90 L45 86 Z" fill="${a.c}"/>`
+      + figArms("#fbfbf8", 11, sk)
+      + figFlags(team, 92, 24, 76);
+  } else {
+    body = figLegs("girl", sk)
+      + `<path d="M36 53 L64 53 Q74 56 74 72 L84 118 L16 118 L26 72 Q26 56 36 53 Z" fill="${a.c}"/>`
+      + `<path d="M40 53 Q50 65 60 53 Z" fill="#fff"/>`
+      + figArms(sk, 9, sk, a.c)
+      + figFlags(team, 84, 27, 73);
+  }
+  return `${FIG_SVG}${body}<rect x="45" y="44" width="10" height="12" fill="${sk}"/>${head}</svg>`;
+}
+function botFigure(helmet, team) {
+  return `${FIG_SVG}${figLegs("bot")}
+    <rect x="24" y="54" width="52" height="40" rx="8" fill="#8fa3ad" stroke="#1d1a17" stroke-width="1.5"/>
+    <rect x="36" y="62" width="28" height="18" rx="3" fill="#2b3a42"/>
+    ${[0, 1, 2].map(k => `<circle cx="${42 + k * 8}" cy="71" r="2.6" fill="${["#5fe3ff", "#e9b949", "#57c27a"][k]}"/>`).join("")}
+    <g class="arm a"><path d="M25 60 L15 90" stroke="#6f848e" stroke-width="10" stroke-linecap="round"/><circle cx="14" cy="94" r="6" fill="#b9c7ce" stroke="#1d1a17" stroke-width="1.2"/></g>
+    <g class="arm b"><path d="M75 60 L85 90" stroke="#6f848e" stroke-width="10" stroke-linecap="round"/><circle cx="86" cy="94" r="6" fill="#b9c7ce" stroke="#1d1a17" stroke-width="1.2"/></g>
+    ${figFlags(team, 90, 24, 76)}
+    <rect x="44" y="44" width="12" height="12" fill="#6f848e" stroke="#1d1a17" stroke-width="1.2"/>
+    <g transform="translate(17 4) scale(.66)">${botHead(helmet)}</g></svg>`;
+}
+function teamFigure(helmet, team) {
+  return `${FIG_SVG}${figLegs("team")}
+    <g class="arm a"><path d="M24 84 L12 104" stroke="#5d3013" stroke-width="6" stroke-linecap="round"/><circle cx="11" cy="106" r="5" fill="#8a4b22" stroke="#5d3013" stroke-width="1.5"/></g>
+    <g class="arm b"><path d="M76 84 L88 104" stroke="#5d3013" stroke-width="6" stroke-linecap="round"/><circle cx="89" cy="106" r="5" fill="#8a4b22" stroke="#5d3013" stroke-width="1.5"/></g>
+    <ellipse cx="50" cy="88" rx="34" ry="24" transform="rotate(-18 50 88)" fill="#8a4b22" stroke="#5d3013" stroke-width="2"/>
+    <path d="M30 98 L70 78" stroke="#fff" stroke-width="3"/>
+    ${[0, 1, 2, 3].map(k => `<path d="M${42 + k * 6} ${89 - k * 3} l4 8" stroke="#fff" stroke-width="2.4"/>`).join("")}
+    <text x="50" y="103" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="13" fill="#f2efe4">TEAM</text>
+    ${figFlags(team, 106, 30, 70)}
+    <path d="M26 68 Q26 30 50 30 Q74 30 74 68 L74 72 L26 72 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>
+    <path d="M30 66 L70 66 M30 60 L70 60" stroke="#d8d8d0" stroke-width="2.4"/>
+    <ellipse cx="40" cy="38" rx="8" ry="4" fill="#fff" opacity=".28" transform="rotate(-20 40 38)"/></svg>`;
+}
+function qbFigure(helmet, team) {
+  const sk = "#e9b48a";
+  return `${FIG_SVG}${figLegs("qb", sk)}
+    <path d="M24 97 L24 63 Q26 54 36 53 L64 53 Q74 54 76 63 L76 97 Z" fill="${team}" stroke="#1d1a17" stroke-width="1"/>
+    <text x="50" y="84" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#fff" stroke="#1d1a17" stroke-width=".6">QB</text>
+    ${figArms(team, 11, sk)}
+    <rect x="24" y="92" width="52" height="6" fill="#1d1a17"/>
+    <rect x="45" y="44" width="10" height="12" fill="${sk}"/>
+    <g transform="translate(17 2) scale(.66)"><ellipse cx="50" cy="42" rx="30" ry="31" fill="${sk}"/>
+      <path d="M11 52 Q8 -2 50 -2 Q92 -2 89 52 L89 56 Q86 62 77 60 L77 44 Q68 31 50 29 Q32 31 23 44 L23 60 Q14 62 11 56 Z" fill="${helmet}" stroke="#1d1a17" stroke-width="1.5"/>
+      <path d="M24 38 Q50 28 76 38 L76 48 Q50 58 24 48 Z" fill="#1d1a17" opacity=".9"/>
+      <path d="M46 0 L54 0 L53 22 L47 22 Z" fill="#f2efe4" opacity=".85"/>
+      <ellipse cx="34" cy="10" rx="9" ry="4" fill="#fff" opacity=".28" transform="rotate(-20 34 10)"/>
+      <path d="M23 50 Q50 57 77 50 M23 58 Q50 65 77 58 M50 53.5 L50 62" stroke="#d8d8d0" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M23 50 L23 58 M77 50 L77 58" stroke="#d8d8d0" stroke-width="3" stroke-linecap="round"/>
+      <path d="M41 67 Q50 73 59 67" stroke="#3a2a20" stroke-width="2.4" fill="none" stroke-linecap="round"/></g></svg>`;
 }
 
 (function () {
@@ -273,13 +368,16 @@ const cfg = ps ? { host: ps.split(":")[0], port: +ps.split(":")[1] || 9000, path
 const teamColor = t => t ? "#2f7fb8" : "#b8482c";
 const LVL = { pewee: "Pewee", college: "College", pro: "Pro", random: "Random" };
 let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", sentPick = null, sentHike = false, myAns = null, editing = false;
-const form = { av: 0, level: "pewee", team: 0 };
+let pending = null, stopped = false, misses = 0, lastMsg = 0;
+const form = { av: 0, level: "pewee", team: 0, avSet: false };
 const key = () => "gfme_" + code;
 function loadMe() { try { return JSON.parse(localStorage.getItem(key())); } catch (e) { return null; } }
 function saveMe(m) { try { localStorage.setItem(key(), JSON.stringify(m)); } catch (e) {} }
 function newPid() { return "p" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
 function setStatus(text, bad) { const s = $("#status"); s.textContent = text; s.classList.toggle("on", !bad && text === "Connected"); }
-function send(m) { try { if (conn && conn.open) conn.send(m); } catch (e) {} }
+function send(m) { try { if (conn && conn.open && !dead(conn)) { conn.send(m); return true; } } catch (e) {} setStatus("Not connected, try again", true); ensure(); return false; }
+function dead(c) { try { const pc = c.peerConnection, dc = c.dataChannel; return (pc && ["disconnected", "failed", "closed"].includes(pc.iceConnectionState)) || (dc && dc.readyState !== "open"); } catch (e) { return false; } }
+function dropPending() { if (pending && !pending.open) { try { pending.close(); } catch (e) {} } pending = null; }
 
 // ---- connection to the big screen ----
 function connect() {
@@ -291,7 +389,8 @@ function connect() {
   p.on("error", e => {
     if (peer !== p) return;
     const t = (e && e.type) || "error"; dialing = null;
-    if (t === "peer-unavailable") setStatus(`Can't find game ${code}. Is the big screen on, with phones turned on?`, true);
+    dropPending();
+    if (t === "peer-unavailable") { misses++; setStatus(`Can't find game ${code}. Is the big screen on, with phones turned on?`, true); if (misses >= 2) offerCodeChange(); }
     else if (["network", "server-error", "socket-error", "socket-closed", "disconnected"].includes(t)) setStatus("No connection. Trying again…", true);
     else setStatus("Problem: " + t, true);
     if (["browser-incompatible", "invalid-id", "invalid-key", "ssl-unavailable", "unavailable-id"].includes(t)) { try { p.destroy(); } catch (x) {} peer = null; }
@@ -301,35 +400,55 @@ function connect() {
 }
 function retry(ms) { clearTimeout(retryT); retryT = setTimeout(ensure, ms); }
 function ensure() {
-  if (!code) return;
-  if (conn && conn.open) return;
+  if (!code || stopped) return;
+  if (conn && conn.open) { // a phone that slept can keep a dead channel that still says "open"
+    if (dead(conn) || (lastMsg && Date.now() - lastMsg > 40000)) { const c = conn; conn = null; try { c.close(); } catch (e) {} setStatus("Reconnecting…", true); } else return;
+  }
   if (!peer || peer.destroyed) { peer = null; connect(); }
   else if (peer.disconnected) { try { peer.reconnect(); } catch (e) { peer = null; connect(); } }
   else if (peer.open) dial();
 }
 function dial() {
-  if (conn && conn.open) return;
+  if (stopped || (conn && conn.open)) return;
   if (dialing && Date.now() - dialing < 8000) return;
+  dropPending();
   dialing = Date.now();
   setStatus("Finding the game…", true);
   const c = peer.connect("gfb-" + code, { reliable: true });
-  c.on("open", () => { conn = c; dialing = null; setStatus("Connected"); if (me) send({ t: "join", ...me }); });
+  pending = c;
+  c.on("open", () => { if (pending === c) pending = null; conn = c; dialing = null; misses = 0; lastMsg = Date.now(); setStatus("Connected"); if (me) send({ t: "join", ...me }); });
   c.on("data", onData);
-  c.on("close", () => { if (conn === c) { conn = null; setStatus("Lost the big screen. Reconnecting…", true); retry(1500); } });
-  c.on("error", () => { if (conn === c) conn = null; dialing = null; retry(3000); });
+  c.on("close", () => { if (pending === c) pending = null; if (conn === c) { conn = null; if (!stopped) { setStatus("Lost the big screen. Reconnecting…", true); retry(1500); } } });
+  c.on("error", () => { if (pending === c) pending = null; if (conn === c) conn = null; dialing = null; retry(3000); });
+}
+function offerCodeChange() {
+  const s = $("#status"); if (s.querySelector("button")) return;
+  const b = document.createElement("button"); b.type = "button"; b.textContent = "Try a different code"; b.className = "btn ghost"; b.style.cssText = "margin-left:8px;padding:4px 10px;font-size:14px";
+  b.addEventListener("click", () => { stopped = true; clearTimeout(retryT); showOnly("codeScr"); $("#codeIn").value = code; $("#codeErr").textContent = `Check the four letters on the big screen. ${code} didn't answer.`; $("#codeIn").focus(); });
+  s.appendChild(b);
 }
 setInterval(ensure, 5000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) ensure(); });
 setInterval(() => send({ t: "ping" }), 15000);
 function onData(d) {
   if (!d || typeof d !== "object") return;
-  if (d.t === "hello") { hello = d; applyTeams(); if (!me) showSign(); else render(); }
-  else if (d.t === "full") { $("#signErr").textContent = "The roster is full (16 players). Ask the host to make room."; showSign(); }
+  lastMsg = Date.now();
+  if (d.t === "pong") return;
+  if (d.t === "hello") { hello = d; applyTeams(); if (!me) { if ($("#signScr").hidden) showSign(); else $("#signNote").textContent = signNote(); } else render(); }
+  else if (d.t === "replaced") { // this player is open in a newer tab or on another phone: stop fighting over the spot
+    stopped = true; clearTimeout(retryT); const c = conn; conn = null; try { c && c.close(); } catch (e) {}
+    setStatus("This player is open in another tab or phone. Close this one, or reload to take over.", true);
+  }
+  else if (d.t === "full") { me = null; try { localStorage.removeItem(key()); } catch (e) {} state = null; showSign("The roster is full (16 players). Ask the host to make room, then sign up again."); }
   else if (d.t === "kicked") { me = null; try { localStorage.removeItem(key()); } catch (e) {} state = null; showSign("The host took you off the roster. You can sign up again."); }
   else if (d.t === "state") {
     if (d.build && d.build !== GF_BUILD) { // the big screen runs a newer page: reload once to match it
       let seen = null; try { seen = sessionStorage.getItem("gf_reloaded_for"); } catch (e) {}
       if (seen !== d.build) { try { sessionStorage.setItem("gf_reloaded_for", d.build); } catch (e) {} location.reload(); return; }
+    }
+    if (d.me && me) { // follow what the host set on the laptop (a drag to the other team, a fixed name), so a rejoin never undoes it
+      const m = { ...me, name: d.me.name, av: d.me.av, level: d.me.level, team: d.me.team };
+      if (JSON.stringify(m) !== JSON.stringify(me)) { me = m; saveMe(me); }
     }
     state = d; render();
   }
@@ -344,15 +463,16 @@ function showSign(note) {
   editing = !!me;
   showOnly("signScr");
   $("#signCode").textContent = code;
-  $("#signNote").textContent = note || (hello && hello.started ? "The game has already started. Sign up and you'll take the field at the next huddle." : "Pick a name and a picture. You can change them until kickoff.");
+  $("#signNote").textContent = note || signNote();
   if (me) { $("#nameIn").value = me.name; form.av = me.av; form.level = me.level; form.team = me.team; }
-  else if (!$("#nameIn").value) form.av = Math.floor(Math.random() * AVATARS.length);
+  else if (!form.avSet) { form.av = Math.floor(Math.random() * AVATARS.length); form.avSet = true; }
   renderAvPick(); segSet("lvlSeg", form.level); segSet("teamSeg", form.team);
   $("#joinBtn").textContent = me ? "Save" : "Join the game";
   $("#signCancel").hidden = !me;
-  if (!me) $("#nameIn").focus({ preventScroll: true });
+  if (!me && !$("#nameIn").value) $("#nameIn").focus({ preventScroll: true });
 }
-$("#avPick").addEventListener("click", e => { const b = e.target.closest("[data-av]"); if (!b) return; form.av = +b.dataset.av; renderAvPick(); });
+function signNote() { return hello && hello.started ? "The game has already started. Sign up and you'll take the field at the next huddle." : "Pick a name and a picture. You can change them until kickoff."; }
+$("#avPick").addEventListener("click", e => { const b = e.target.closest("[data-av]"); if (!b) return; form.av = +b.dataset.av; form.avSet = true; renderAvPick(); });
 $("#lvlSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; form.level = b.dataset.v; segSet("lvlSeg", form.level); });
 $("#teamSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; form.team = +b.dataset.v; segSet("teamSeg", form.team); });
 $("#signCancel").addEventListener("click", () => { editing = false; if (me) { showOnly("main"); render(); } });
@@ -363,14 +483,15 @@ $("#signForm").addEventListener("submit", e => {
   $("#signErr").textContent = "";
   me = { pid: (me && me.pid) || newPid(), name, av: form.av, level: form.level, team: form.team };
   saveMe(me); editing = false;
-  send({ t: "join", ...me });
+  if (stopped) { stopped = false; ensure(); }
+  send({ t: "join", ...me, edit: true });
   showOnly("main"); render();
   try { navigator.vibrate && navigator.vibrate(30); } catch (x) {}
 });
 $("#codeForm").addEventListener("submit", e => {
   e.preventDefault();
   const c = $("#codeIn").value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
-  if (c.length !== 4) return;
+  if (!/^[ABCDEFGHJKMNPQRSTUVWXYZ]{4}$/.test(c)) { $("#codeErr").textContent = c.length !== 4 ? "The code is four letters." : "That's not a game code: it never has an I, L or O in it. Check the big screen."; return; }
   const u = new URL(location.href); u.searchParams.set("g", c); location.href = u.href;
 });
 
@@ -424,9 +545,9 @@ function render() {
     h = `<div class="eyebrow">${esc(s.play || "")}</div><p class="msg">${esc(s.msg || "Waiting for the big screen…")}</p>`;
   }
   v.innerHTML = h;
-  v.querySelectorAll(".opt[data-o]:not([disabled])").forEach(b => b.addEventListener("click", () => { const o = s.q.options[+b.dataset.o]; myAns = o; send({ t: "answer", opt: o }); render(); }));
-  v.querySelectorAll(".opt[data-pick]").forEach(b => b.addEventListener("click", () => { sentPick = +b.dataset.pick; send({ t: "pick", id: sentPick }); render(); }));
-  const hb = $("#hikeBtn"); if (hb) hb.addEventListener("click", () => { sentHike = true; send({ t: "hike" }); render(); });
+  v.querySelectorAll(".opt[data-o]:not([disabled])").forEach(b => b.addEventListener("click", () => { const o = s.q.options[+b.dataset.o]; if (send({ t: "answer", opt: o })) { myAns = o; render(); } }));
+  v.querySelectorAll(".opt[data-pick]").forEach(b => b.addEventListener("click", () => { const id = +b.dataset.pick; if (send({ t: "pick", id })) { sentPick = id; render(); } }));
+  const hb = $("#hikeBtn"); if (hb) hb.addEventListener("click", () => { if (send({ t: "hike" })) { sentHike = true; render(); } });
   const eb = $("#editBtn"); if (eb) eb.addEventListener("click", () => showSign());
 }
 
