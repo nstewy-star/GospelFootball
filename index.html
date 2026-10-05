@@ -289,6 +289,10 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .thought .who { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--f-ui); font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; }
 .thought .who .lvl { background: #14211f; }
 .thought .tag { margin-left: auto; font-size: 12px; letter-spacing: .12em; color: #4b5e5a; }
+.thought .readq { font-size: 12px; letter-spacing: .06em; font-weight: 700; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; border: 2px solid #14211f; background: transparent; color: #14211f; }
+.thought .readq[aria-pressed="true"] { background: #14211f; color: var(--chalk); }
+.thought .readq[aria-pressed="true"]::before { content: "🔊 "; }
+.thought .readq[aria-pressed="false"]::before { content: "🔇 "; }
 .thought .q { font-family: var(--f-read); font-size: clamp(16px, 2vw, 20px); line-height: 1.3; font-weight: 600; }
 .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 @media (max-width: 560px) { .opts { grid-template-columns: 1fr; } }
@@ -480,7 +484,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-030309';</script>
+<script>window.GF_BUILD = '20261005-032245';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -1971,8 +1975,10 @@ const sfx = {
 };
 
 // ---------- announcer (the browser's own speech voice) ----------
-const VOICE_MODES = ["plays", "all", "off"];
-let voiceMode = VOICE_MODES.includes(store.get("gf_voice")) ? store.get("gf_voice") : "plays";
+const VOICE_MODES = ["plays", "off"];
+let voiceMode = store.get("gf_voice") === "off" ? "off" : "plays";
+// readQ: the questions and their answer choices are read out loud (toggle in the question box; it works mid-game)
+let readQ = store.get("gf_readq") == null ? true : !!store.get("gf_readq");
 const TTS = { ok: typeof speechSynthesis !== "undefined" && typeof SpeechSynthesisUtterance !== "undefined", voice: null, q: [], busy: false, since: 0 };
 function pickVoice() {
   let vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
@@ -2007,7 +2013,7 @@ function speakNow() {
 // speak(text): queued after whatever is playing. flush: drop the lines still waiting (keep the one playing). interrupt: stop everything and say this now.
 function speak(text, o) {
   o = o || {};
-  if (!sound || voiceMode === "off" || !TTS.ok) return;
+  if (!sound || (voiceMode === "off" && !o.force) || !TTS.ok) return;
   const t = cleanSpeech(text); if (!t) return;
   if (o.interrupt) hush(); else if (o.flush) TTS.q.length = 0;
   // long lines one sentence at a time, so a browser that cuts long speech short never drops the end
@@ -2018,10 +2024,13 @@ function speak(text, o) {
   push(chunk);
   speakNow();
 }
-function hush() { TTS.q.length = 0; TTS.busy = false; TTS.cur = null; try { if (TTS.ok) speechSynthesis.cancel(); } catch (e) {} voxStop(); }
+function ttsStop() { TTS.q.length = 0; TTS.busy = false; TTS.cur = null; READ.tts = false; try { if (TTS.ok) speechSynthesis.cancel(); } catch (e) {} }
+// ttsIdle(): resolves once the browser voice has nothing left to say (polled; capped at 40 s)
+function ttsIdle() { return new Promise(res => { const t0 = Date.now(); const tick = () => { if ((!TTS.busy && !TTS.q.length) || Date.now() - t0 > 40000) res(); else setTimeout(tick, 150); }; tick(); }); }
+function hush() { ttsStop(); voxStop(); }
 // ---------- voice clips: ElevenLabs recordings under audio/ (see audio/lines.json), with the browser voice as the fallback ----------
 const AUDIO_BASE = (typeof window.GF_AUDIO_URL === "string" && window.GF_AUDIO_URL) || "audio/";
-const VOX = { on: false, cache: new Map(), refQ: [], refCur: null, avCur: [] };
+const VOX = { on: false, cache: new Map(), refQ: [], refCur: null, refIt: null, avCur: [] };
 // the recordings are in use once audio/voices.json can be read; until then (and when a clip is missing) the browser voice reads the line
 try { fetch(AUDIO_BASE + "voices.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(v => { if (v && typeof v === "object") { VOX.on = true; VOX.voices = v; } }).catch(() => {}); } catch (e) {}
 // caps on the field that have a referee recording (the text as cap() shows it -> the key in audio/lines.json)
@@ -2030,30 +2039,38 @@ const CAP_KEYS = { "Hut... hut... HIKE!": "hike", "Snap... hold... KICK!": "kick
   "Recovered by the defense!": "recovered", "Defense wakes up and grabs it!": "recovered", "Free rusher!": "rusher", "Touchback!": "touchback", "Whiff! Guessed pass": "whiff", "FLAG! Holding, +5": "flag", "Flag! Fumble wiped out": "flag", "Incomplete, but a flag! +5": "flag" };
 function capKey(text) { if (CAP_KEYS[text]) return CAP_KEYS[text]; const m = /^\+(\d+)$/.exec(text); return m ? (+m[1] >= 15 ? "big" : "gain") : null; }
 function clipAudio(path) { let a = VOX.cache.get(path); if (!a) { a = new Audio(AUDIO_BASE + path); a.preload = "auto"; VOX.cache.set(path, a); } return a; }
-function playClip(a) {
+// playClip(a, max): plays a clip and resolves when it ends (false when it could not play); the backstop timer uses the clip's length when known, else max (8 s)
+function playClip(a, max) {
   return new Promise(res => {
     let done = false; const fin = ok => { if (done) return; done = true; a.onended = a.onerror = null; res(ok); };
     a.onended = () => fin(true); a.onerror = () => fin(false);
     try { a.currentTime = 0; const p = a.play(); if (p && p.catch) p.catch(() => fin(false)); } catch (e) { fin(false); }
-    setTimeout(() => fin(true), 8000);
+    setTimeout(() => fin(true), isFinite(a.duration) && a.duration > 0 ? a.duration * 1000 + 1500 : max || 8000);
   });
 }
+// the referee's queue: play calls ({key}) and the pieces of a question being read ({path, q: true}); a missing clip is read by the browser voice before the queue moves on
 function refNext() {
   if (VOX.refCur || !VOX.refQ.length) return;
-  const it = VOX.refQ.shift(), a = clipAudio("ref/" + it.key + ".mp3"); VOX.refCur = a;
-  playClip(a).then(ok => { VOX.refCur = null; if (!ok) speak(it.text); refNext(); });
+  const it = VOX.refQ.shift(), a = clipAudio(it.path || "ref/" + it.key + ".mp3"); VOX.refCur = a; VOX.refIt = it;
+  playClip(a, it.q ? 30000 : 0).then(ok => {
+    if (it.q) { if (ok) READ.ok++; else READ.fail++; }
+    if (ok) { if (VOX.refCur === a) { VOX.refCur = null; VOX.refIt = null; } refNext(); return; }
+    if (it.q) READ.tts = true;
+    speak(it.text, { force: !!it.q });
+    ttsIdle().then(() => { if (VOX.refCur === a) { VOX.refCur = null; VOX.refIt = null; } if (it.q && !VOX.refQ.some(x => x.q)) READ.tts = false; refNext(); });
+  });
 }
 // refSay(key, text, o): the referee's recorded call when there is one; otherwise the browser voice reads the text (always when there are no recordings, only in "everything" mode when there are)
 function refSay(key, text, o) {
   o = o || {};
   if (!sound || voiceMode === "off") return;
   if (!VOX.on) { speak(text, o); return; }
-  if (!key) { if (voiceMode === "all") speak(text, o); return; }
-  if (o.interrupt) { voxStop(); hush(); } else if (o.flush) VOX.refQ.length = 0;
+  if (!key) return;
+  if (o.interrupt) hush(); else if (o.flush) VOX.refQ.length = 0;
   VOX.refQ.push({ key, text }); refNext();
 }
-// detail(text, o): the longer explanation after a call; spoken only when the announcer reads everything (or when there are no recordings)
-function detail(text, o) { if (!VOX.on || voiceMode === "all") speak(text, o); }
+// detail(text, o): the longer explanation after a call; spoken only while there are no recordings
+function detail(text, o) { if (!VOX.on) speak(text, o); }
 // avSay(av, key, delay): a player's own recorded line, chosen by their picture (Robo has its own); drawn team players and the QB have none
 function avSay(av, key, delay) {
   if (!sound || voiceMode === "off" || !VOX.on) return;
@@ -2061,15 +2078,67 @@ function avSay(av, key, delay) {
   const go = () => { const a = clipAudio("av/" + folder + "/" + key + ".mp3"); VOX.avCur.push(a); playClip(a).then(() => { const i = VOX.avCur.indexOf(a); if (i >= 0) VOX.avCur.splice(i, 1); }); };
   if (delay) setTimeout(go, delay); else go();
 }
-function voxStop() { VOX.refQ.length = 0; [VOX.refCur, ...VOX.avCur].forEach(a => { if (a) { try { a.pause(); } catch (e) {} } }); VOX.refCur = null; VOX.avCur.length = 0; }
+function voxStop() { VOX.refQ.length = 0; [VOX.refCur, ...VOX.avCur].forEach(a => { if (a) { try { a.pause(); } catch (e) {} } }); VOX.refCur = null; VOX.refIt = null; VOX.avCur.length = 0; }
+// ---------- reading the questions: the referee's recording of each question (audio/q/<id>.mp3) and of each answer choice (audio/opt/<id>.mp3) after its letter (audio/ref/letter_a..d.mp3); ids = the first 10 hex digits of the SHA-1 of the exact text ----------
+// sha1(str): hex SHA-1 of the UTF-8 string, small and synchronous (ids of the recorded questions)
+function sha1(str) {
+  const bytes = new TextEncoder().encode(str), ml = bytes.length, words = [];
+  for (let i = 0; i < ml; i++) words[i >> 2] |= bytes[i] << (24 - (i % 4) * 8);
+  words[ml >> 2] |= 0x80 << (24 - (ml % 4) * 8);
+  const n = (((ml + 8) >> 6) + 1) * 16; words[n - 1] = ml * 8; words[n - 2] = Math.floor(ml * 8 / 4294967296);
+  for (let i = 0; i < n; i++) words[i] = words[i] | 0;
+  let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+  const rotl = (x, c) => (x << c) | (x >>> (32 - c)), w = new Array(80);
+  for (let i = 0; i < n; i += 16) {
+    for (let t = 0; t < 16; t++) w[t] = words[i + t];
+    for (let t = 16; t < 80; t++) w[t] = rotl(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+    let a = h0, b = h1, c = h2, d = h3, e = h4;
+    for (let t = 0; t < 80; t++) {
+      const f = t < 20 ? (b & c) | (~b & d) : t < 40 ? b ^ c ^ d : t < 60 ? (b & c) | (b & d) | (c & d) : b ^ c ^ d;
+      const k = t < 20 ? 0x5A827999 : t < 40 ? 0x6ED9EBA1 : t < 60 ? 0x8F1BBCDC : 0xCA62C1D6;
+      const tmp = (rotl(a, 5) + f + e + k + w[t]) | 0; e = d; d = c; c = rotl(b, 30); b = a; a = tmp;
+    }
+    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0; h4 = (h4 + e) | 0;
+  }
+  return [h0, h1, h2, h3, h4].map(x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+}
+const READ = { ok: 0, fail: 0, tts: false, hist: [] };
+function qid(s) { return sha1(String(s)).slice(0, 10); }
+function qClips(q) { return [{ path: "q/" + qid(q.text) + ".mp3", text: q.text, q: true }].concat(q.options.flatMap((o, i) => [{ path: "ref/letter_" + "abcd"[i] + ".mp3", text: "ABCD"[i] + ".", q: true }, { path: "opt/" + qid(o) + ".mp3", text: o, q: true }])); }
+// once six pieces in a row have failed with none ever played, the question recordings are not there: the browser voice reads the questions instead
+function qClipsReady() { return VOX.on && !(READ.fail >= 6 && !READ.ok); }
+function preloadQuestion(q) {
+  if (!(readQ && q && qClipsReady())) return;
+  const paths = qClips(q).map(c => c.path); paths.forEach(p => clipAudio(p));
+  READ.hist.push(paths); while (READ.hist.length > 3) READ.hist.shift().forEach(p => VOX.cache.delete(p)); // keep only the last few questions' clips in memory
+}
+// readQuestion(q, who): reads the question and its choices as shown (who = "Ben, Pewee question" for the browser voice, which has no recording of the names)
+function readQuestion(q, who) {
+  readStop();
+  if (!sound || !readQ || !q) return;
+  if (!qClipsReady() || !TTS.ok && !VOX.on) {
+    READ.tts = true; speak(`${who ? who + ". " : ""}${q.text} ${q.options.map((o, i) => `${"ABCD"[i]}, ${o}.`).join(" ")}`, { force: true, flush: true });
+    ttsIdle().then(() => { if (!VOX.refQ.some(x => x.q) && !(VOX.refIt && VOX.refIt.q)) READ.tts = false; });
+    return;
+  }
+  qClips(q).forEach(c => VOX.refQ.push(c)); refNext();
+}
+function readingNow() { return !!(READ.tts || VOX.refQ.some(x => x.q) || (VOX.refIt && VOX.refIt.q)); }
+// readStop(): stops the reading (the play calls queued behind it go on)
+function readStop() {
+  for (let i = VOX.refQ.length - 1; i >= 0; i--) if (VOX.refQ[i].q) VOX.refQ.splice(i, 1);
+  if (READ.tts) ttsStop();
+  if (VOX.refIt && VOX.refIt.q) { const a = VOX.refCur; VOX.refCur = null; VOX.refIt = null; try { if (a) a.pause(); } catch (e) {} refNext(); }
+}
+function setReadQ(v) { readQ = !!v; store.set("gf_readq", readQ); if (!readQ) readStop(); }
 // preloadVoices(avs): warm the referee's calls and the lines of the players in the game
 function preloadVoices(avs) { if (!VOX.on) return; Object.values(CAP_KEYS).concat(["welcome", "newgame", "td", "first", "correct", "wrong", "field", "bench", "qb", "captain", "final", "tie", "gain", "big"]).forEach(k => clipAudio("ref/" + k + ".mp3")); (avs || []).forEach(av => { const f = av === "bot" ? "56" : Number.isInteger(av) ? String(av).padStart(2, "0") : null; if (f) ["field", "right", "wrong", "throw", "run", "td", "hit", "block"].forEach(k => clipAudio("av/" + f + "/" + k + ".mp3")); }); }
 function syncVoice() {
   const b = $("#voiceBtn"); if (!b) return;
   b.hidden = !TTS.ok;
-  b.textContent = voiceMode === "all" ? "Announcer: everything" : voiceMode === "plays" ? "Announcer: plays" : "Announcer: off";
+  b.textContent = voiceMode === "off" ? "Announcer: off" : "Announcer: on";
   b.setAttribute("aria-pressed", String(voiceMode !== "off"));
-  b.title = voiceMode === "all" ? "The announcer calls the plays and reads every question" : voiceMode === "plays" ? "The announcer calls the plays" : "The announcer is off";
+  b.title = voiceMode === "off" ? "The announcer is off" : "The announcer calls the plays. Reading the questions out loud has its own switch in the question box.";
 }
 
 // ---------- setup UI ----------
@@ -2228,8 +2297,8 @@ $("#startBtn").addEventListener("click", () => {
 });
 $("#soundBtn").addEventListener("click", () => { sound = !sound; store.set("gf_sound", sound); syncSound(); if (sound) sfx.good(); else hush(); });
 $("#voiceBtn").addEventListener("click", () => {
-  voiceMode = VOICE_MODES[(VOICE_MODES.indexOf(voiceMode) + 1) % VOICE_MODES.length]; store.set("gf_voice", voiceMode); syncVoice();
-  if (voiceMode === "off") hush(); else refSay("newgame", voiceMode === "all" ? "I'll call the plays and read the questions." : "I'll call the plays.", { interrupt: true });
+  voiceMode = voiceMode === "off" ? "plays" : "off"; store.set("gf_voice", voiceMode); syncVoice();
+  if (voiceMode === "off") hush(); else refSay("newgame", "I'll call the plays.", { interrupt: true });
 });
 function syncSound() { $("#soundBtn").textContent = sound ? "Sound on" : "Sound off"; $("#soundBtn").setAttribute("aria-pressed", String(sound)); }
 $("#quitBtn").addEventListener("click", () => { if (S && S.screen === "game" && !S.confirmQuit) { S.confirmQuit = true; $("#quitBtn").textContent = "Tap again to quit"; setTimeout(() => { if (S) { S.confirmQuit = false; $("#quitBtn").textContent = "New game"; } }, 2500); return; } S = null; show(); });
@@ -2288,9 +2357,12 @@ function nextQuestion() {
   const p = S.players[S.order[S.qi]];
   const lvl = p.level === "random" ? ["pewee", "college", "pro"][rnd(3)] : p.level;
   S.q = drawQuestion(lvl); S.q.level = lvl; S.answered = null; NET.qvotes = {};
+  preloadQuestion(S.q);
 }
+function whoAsks(p) { return p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"; }
 function answer(opt) {
   if (S.answered) return;
+  readStop();
   const p = S.players[S.order[S.qi]];
   const ok = opt === S.q.answer;
   S.answered = { opt, ok };
@@ -2572,18 +2644,24 @@ async function stepUp() {
   await moveTok(p, spotlight(), 800);
   if (token !== DIR.token) return;
   showBubble();
-  if (voiceMode === "all" && S.q) speak(`${p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"}. ${S.q.text} ${S.q.options.map((o, i) => `${"ABCD"[i]}, ${o}.`).join(" ")}`);
+  if (S.q) readQuestion(S.q, whoAsks(p));
   if (p.bot) botAnswer(p, token);
 }
 const BOT = { key: null, acc: { pewee: 0.6, college: 0.68, pro: 0.76 } };
 function botAnswer(p, token) {
-  setTimeout(() => {
+  // a bot waits for the referee to finish reading the question before it answers
+  const go = () => {
+    if (token !== DIR.token || !S || S.phase !== "questions" || S.answered || !S.q || S.players[S.order[S.qi]] !== p) return;
+    if (readingNow()) { setTimeout(go, 400); return; }
+    setTimeout(() => {
     if (token !== DIR.token || !S || S.phase !== "questions" || S.answered || !S.q || S.players[S.order[S.qi]] !== p) return;
     const ok = Math.random() < (BOT.acc[S.q.level] || 0.65);
     const wrong = S.q.options.filter(o => o !== S.q.answer);
     answer(ok ? S.q.answer : wrong[rnd(wrong.length)]);
     setTimeout(() => { if (token === DIR.token && S && S.phase === "questions" && S.answered && S.players[S.order[S.qi]] === p) advance(); }, reduced ? 80 : 1900);
-  }, reduced ? 60 : 1400);
+    }, reduced ? 60 : 1400);
+  };
+  setTimeout(go, reduced ? 10 : 300);
 }
 function botFourth() {
   const { fg, dr } = fourthInfo(), need = S.ltg - dr;
@@ -2607,7 +2685,7 @@ function showBubble() {
   const b = $("#thought"); b.hidden = false; stadium().classList.add("asking");
   renderBubble();
 }
-function hideBubble() { const t = $("#thought"); t.hidden = true; t.innerHTML = ""; $("#shade").hidden = true; $("#tdot1").hidden = true; $("#tdot2").hidden = true; stadium().classList.remove("asking"); }
+function hideBubble() { readStop(); const t = $("#thought"); t.hidden = true; t.innerHTML = ""; $("#shade").hidden = true; $("#tdot1").hidden = true; $("#tdot2").hidden = true; stadium().classList.remove("asking"); }
 function renderBubble() {
   if (!S || S.phase !== "questions") return;
   const p = S.players[S.order[S.qi]], q = S.q, a = S.answered, off = S.possession;
@@ -2615,7 +2693,7 @@ function renderBubble() {
   const last = S.qi === S.order.length - 1;
   const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
-  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true))}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span></div>
+  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true))}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span><button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button></div>
     <div class="q">${esc(q.text)}</div>
     <div class="opts">${q.options.map((o, i) => { let cls = ""; if (a) { if (o === q.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>
     ${a ? `<div class="foot"><span class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</span>
@@ -2625,6 +2703,7 @@ function renderBubble() {
   b.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => answer(q.options[+x.dataset.o])));
   const nb = $("#nextBtn"); if (nb) { nb.addEventListener("click", advance); nb.focus({ preventScroll: true }); }
   const lb = $("#lockBtn"); if (lb) lb.addEventListener("click", () => checkVotes(true));
+  const rb = $("#readQBtn"); if (rb) rb.addEventListener("click", () => { setReadQ(!readQ); renderBubble(); if (readQ && !S.answered) readQuestion(S.q, whoAsks(p)); $("#readQBtn").focus({ preventScroll: true }); });
   netSync();
 }
 function positionBubble() {
