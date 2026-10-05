@@ -247,11 +247,13 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .tok.down .tfig { transform: translate(8px, -6px) rotate(90deg); filter: drop-shadow(-3px 2px 2px rgba(0,0,0,.4)); }
 .tok.hit .tfig { animation: shake .4s; }
 .tok.turn .tfig { filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 12px var(--gold)); }
-.tname { font-size: 13px; font-weight: 700; background: rgba(7,17,19,.9); color: var(--chalk); padding: 0 7px; border-radius: 999px; white-space: nowrap; line-height: 18px; }
-.tok.t1 .tname { margin-bottom: 22px; }
+.tname { font-size: 13px; font-weight: 700; background: rgba(7,17,19,.9); color: var(--chalk); padding: 0 7px; border-radius: 999px; white-space: nowrap; line-height: 18px; position: absolute; top: 20%; z-index: 3; } /* beside the helmet, never over the player behind (Nick, 2026-10-05) */
+.tok.t0 .tname { right: calc(100% - 8px); } /* the home team lines up on the left of the ball, so its tags point left */
+.tok.t1 .tname { left: calc(100% - 8px); } /* the away team on the right, tags right */
+.tok.qbtok { z-index: 1; } /* the stand-in quarterback stays behind the receiver's tag */
 .tsay { position: absolute; bottom: calc(100% + 8px); left: 50%; z-index: 3; transform: translateX(-50%); background: var(--chalk); color: #0c1a1c; font-weight: 800; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; padding: 5px 11px; border-radius: 12px; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.4); animation: pop .3s ease-out; }
 .tsay::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--chalk); }
-.tsay.o { bottom: calc(100% + 34px); left: 30%; }
+.tsay.o { bottom: calc(100% + 12px); left: 30%; }
 .tsay.d { background: #0c1a1c; color: var(--chalk); border: 2px solid var(--chalk); left: 70%; } .tsay.d::after { border-top-color: var(--chalk); }
 .tsay.flag { background: var(--flag); color: #241d00; } .tsay.flag::after { border-top-color: var(--flag); }
 .tsay.goodb { background: var(--good); color: #062010; } .tsay.goodb::after { border-top-color: var(--good); }
@@ -547,7 +549,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-052025';</script>
+<script>window.GF_BUILD = '20261005-052911';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
