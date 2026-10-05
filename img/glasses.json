@@ -1,12 +1,12 @@
 {
-"about": "Glasses overlay for the round pictures img/pic-<key>.webp. For each key, x and y are the point between the eyes and w the eye span, all as fractions of the picture size. Draw a glasses image with width 1.25*w of the picture, centred on (x, y).",
+"about": "Glasses overlay for the round pictures img/pic-<key>.webp. For each key, x and y are the point between the eyes and w the eye span, all as fractions of the picture size. Draw a glasses image with width 1.0*w of the picture, centred on (x, y).",
 "styles": {
 "gold": "img/glasses-gold.webp",
 "black": "img/glasses-black.webp",
 "brown": "img/glasses-brown.webp",
 "red": "img/glasses-red.webp"
 },
-"width_factor": 1.25,
+"width_factor": 1.0,
 "eyes": {
 "00": {
 "x": 0.4874,
