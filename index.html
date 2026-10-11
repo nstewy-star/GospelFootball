@@ -32,6 +32,7 @@
 }
 * { box-sizing: border-box; }
 html, body { background: var(--night); color: var(--chalk); }
+html { overflow-x: hidden; } /* the stadium no longer clips the field, so a name tag on the far bench of a narrow window must not add a sideways scroll */
 body { font-family: var(--f-ui); font-size: 17px; line-height: 1.35; }
 .wrap { max-width: 1440px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 40px; display: flex; flex-direction: column; gap: 18px; }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: .02em; }
@@ -216,10 +217,10 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 
 /* Stadium (3D) */
 .arena { position: relative; }
-.stadium { --far: 50px; position: relative; height: clamp(280px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
+.stadium { --far: 50px; position: relative; height: clamp(280px, 62vh, 620px); border-radius: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.5); /* no overflow clip here: WebKit (Safari) clips a 3D field inside an overflow-clipped box with a rectangle mapped into the field's own plane, which cut the far end zone off on a slant and hid standing figures (Nick, 2026-10-11); the goal posts are sized to end inside the stadium instead (fitPosts) */
   background: linear-gradient(#0b1e2b 0%, #10303c calc(var(--far) - 56px), #173a44 calc(var(--far) - 40px), #1d4047 calc(var(--far) - 8px), #113a2e var(--far), #0f2f27 100%);
   perspective: 1100px; perspective-origin: 50% 18%; }
-.stadium::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--far) - 40px); height: 40px; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
+.stadium::before { content: ""; position: absolute; left: 22px; right: 22px; top: calc(var(--far) - 40px); height: 40px; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
 .cam { position: absolute; z-index: 1; left: 0; right: 0; margin-inline: auto; width: 100%; aspect-ratio: 120 / 54; bottom: 12px; transform-origin: 50% 100%; transform: rotateX(var(--tilt)); transform-style: preserve-3d; }
 .plane { position: absolute; inset: 0; transform-origin: 0 0; transition: transform .9s cubic-bezier(.4,.1,.2,1); transform-style: preserve-3d; }
 .turf { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, var(--turf) 0 4.1667%, var(--turf-2) 4.1667% 8.3333%); box-shadow: 0 0 0 6px #d9d3bf; }
@@ -236,8 +237,8 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .los { position: absolute; top: 0; bottom: 0; width: 4px; background: var(--away); box-shadow: 0 0 10px rgba(79,166,224,.9); transform: translateX(-2px); transition: left .8s ease; }
 .fdl { position: absolute; top: 0; bottom: 0; width: 4px; background: var(--flag); transform: translateX(-2px); transition: left .8s ease; opacity: .95; }
 .post { position: absolute; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
-.post-body { position: absolute; bottom: 0; width: calc(var(--pw) * .1); height: calc(var(--pw) * .21); left: calc(var(--pw) * -.05); transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)); }
-.post-body svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.post-body { position: absolute; bottom: 0; width: calc(var(--pw) * .1); height: calc(var(--pw) * var(--ph, .21)); left: calc(var(--pw) * -.05); transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)); }
+.post-body svg { width: 100%; height: 100%; display: block; } /* xMidYMax slice: a shortened post keeps its scale and loses the top of its uprights, as the stadium edge used to cut them */
 .tok { position: absolute; width: 0; height: 0; transform-style: preserve-3d; z-index: 2; }
 .tok-body { position: absolute; bottom: 0; left: calc(var(--tw) / -2); width: var(--tw); transform-origin: 50% 100%; transform: rotateX(calc(var(--tilt) * -1)) scale(var(--ts)); transform-style: preserve-3d; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: filter .3s, transform .35s; }
 /* Standing figures: drawn bodies with the player's picture for a face, billboarded upright on the tilted field */
@@ -402,7 +403,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
 @media (max-width: 560px) {
   :root { --tw: 58px; }
   :root { --tilt: 48deg; }
-  .stadium { height: 400px; perspective-origin: 50% 8%; }
+  .stadium { height: 400px; perspective-origin: 50% 8%; overflow: clip; } /* the field is drawn wider than a phone screen, so here the stadium still clips (Safari may mis-clip it) */
   .cap { font-size: min(18px, calc(var(--far) * .6)); } .headline { font-size: min(clamp(22px, 7vw, 34px), calc(var(--far) * .9)); }
   .top { gap: 8px; } .brand { width: 100%; } .icon-btn { font-size: 12px; padding: 6px 10px; }
   .cam { width: 190%; left: -45%; bottom: 2%; }
@@ -565,7 +566,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-200940';</script>
+<script>window.GF_BUILD = '20261011-202334';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2882,7 +2883,7 @@ const stadium = () => $("#stadium");
 function dirOf() { return S.possession === 0 ? 1 : -1; }
 function teamColor(t, dark) { return t === 0 ? (dark ? "#b8482c" : "#e2603f") : (dark ? "#2f7fb8" : "#4fa6e0"); }
 function postSVG() {
-  return `<svg viewBox="0 0 100 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  return `<svg viewBox="0 0 100 210" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <rect x="46" y="110" width="8" height="100" fill="#e9b949"/><rect x="40" y="196" width="20" height="14" rx="3" fill="#2a2a2a"/>
     <rect x="4" y="104" width="92" height="8" rx="2" fill="#e9b949"/>
     <rect x="4" y="0" width="7" height="110" fill="#e9b949"/><rect x="89" y="0" width="7" height="110" fill="#e9b949"/>
@@ -2921,6 +2922,16 @@ function sizeVars() {
   }
   st.style.setProperty("--far", Math.round(st.clientHeight - FIELD_BOTTOM - cam.getBoundingClientRect().height) + "px");
   document.documentElement.style.setProperty("--pw", cam.clientWidth + "px");
+  fitPosts();
+}
+function fitPosts() { // the stadium no longer clips its 3D content (Safari mis-clipped it), so the goal posts are shortened until their uprights end inside the stadium
+  const st = stadium(), pb = st && st.querySelector(".post-body"); if (!pb) return;
+  st.style.removeProperty("--ph");
+  const top = st.getBoundingClientRect().top + 4;
+  for (let i = 0, ph = 0.21; i < 3; i++) {
+    const r = pb.getBoundingClientRect(); if (r.top >= top - 0.5 || r.height < 1) break;
+    ph = Math.max(0.05, ph * (r.bottom - top) / r.height); st.style.setProperty("--ph", ph.toFixed(3));
+  }
 }
 function fitStadium() { // the scoreboard above the field is rendered after the field is built and can change height, so re-fit the stadium when it has moved
   const st = stadium(); if (!st || phone()) return;
