@@ -46,7 +46,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .eyebrow { font-family: var(--f-ui); font-weight: 600; text-transform: uppercase; letter-spacing: .14em; font-size: 13px; color: var(--muted); }
 .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
 .lvl { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--night); color: var(--muted); flex: none; }
-.lvl.pewee { color: #9fe0a9; } .lvl.college { color: #f5c96a; } .lvl.pro { color: #ff9c8a; } .lvl.random { color: #c9b6ff; }
+.lvltip { position: fixed; z-index: 60; width: min(400px, calc(100vw - 24px)); background: #fffdf6; color: #1d1606; border-radius: 12px; padding: 10px 13px; box-shadow: 0 12px 32px rgba(0,0,0,.4); font-size: 14px; line-height: 1.35; text-align: left; pointer-events: none; }
+.lvltip[hidden] { display: none; } .lvltip b { display: block; font-size: 15px; } .lvltip .ages { color: #5a4a2a; } .lvltip .ex { margin-top: 7px; padding-top: 7px; border-top: 1px solid #e6dcc3; } .lvltip .ex .eyebrow { color: #7a5a10; display: block; margin-bottom: 3px; } .lvltip ol { margin: 4px 0 0; padding-left: 20px; } .lvltip li { margin: 1px 0; } .lvltip .ref { color: #7a5a10; font-weight: 700; }
+.lvl.read { color: #9fdcf0; } .lvl.pewee { color: #9fe0a9; } .lvl.college { color: #f5c96a; } .lvl.pro { color: #ff9c8a; } .lvl.random { color: #c9b6ff; }
+.thought .readlabel { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #4b5e5a; } .thought .q.read { font-size: clamp(20px, 2.4vw, 28px); } .thought .ref { font-family: var(--f-ui); font-weight: 700; color: #7a5a10; font-size: 15px; }
 .av { display: inline-block; position: relative; border-radius: 50%; overflow: hidden; flex: none; background: var(--panel-2); vertical-align: middle; }
 .av .specs, .avpick button .specs, .tfig .specs { position: absolute; height: auto; object-fit: fill; border-radius: 0; transform: translate(-50%, -50%) rotate(var(--tilt, 0deg)); pointer-events: none; }
 .seg.glstyles button { padding: 4px 8px; } .seg.glstyles img { height: 18px; width: auto; display: block; }
@@ -62,6 +65,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .setupbar[hidden] { display: none; }
 .barsel { display: flex; align-items: center; gap: 8px; }
 .barsel select { padding: 6px 10px; font-size: 14px; border-radius: 999px; }
+.pools { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pools[hidden] { display: none; }
+.pools .pool { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px 4px 7px; border-radius: 999px; background: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.pools .pool input { margin: 0; accent-color: var(--gold); width: 14px; height: 14px; }
+.pools .pool:has(input:checked) { background: var(--gold); color: #1d1606; }
 .top-actions .btn { padding: 8px 18px; font-size: 15px; }
 .top-actions .btn[hidden] { display: none; }
 .brand h1 { font-size: clamp(26px, 5vw, 38px); color: var(--chalk); }
@@ -410,6 +418,7 @@ td.n, th.n { text-align: right; }
     <div class="brand"><h1>Gospel <span>Football</span></h1><span class="eyebrow" id="subtitle">A General Conference game</span></div>
     <div class="setupbar" id="setupBar" hidden>
       <label class="barsel" for="modeSel"><span class="eyebrow">Playbook</span><select id="modeSel"></select></label>
+      <div class="pools" id="poolRow" hidden></div>
       <label class="barsel" for="playsSel"><span class="eyebrow">Length</span>
         <select id="playsSel">
           <option value="14">14 plays (quick)</option>
@@ -428,7 +437,7 @@ td.n, th.n { text-align: right; }
 
   <div class="hero" id="hero" hidden>
     <div class="hero-art" id="heroArt"></div>
-    <div class="hero-left"><div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Pewee, College and Pro levels for the whole family.</p></div><div class="hero-phones phones" id="phoneBox"></div></div>
+    <div class="hero-left"><div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Peewee, Junior, College and Pro levels for the whole family.</p></div><div class="hero-phones phones" id="phoneBox"></div></div>
     <div class="hero-side"><div class="hero-teams" id="heroTeams"></div></div>
   </div>
   <div class="hero-foot" id="heroFoot" hidden>
@@ -452,7 +461,8 @@ td.n, th.n { text-align: right; }
           <div class="editbar" id="editBar" hidden></div>
           <label class="field-label name" for="pName"><input type="text" id="pName" maxlength="24" placeholder="Type a name" aria-label="Player name"></label>
           <div class="seg" id="lvlSeg" role="group" aria-label="Level">
-            <button type="button" data-v="pewee" aria-pressed="true">Pewee</button>
+            <button type="button" data-v="read" aria-pressed="false">Peewee</button>
+            <button type="button" data-v="pewee" aria-pressed="true">Junior</button>
             <button type="button" data-v="college" aria-pressed="false">College</button>
             <button type="button" data-v="pro" aria-pressed="false">Pro</button>
             <button type="button" data-v="random" aria-pressed="false">Random</button>
@@ -470,7 +480,7 @@ td.n, th.n { text-align: right; }
           <label class="check" for="crewChk"><input type="checkbox" id="crewChk"> Team player: the whole team answers its questions together</label>
           <label class="check" for="botChk"><input type="checkbox" id="botChk"> Bot: the computer plays this spot (its level sets how often it answers right)</label>
         </form>
-        <p class="hint">Random picks a new level for every question. Short a player? Add a team player, or play against the computer with Fill with bots: a Pewee bot gets about 6 in 10 right, a Pro bot about 3 in 4.</p>
+        <p class="hint">Random picks a new level for every question. Short a player? Add a team player, or play against the computer with Fill with bots: a Peewee bot always finishes its reading, a Junior bot gets about 6 in 10 right, a Pro bot about 3 in 4.</p>
       </div>
       <div class="card" id="teamsCard" hidden>
         <div class="team-cols">
@@ -489,7 +499,7 @@ td.n, th.n { text-align: right; }
         <div>
           <h4>The huddle</h4>
           <ul>
-            <li>In each huddle, every player answers one question. A team player's question is answered by the whole team together. Bots answer their own questions (Pewee bots about 60% right, College 68%, Pro 76%) and call their own plays. Pewee questions are easiest, College are harder, Pro are toughest.</li>
+            <li>In each huddle, every player answers one question. A team player's question is answered by the whole team together. Peewee players (ages 3 to 7) read a short scripture or quote out loud and tap Done; they always take the field. Bots answer their own questions (Junior bots about 60% right, College 68%, Pro 76%) and call their own plays. Junior questions are easiest, College are harder, Pro are toughest.</li>
             <li>Answer right and you sprint onto the field and join your team's line of scrimmage. Miss it and you watch this play from the sideline.</li>
             <li>Like real football, the offense keeps the ball and drives one way. Every huddle is one play and one down, and the offense gets 4 downs to reach the yellow line for a first down.</li>
             <li>Then the offense calls the play: huddle up and pick who gets the ball (tap the player). The defense guesses who it will be. Guess right and the defender reads the play; guess wrong and the receiver has room.</li>
@@ -546,17 +556,18 @@ td.n, th.n { text-align: right; }
 
   <!-- END -->
   <section id="end" hidden></section>
-  <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
+  <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261005-065521';</script>
+<script>window.GF_BUILD = '20261011-180531';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
 <script>
 // Question bank: [question, correct, wrong, wrong, wrong, note]
 const QB = {
-conf: {
+conf_apr: {
+read: [["Enduring to the end is the joyous quest of a lifetime.", "Elder David A. Bednar, April 2026"], ["I am your answer: your way, your truth, your life.", "Elder Gerrit W. Gong, April 2026"], ["The Lord honors patient faith. And it is never too late for miracles.", "Elder Taniela B. Wakolo, April 2026"], ["Callings from the Lord are tailor-made for our growth.", "Elder Patrick Kearon, April 2026"], ["In Christ's Church there should be no anonymity.", "Elder Gérald Caussé, April 2026"], ["The sacrament represents the Atonement of Jesus Christ.", "Elder Pedro X. Larreal, April 2026"], ["As we remain tightly bound to Him, He is bound to us.", "Elder Brian J. Holmes, April 2026"], ["The Lord does not ask for perfection all at once.", "Elder Alan R. Walker, April 2026"], ["He lives! Today.", "President Dieter F. Uchtdorf, April 2026"], ["I will give away all my sins to know thee.", "Alma 22:18"], ["Looking unto Jesus the author and finisher of our faith.", "Hebrews 12:2"], ["Ye shall be a peculiar treasure unto me above all people.", "Exodus 19:5"], ["I glory in my Jesus, for he hath redeemed my soul.", "2 Nephi 33:6"], ["It is upon the rock of our Redeemer, who is Christ, the Son of God, that ye must build your foundation.", "Helaman 5:12"], ["Wist ye not that I must be about my Father's business?", "Luke 2:49"], ["Feed my sheep.", "John 21:17"], ["I am the way, the truth, and the life.", "John 14:6"], ["Love one another; as I have loved you.", "John 13:34"], ["Thou art the Christ, the Son of the living God.", "Matthew 16:16"], ["Charity is the pure love of Christ.", "Moroni 7:47"]],
 pewee: [
 ["Who is President of the Church at the 2026 general conferences?","President Dallin H. Oaks","President Henry B. Eyring","Elder David A. Bednar","Elder Gerrit W. Gong","He was sustained in a solemn assembly in April 2026."],
 ["April 2026 general conference was held on what holiday weekend?","Easter","Christmas","Thanksgiving","Pioneer Day","Easter Sunday was April 5, 2026, and many talks focused on the Resurrection."],
@@ -566,25 +577,13 @@ pewee: [
 ["Elder Michael John U. Teh's April 2026 talk title came from a Primary song. Which one?","Follow the Prophet","I Am a Child of God","Popcorn Popping","Book of Mormon Stories","\"Follow the Prophet, He Knows the Way.\""],
 ["Elder Clark G. Gilbert's first talk as an Apostle invited everyone to do what?","Come home","Go to the moon","Stay quiet","Move to Utah","His April 2026 talk was titled \"Come Home.\""],
 ["President Susan H. Porter of the Primary spoke in April 2026 mostly to which group?","Children","Bishops","Missionaries","Grandparents","She taught children that Jesus Christ knows them, understands them and loves them."],
-["Elder Gerrit W. Gong opened October 2026 conference with a talk about what holy place?","The temple","The chapel","The Sacred Grove","The bishop's office","\"Come to the Lord in His Holy House.\""],
-["Elder Ulisses Soares spoke in October 2026 about a \"higher and holier\" what?","Fast","Mountain","Building","Song","\"A Higher and Holier Fast.\""],
 ["What choir sings at general conference?","The Tabernacle Choir at Temple Square","The Salt Lake Singers","The Zion Youth Chorus","The Nauvoo Brass Band","In April 2026 it was directed by Mack Wilberg and Ryan Murphy."],
-["Elder Ronald A. Rasband's October 2026 talk taught us to love like whom?","Jesus","Our pets","Our favorite team","Superheroes","His talk was titled \"Love Like Jesus.\""],
 ["Sister Kristin M. Yee's April 2026 talk was about caring for others. What is that called in the Church?","Ministering","Home evening","Seminary","Tithing","\"Ministering: That Ye Love One Another; as I Have Loved You.\""],
-["Bishop Sean Douglas spoke in October 2026 about what kind of work?","Missionary work","Farm work","Homework","Yard work","\"The Hour of Your Mission Is Come.\""],
-["President Henry B. Eyring's October 2026 talk was titled \"Fear Not, I Am ___.\"","With Thee","Far Away","Coming Soon","Asleep","\"Fear Not, I Am With Thee.\""],
-["Elder Hutch U. Fale's October 2026 talk had the same name as a Primary song. Which song?","I Am a Child of God","Popcorn Popping","Book of Mormon Stories","Give, Said the Little Stream","Saturday afternoon session, October 2026. He taught that knowing we are God's children and that He loves us brings peace and comfort."],
 ["Elder Dale G. Renlund's Easter talk in April 2026 was titled \"Because of ___.\"","Jesus Christ","the Pioneers","Our Teachers","the Sunshine","Sunday morning session, Easter Sunday, April 5, 2026. He taught that because Jesus Christ completed the Atonement, He can redeem us from death, both physical and spiritual."],
 ["Elder Ulisses Soares taught in April 2026 that Jesus Christ is the True ___.","Vine","River","Mountain","Star","\"Jesus Christ — the True Vine,\" Saturday afternoon session, April 2026. See John 15:1–5."],
-["Elder Patrick Kearon's October 2026 talk was titled \"Jesus Lives to ___.\"","Lift","Run","Sing","Build","Saturday afternoon session, October 2026. He compared the Savior's help to the rising air that lifts a glider: \"He is your ever-rising air.\""],
 ["Elder Gary E. Stevenson's April 2026 talk title said something was lost. What was it?","Luggage","Keys","A puppy","Homework","\"Lost Luggage, Redeemed Souls,\" Saturday afternoon, April 2026. He called God's children \"His most precious belongings.\""],
-["Elder Matthew J. Eyring's October 2026 talk said comfort comes from whom?","The Holy Ghost","A doctor","A best friend","A coach","\"Comfort From the Holy Ghost,\" Saturday afternoon session, October 2026. See John 14:26."],
 ["President Susan H. Porter's April 2026 talk title came from Isaiah: \"Here Am I, ___ Me.\"","Send","Teach","Feed","Help","Isaiah 6:8. Sunday afternoon session, April 2026, given by the Primary General President."],
 ["How many sessions did April 2026 general conference have?","4","2","5","8","Two Saturday and two Sunday sessions; there was no Saturday evening session."],
-["Elder Thabo Lebethoa taught in October 2026 that Jesus Christ is the Light and ___ of the World.","Life","King","Song","Door","His title quotes the Savior's words, \"I am the light and the life of the world\" (3 Nephi 11:11). Sunday afternoon session, October 2026; Elder Lebethoa was born in Soweto, South Africa."],
-["Elder Gary E. Stevenson spoke partly to Primary children in October 2026 about \"Fruit To Make One ___.\"","Happy","Tall","Sleepy","Strong","Sunday afternoon session, October 2026. He shared three \"fruits of the gospel.\" The title echoes 1 Nephi 8:10, where the fruit in Lehi's dream was \"desirable to make one happy.\""],
-["President Dallin H. Oaks taught in October 2026 that the gospel of Jesus Christ is for whom?","All people","Only grown-ups","Only prophets","Only missionaries","\"The Gospel of Jesus Christ Is for All,\" Sunday morning session, October 2026."],
-["Elder Paul H. Sinclair's October 2026 talk was titled \"Quick to Help, Slow to ___.\"","Judge","Run","Eat","Sleep","Sunday afternoon, October 2026. He told of Jesus kindly speaking with the woman at the well (John 4)."],
 ["Elder Pedro X. Larreal's April 2026 talk had the same name as a Primary song. Which one?", "I Feel My Savior's Love", "I Love to See the Temple", "Jesus Wants Me for a Sunbeam", "I Hope They Call Me on a Mission", "Sunday morning session, April 2026; Elder Larreal taught that the Atonement and the sacrament are \"a direct reminder of the great love Jesus Christ showed\" each of us."],
 ["Elder Edward B. Rowe's April 2026 talk invited us to choose Jesus Christ as our what?", "Guide", "Mascot", "Neighbor", "Teammate", "His talk was titled \"Choose Jesus Christ as Your Guide,\" Sunday morning session, April 2026, and he said, \"His merciful hand is extended to you even now. Take it!\""],
 ["Elder Thierry K. Mutombo spoke in April 2026 about the joy of a ___ relationship with God.", "covenant", "pen-pal", "business", "long-distance", "\"The Joy of a Covenant Relationship with God,\" Sunday morning session, April 2026; he taught, \"You can feel God's infinite love manifested through His Son, Jesus Christ.\""],
@@ -602,7 +601,101 @@ pewee: [
 ["Which Primary song did the Tabernacle Choir sing in the Sunday afternoon session of April 2026?", "Tell Me the Stories of Jesus", "Popcorn Popping", "Give, Said the Little Stream", "Once There Was a Snowman", "The Tabernacle Choir at Temple Square also sang \"He Is Risen\" and \"Redeemer of Israel\" in the Sunday afternoon session, April 2026."],
 ["What hymn did everyone sing together in the Sunday afternoon session of April 2026?", "I Stand All Amazed", "Praise to the Man", "Count Your Blessings", "Called to Serve", "\"I Stand All Amazed\" was the congregational hymn in the Easter Sunday afternoon session, April 5, 2026."],
 ["Elder David A. Bednar's April 2026 talk was titled \"All Who Have Endured ___.\"", "Valiantly", "Quietly", "Quickly", "Sleepily", "Saturday morning session, April 2026; he taught that \"Enduring to the end is the joyous quest of a lifetime.\""],
-["President D. Todd Christofferson's April 2026 talk was titled \"The Character of ___.\"", "Christ", "Moses", "Nephi", "Peter", "Sunday afternoon session, April 2026; he taught that with faith in Christ we can pray that the Holy Spirit will work a mighty change in us so we want what He wants."],
+["President D. Todd Christofferson's April 2026 talk was titled \"The Character of ___.\"", "Christ", "Moses", "Nephi", "Peter", "Sunday afternoon session, April 2026; he taught that with faith in Christ we can pray that the Holy Spirit will work a mighty change in us so we want what He wants."]
+],
+college: [
+["The April 2026 Saturday morning session opened with what special event?","A solemn assembly sustaining President Oaks","A temple dedication","A choir-only concert","A new hymnbook release","It was President Oaks's first general conference as President of the Church."],
+["Elder David A. Bednar taught in April 2026: \"Enduring to the end is the joyous ___ of a lifetime.\"","quest","burden","test","race","From his talk \"All Who Have Endured Valiantly.\""],
+["Elder Ulisses Soares (April 2026) warned that modern tools should not replace guidance from whom?","The Holy Ghost","Our teachers","Our friends","The internet","He also taught that abiding in Christ is \"a constant.\""],
+["David J. Wunderli taught youth that Jesus Christ is not the weight. Instead, He is our what?","Relief","Coach","Judge","Rulebook","\"He is our relief, He is our strength.\""],
+["In April 2026 Elder Gerrit W. Gong taught that Jesus says, \"I am your ___.\"","Answer","Shepherd","Teacher","Light","\"I am your answer: your way, your truth, your life.\""],
+["Elder Neil L. Andersen's April 2026 talk focused on what?","Eternal marriage","Family history","Self-reliance","Seminary","He described marriage as a place where sacrifice, charity and patience grow."],
+["In April 2026 President Oaks invited us to follow Christ by using \"the language and methods of ___.\"","peacemakers","prophets","missionaries","scholars","From his Sunday morning talk \"Alive in Christ.\""],
+["Elder Patrick Kearon's April 2026 talk on serving in callings was titled what?","About His Business","Go and Do","Lift Where You Stand","Serve with Joy","\"About His Business.\""],
+["President Emily Belle Freeman's April 2026 talk was titled \"Best Days and ___ Days.\"","Worst","Rainy","Busy","Quiet","Sunday morning session, April 2026."],
+["President Dieter F. Uchtdorf's April 2026 Easter talk was titled what?","Encounter at the Empty Tomb","The Road to Emmaus","Morning in the Garden","The Third Day","Sunday morning session, April 2026."],
+["Elder Brian J. Holmes taught in April 2026 that the Savior \"is not only our guide, He is the ___.\"","path","map","finish line","compass","Saturday afternoon session, April 2026."],
+["In April 2026 President Christofferson taught that with faith in Christ we can pray for the Holy Spirit to effect a mighty ___ in us.","change","miracle","storm","victory","Sunday afternoon session, April 2026."],
+["Announced shortly before April 2026 general conference, what changed for Sunday classes beginning September 6, 2026?","Sunday School and quorum classes now meet every week","Sacrament meeting was shortened to 40 minutes","Primary moved to a separate weekday meeting","Meetings returned to a three-hour block","The alternating-week schedule ended; sacrament meeting remains 60 minutes and each class is 25 minutes."],
+["Beginning in April 2026, which general conference session did the First Presidency discontinue?","The Saturday evening session","The Sunday afternoon session","The Saturday afternoon session","The Sunday morning session","Conference now has four daytime sessions: two on Saturday and two on Sunday."],
+["The 2025 statistical report released in April 2026 listed total Church membership at about how many?","17.9 million","15.2 million","20.4 million","12.8 million","17,887,212 members as of December 31, 2025, with 204 temples in operation."],
+["Elder Aaron T. Hall's April 2026 title \"I Glory in My Jesus\" quotes which Book of Mormon prophet?","Nephi","Alma","Ammon","Moroni","2 Nephi 33:6: \"I glory in my Jesus, for he hath redeemed my soul.\""],
+["Elder Quentin L. Cook's April 2026 talk \"Keys, Covenants and Easter\" named Gethsemane, Calvary and what third place?","The Garden Tomb","The Upper Room","The Sea of Galilee","The road to Emmaus","He called them \"eternity-shaping events\"; Sunday afternoon session, April 2026."],
+["Rosemary K. Chibota, called in April 2026 as Primary General President, was raised in which country?","Zimbabwe","Ghana","Kenya","Nigeria","Of Malawian origin; she and her husband led the Alabama Birmingham Mission, 2022–2025."],
+["Which choir provided the music for the Saturday afternoon session of April 2026 general conference?", "Combined choir from BYU–Idaho", "BYU Men's Chorus", "A choir from northern Utah", "Utah Valley institute choir", "A combined choir from Brigham Young University–Idaho sang, directed by Atina Coates, Eda Ashby, Paul Busselberg and Randall Kempton, with Linda Margetts and Joseph Peeples at the organ."],
+["Elder Wan-Liang Wu's April 2026 title, \"I Will Give Away All My Sins To Know Thee,\" quotes which Book of Mormon figure?", "King Lamoni's father", "King Lamoni", "King Benjamin", "Zeezrom", "In Alma 22:18 the father of Lamoni prayed, \"I will give away all my sins to know thee,\" and Elder Wu taught that coming to Christ means being converted to Him."],
+["Elder Eduardo F. Ortega's April 2026 talk called Christ the \"Author and Finisher of Our Faith,\" a phrase from which New Testament book?", "Hebrews", "Romans", "Ephesians", "James", "Hebrews 12:2 says, \"Looking unto Jesus the author and finisher of our faith,\" and Elder Ortega taught that becoming a lifelong disciple of Christ is a process."],
+["Elder Alan R. Walker's April 2026 title \"A Peculiar Treasure\" comes from the Lord's covenant promise to Israel in which book?", "Exodus", "Leviticus", "Deuteronomy", "Joshua", "Exodus 19:5 promises, \"ye shall be a peculiar treasure unto me above all people.\" Elder Walker taught that becoming the Lord's treasure \"requires patient effort, faithful persistence and sacrifice.\""],
+["Elder Chi Hong (Sam) Wong's April 2026 title \"Remember 'Remember, Remember'\" echoes which Book of Mormon prophet's words to his sons?", "Helaman", "Alma", "Mosiah", "Mormon", "Helaman 5:12 begins, \"And now, my sons, remember, remember that it is upon the rock of our Redeemer, who is Christ, the Son of God, that ye must build your foundation.\""],
+["Which Apostle conducted the Sunday afternoon session of April 2026 general conference?", "Elder Dale G. Renlund", "Elder Neil L. Andersen", "Elder Quentin L. Cook", "Elder Gerrit W. Gong", "Elder Renlund conducted the Easter Sunday afternoon session, which President Christofferson opened with \"The Character of Christ.\""],
+["Elder Edward B. Rowe taught in April 2026 that Jesus is \"not only a perfect and personal guide\" but also the resurrected Redeemer and ___.", "Master Healer", "Good Shepherd", "Great Deliverer", "True Vine", "In \"Choose Jesus Christ as Your Guide,\" Elder Rowe said, \"His merciful hand is extended to you even now. Please take it!\""],
+["Elder Pedro X. Larreal's April 2026 talk \"I Feel My Savior's Love\" centered on which ordinance?", "The sacrament", "Baptism", "Confirmation", "The endowment", "He taught, \"The sacrament represents the Atonement of Jesus Christ,\" and urged, \"Elevate your spiritual preparation and reverence as you partake of the sacrament. It is vital.\""],
+["What was the title of Elder Gérald Caussé's April 2026 talk?", "Love All; Love Each", "Love One Another", "Love Like Jesus", "Love Thy Neighbor", "In \"Love All; Love Each\" he taught that \"in Christ's Church there should be no anonymity.\""],
+["How many times did President Dallin H. Oaks speak during April 2026 general conference?", "3", "1", "2", "4", "Thirty-two speakers delivered 34 talks; President Oaks gave introductory remarks, the Easter talk \"Alive in Christ\" and closing remarks."],
+["President Uchtdorf (April 2026): \"Because of what happened on that Sunday morning, we can speak of Jesus Christ in the ___.\"", "present tense", "past tense", "future tense", "first person", "From \"Encounter at the Empty Tomb\": \"He lives! Today.\""],
+["In his April 2026 introductory remarks, President Oaks said a solemn assembly like this one is held only when?", "When a new Church President is called", "Every April conference", "Every ten years", "When a temple is dedicated", "He said, \"We do this only in the first conference where a new President and prophet of the Church has been called.\""],
+["At the April 2026 Sunday afternoon session, the congregation joined the Tabernacle Choir in singing which hymn?", "I Stand All Amazed", "Come, Come, Ye Saints", "How Great Thou Art", "The Spirit of God", "The choir also sang \"He Is Risen,\" \"Lord, I Would Follow Thee,\" \"Tell Me the Stories of Jesus\" and \"Redeemer of Israel.\""],
+["Elder Kearon's April 2026 title \"About His Business\" recalls Jesus at age twelve in the temple, recorded in which Gospel?", "Luke", "Matthew", "Mark", "John", "Luke 2:49: \"wist ye not that I must be about my Father's business?\" Elder Kearon taught that \"callings from the Lord are tailor-made for our growth.\""],
+["President Eyring said in April 2026 that faithful Saints worldwide have \"flooded heaven with ___.\"", "prayers", "tears", "songs", "questions", "In \"Prayers for Peace\" he taught that prayer requires no flowery language, and God hears the secret prayers of the heart."],
+["Which of these was NOT one of the eight new General Authority Seventies sustained in April 2026?", "Elder Alfred Kyungu", "Elder Jeremiah J. Morgan", "Elder James O. Fantone", "Elder Christian C. Chigbundu", "Elder Kyungu was sustained in 2021; the eight new Seventies also included Elders Matthew J. Eyring, Hutch U. Fale, Kevin J. Hathaway, Thabo Lebethoa and Paul H. Sinclair."]
+],
+pro: [
+["Who was announced in April 2026 as the new Primary General President, beginning August 1, 2026?","Rosemary K. Chibota","Susan H. Porter","Tamara W. Runia","Kristin M. Yee","Her counselors are Nina M. Garfield and Theresa A. Collins."],
+["Who conducted the Saturday morning session of April 2026 conference?","President D. Todd Christofferson","President Henry B. Eyring","Elder Ronald A. Rasband","Elder Dale G. Renlund","Elder Rasband conducted the Saturday afternoon session."],
+["Elder Wan-Liang Wu taught in April 2026: \"It is an intrinsic relationship between faith and ___.\"","works","hope","prayer","grace","Saturday afternoon session, April 2026."],
+["Which Seventy taught in April 2026: \"it is never too late for miracles\"?","Elder Taniela B. Wakolo","Elder Aaron T. Hall","Elder Alan R. Walker","Elder Edward B. Rowe","He also testified that \"the Lord honors patient faith.\""],
+["Elder Gary E. Stevenson taught in April 2026: \"We are all one ___. We all need help along the way.\"","family","team","body","fold","Saturday afternoon session, April 2026."],
+["Before his call to the Twelve, Elder Gérald Caussé served in what calling?","Presiding Bishop","Sunday School General President","Church Historian","Mission Department director","Both Elder Caussé and Elder Gilbert gave their first talks as Apostles in April 2026."],
+["Elder Clark G. Gilbert served as what before his call to the Twelve?","Commissioner of the Church Educational System","Presiding Bishop","Temple Department director","President of the Seventy","He gave his first talk as an Apostle, \"Come Home,\" in April 2026."],
+["Who was announced in April 2026 to join the Presidency of the Seventy?","Elder Benjamin M. Z. Tai","Elder Brook P. Hales","Elder Craig C. Christensen","Elder Eduardo Gavarret","The change took effect August 1, 2026."],
+["Elder Clement M. Matswagothata said the question should never be \"Will the Savior walk with me?\" because of what?","He will","It depends on our works","Only prophets know","We must earn it first","Saturday afternoon session, April 2026."],
+["Elder Gérald Caussé taught in April 2026: \"Though we may seem small in a physical sense, each of us is personally ___.\"","known","tested","measured","forgotten","His first conference talk as an Apostle."],
+["Elder Gary E. Stevenson's April 2026 talk had what unusual title?","Lost Luggage, Redeemed Souls","Lost Sheep, Rescued Souls","Missing Keys, Open Doors","Empty Bags, Full Hearts","Saturday afternoon session, April 2026; he taught that we serve as stewards of God's most precious possessions, His children."],
+["How many new Area Seventies were sustained at the April 2, 2026 general conference leadership meeting?","91","47","68","112","Another 75 Area Seventies were to be released on or before Aug. 1, 2026."],
+["Which of these General Authority Seventies was given emeritus status effective Aug. 1, 2026?","Elder Erich W. Kopischke","Elder Benjamin M. Z. Tai","Elder Michael A. Dunn","Elder Edward Dube","Seven were released in April 2026, including Elders Christensen, Gavarret, Hales, Jackson, Meurs and Palmer."],
+["What did the Church say the April 4, 2026 solemn assembly sustaining President Oaks would NOT include?","A Hosanna Shout","An opening prayer","A sustaining vote for the First Presidency","Music by the Tabernacle Choir","Newsroom said the solemn assembly in the Saturday morning session would not include a Hosanna Shout."],
+["Which Apostle's April 2026 talk was titled \"Keys, Covenants and Easter\"?","Elder Quentin L. Cook","Elder Neil L. Andersen","Elder Gerrit W. Gong","Elder Dale G. Renlund","Sunday afternoon session, April 2026; he spoke of Gethsemane, Calvary and the Garden Tomb."],
+["The 2025 Statistical Report released at April 2026 conference listed total Church membership as what?","17,887,212","17,254,394","18,306,071","16,975,120","The report also listed 3,695 stakes and 385,490 converts baptized during 2025."],
+["Who offered the opening prayer of the Saturday morning session of April 2026 general conference?", "Elder Michael B. Strong", "Elder Christopher H. Kim", "Elder Scott D. Whiting", "Elder Hugo E. Martínez", "Elder Michael B. Strong opened the April 4, 2026 solemn-assembly session with prayer, and Elder Christopher H. Kim gave the closing prayer."],
+["Elder Patrick Kearon (April 2026) defined what principle as \"a voluntary, personal commitment to support, uphold and help\" those called?", "Common consent", "Ministering", "Consecration", "Stewardship", "In \"About His Business\" he grounded common consent in Doctrine and Covenants 28:13: \"all things must be done in order, and by common consent in the church.\""],
+["Sister Kristin M. Yee told how a ministering brother's weekly temple invitation led her father to become what?", "A temple ordinance worker", "A ward mission leader", "A stake patriarch", "A seminary teacher", "In her April 2026 talk on ministering, Sister Yee said her father accepted the invitation to attend the temple weekly and eventually served as a temple ordinance worker."],
+["Elder Clark G. Gilbert's \"Come Home\" called Christ \"the repairer of the breach,\" a title from which Old Testament book?", "Isaiah", "Jeremiah", "Ezekiel", "Nehemiah", "Isaiah 58:12 says, \"thou shalt be called, The repairer of the breach, The restorer of paths to dwell in.\""],
+["Elder David A. Bednar taught in April 2026: \"We can possess charity, but ultimately charity should ___ us.\"", "possess", "change", "define", "fill", "From \"All Who Have Endured Valiantly,\" where he linked enduring to the end with the spiritual gift of charity in Moroni 7:45-47."],
+["Elder Michael John U. Teh described sunlight reflected into shadowed apartments by tall buildings in which city?", "Hong Kong", "Tokyo", "Seoul", "Manila", "In \"Follow the Prophet; He Knows the Way,\" he used the reflected light of Hong Kong's towers to teach that disciples become instruments through whom the Savior blesses others."],
+["As a young father behind on tithing, Elder Jorge T. Becerra felt prompted to sell what?", "His only car", "His wedding ring", "His guitar", "His family's piano", "In \"Tithing: Putting God First,\" he said the buyer paid exactly what he needed, and a friend soon offered him another vehicle."],
+["Elder Wan-Liang Wu's family moved from Taiwan to which country when he was 10, where missionaries taught him?", "Bolivia", "Peru", "Argentina", "Chile", "In \"I Will Give Away All My Sins To Know Thee,\" he recalled learning of \"a living God, his Heavenly Father, who loves him\" despite the language barrier."],
+["Elder Brian J. Holmes opened \"Jesus Christ Is the Way\" with a blind runner tethered to a guide at a marathon in which country?", "Switzerland", "Austria", "Norway", "New Zealand", "He watched the runner at the Jungfrau-Marathon and taught, \"As we remain tightly bound to Him, He is bound to us.\""],
+["Elder Clement M. Matswagothata said his surname from Botswana means what?", "Getting out of a difficult situation", "One who brings the rain", "Keeper of the family cattle", "Child born at sunrise", "In \"He Knows You by Name,\" he said the name also means \"someone who can do hard things,\" a reminder that the Savior guides him through every season of life."],
+["Elder Edward B. Rowe told of following the footsteps of a guide named Winta to avoid what?", "Land mines", "Quicksand", "Crocodiles", "Avalanches", "In \"Choose Jesus Christ as Your Guide,\" the young lawyer's trip through a war zone taught him to let Christ guide him \"amid its spiritual land mines.\""],
+["Elder Dale G. Renlund's \"Because of Jesus Christ\" opened with his family's dog, Lady, unable to choose between what?", "Two toy balls", "Two food bowls", "Two leashes", "Two dog beds", "Lady retreated to her bed rather than choose, illustrating how an eternal perspective helps us focus on the Savior amid many concerns."],
+["As a boy, Elder Alan R. Walker hunted for shiny rocks at the foot of the Andes near which Argentine city?", "Mendoza", "Salta", "Córdoba", "Bariloche", "In \"A Peculiar Treasure\" he recalled his grandparents' home and quoted Exodus 19:5: \"ye shall be a peculiar treasure unto me above all people.\""],
+["President Emily Belle Freeman's \"Best Days and Worst Days\" traced the best and worst days of which apostle?", "Peter", "Thomas", "John", "Paul", "She moved from Peter's confession in Matthew 16, to his sinking in Matthew 14, to \"Feed my sheep\" in John 21:17."],
+["Elder Chi Hong (Sam) Wong quoted Mosiah 2:41: the obedient dwell with God \"in a state of never-ending ___.\"", "happiness", "glory", "peace", "light", "Mosiah 2:41 reads, \"they are received into heaven, that thereby they may dwell with God in a state of never-ending happiness.\""],
+["Besides Nephi, Elder Aaron T. Hall cited which missionary who said, \"we will glory in the Lord\"?", "Ammon", "Aaron", "Alma", "Amulek", "Alma 26:16 records Ammon's words: \"let us glory, yea, we will glory in the Lord; yea, we will rejoice, for our joy is full.\""],
+["Elder Taniela B. Wakolo said his wife attended church alone for how many years before he was baptized?", "Eight", "Three", "Five", "Twelve", "In \"Come Unto Christ — Together,\" he said 24 missionaries had contact with him before his baptism, fulfilling her patriarchal blessing's promise that he would take her to the temple."],
+["Elder Gerrit W. Gong recalled a story President Oaks told at BYU about a grandfather's chest of what?", "Coins", "Letters", "Seeds", "Tools", "In \"'Tis Eastertide: No One Walks Alone,\" he recalled hearing the story as a BYU freshman on a panel with then-university president Oaks; one granddaughter \"carefully chose only a few coins, which were all gold pieces.\""],
+["In his April 2026 closing remarks, President Oaks paired \"Tell Me the Stories of Jesus\" with which hymn as capturing the conference?", "Redeemer of Israel", "I Stand All Amazed", "How Firm a Foundation", "Come, Come, Ye Saints", "He taught that \"Jesus Christ is the way to peace in this world and eternal life in the world to come,\" citing Alma 37:47, \"look to God and live.\""],
+["The 2025 Statistical Report released at April 2026 conference listed how many missions?", "451", "407", "476", "423", "The report also listed 488 districts, 32,046 wards and branches, and nine temples dedicated during 2025."],
+["Which member of the Primary General Presidency announced in April 2026 was born in Japan?", "Nina M. Garfield", "Rosemary K. Chibota", "Theresa A. Collins", "Amy A. Wright", "Sister Garfield, first counselor, was born in Japan to a Japanese mother and an American father and raised in Colorado."],
+["The First Presidency sustained in the April 4, 2026 solemn assembly had first been announced on what date?", "October 14, 2025", "October 2, 2025", "November 1, 2025", "January 10, 2026", "Newsroom noted the solemn assembly was the first formal sustaining of President Oaks and his counselors by the whole Church membership."],
+["Elder Quentin L. Cook said the keys committed by which three messengers are \"central to the Restoration\"?", "Moses, Elias and Elijah", "Peter, James and John", "Moroni, John and Elijah", "Adam, Enoch and Noah", "They appeared to Joseph Smith and Oliver Cowdery in the Kirtland Temple on April 3, 1836, as recorded in Doctrine and Covenants 110."]
+],
+},
+conf_oct: {
+read: [["He is your ever-rising air.", "Elder Patrick Kearon, October 2026"], ["No time or effort is ever wasted in reading the Book of Mormon.", "Elder Jeremiah J. Morgan, October 2026"], ["Your Heavenly Father sees you. Your Savior, Jesus Christ, sees you.", "President Rosemary K. Chibota, October 2026"], ["To teach like the Savior, we must love like the Savior.", "Brother Gabriel W. Reid, October 2026"], ["The closer we come to Him, the closer we will come to each other.", "President Dieter F. Uchtdorf, October 2026"], ["God invites us to trust Him and His promises.", "Elder Dale G. Renlund, October 2026"], ["In His time and way, Jesus Christ will deliver you.", "Elder Kevin J. Hathaway, October 2026"], ["The law of tithing is a law of faith.", "Elder Patricio M. Giuffra, October 2026"], ["While they may seem small and simple, they are truly the armor of God.", "Elder Christian C. Chigbundu, October 2026"], ["Let us always only speak with love and gratitude.", "Elder Gerrit W. Gong, October 2026"], ["There is great power in a sincere, humble and heartfelt testimony.", "Elder Gérald Caussé, October 2026"], ["Pray every day for eyes to see the divine appointments God places before us.", "President Timothy L. Farnes, October 2026"], ["Be not afraid, only believe.", "Mark 5:36"], ["All these things shall give thee experience, and shall be for thy good.", "Doctrine and Covenants 122:7"], ["O be wise; what can I say more?", "Jacob 6:12"], ["Fear thou not; for I am with thee: be not dismayed; for I am thy God.", "Isaiah 41:10"], ["Draw near unto me and I will draw near unto you; seek me diligently and ye shall find me.", "Doctrine and Covenants 88:63"], ["Special witnesses of the name of Christ in all the world.", "Doctrine and Covenants 107:23"], ["To let the oppressed go free, and that ye break every yoke.", "Isaiah 58:6"], ["Desirable to make one happy.", "1 Nephi 8:10"], ["Ye are all one in Christ Jesus.", "Galatians 3:28"]],
+pewee: [
+["Elder Gerrit W. Gong opened October 2026 conference with a talk about what holy place?","The temple","The chapel","The Sacred Grove","The bishop's office","\"Come to the Lord in His Holy House.\""],
+["Elder Ulisses Soares spoke in October 2026 about a \"higher and holier\" what?","Fast","Mountain","Building","Song","\"A Higher and Holier Fast.\""],
+["Elder Ronald A. Rasband's October 2026 talk taught us to love like whom?","Jesus","Our pets","Our favorite team","Superheroes","His talk was titled \"Love Like Jesus.\""],
+["Bishop Sean Douglas spoke in October 2026 about what kind of work?","Missionary work","Farm work","Homework","Yard work","\"The Hour of Your Mission Is Come.\""],
+["President Henry B. Eyring's October 2026 talk was titled \"Fear Not, I Am ___.\"","With Thee","Far Away","Coming Soon","Asleep","\"Fear Not, I Am With Thee.\""],
+["Elder Hutch U. Fale's October 2026 talk had the same name as a Primary song. Which song?","I Am a Child of God","Popcorn Popping","Book of Mormon Stories","Give, Said the Little Stream","Saturday afternoon session, October 2026. He taught that knowing we are God's children and that He loves us brings peace and comfort."],
+["Elder Patrick Kearon's October 2026 talk was titled \"Jesus Lives to ___.\"","Lift","Run","Sing","Build","Saturday afternoon session, October 2026. He compared the Savior's help to the rising air that lifts a glider: \"He is your ever-rising air.\""],
+["Elder Matthew J. Eyring's October 2026 talk said comfort comes from whom?","The Holy Ghost","A doctor","A best friend","A coach","\"Comfort From the Holy Ghost,\" Saturday afternoon session, October 2026. See John 14:26."],
+["Elder Thabo Lebethoa taught in October 2026 that Jesus Christ is the Light and ___ of the World.","Life","King","Song","Door","His title quotes the Savior's words, \"I am the light and the life of the world\" (3 Nephi 11:11). Sunday afternoon session, October 2026; Elder Lebethoa was born in Soweto, South Africa."],
+["Elder Gary E. Stevenson spoke partly to Primary children in October 2026 about \"Fruit To Make One ___.\"","Happy","Tall","Sleepy","Strong","Sunday afternoon session, October 2026. He shared three \"fruits of the gospel.\" The title echoes 1 Nephi 8:10, where the fruit in Lehi's dream was \"desirable to make one happy.\""],
+["President Dallin H. Oaks taught in October 2026 that the gospel of Jesus Christ is for whom?","All people","Only grown-ups","Only prophets","Only missionaries","\"The Gospel of Jesus Christ Is for All,\" Sunday morning session, October 2026."],
+["Elder Paul H. Sinclair's October 2026 talk was titled \"Quick to Help, Slow to ___.\"","Judge","Run","Eat","Sleep","Sunday afternoon, October 2026. He told of Jesus kindly speaking with the woman at the well (John 4)."],
 ["Sister Tamara W. Runia began her October 2026 talk with Joseph Smith in what place?", "In jail", "On a boat", "In a cave", "At school", "In Liberty Jail the Lord told Joseph, \"all these things shall give thee experience, and shall be for thy good\" (D&C 122:7); Saturday morning session, October 2026."],
 ["Elder Kevin J. Hathaway told in October 2026 how Jesus said \"Be not afraid, only believe\" to which worried father?", "Jairus", "Herod", "Zacchaeus", "Pilate", "\"Jesus Christ Is the Great Deliverer,\" Saturday morning session, October 2026. Jesus spoke these words to Jairus when he heard his daughter had died (Mark 5:36); Elder Hathaway taught, \"In His time and way, Jesus Christ will deliver you.\""],
 ["Which of these was NOT one of the four habits Elder Christian C. Chigbundu said build \"spiritual immunity\"?", "Watching TV", "Reading the scriptures", "Praying", "Taking the sacrament", "\"Spiritual Immunity,\" Saturday afternoon session, October 2026. His four habits were scriptures, prayers, the sacrament and covenants; he said, \"While they may seem small and simple, they are truly the armor of God.\""],
@@ -629,49 +722,15 @@ pewee: [
 ["Elder Clark G. Gilbert's October 2026 talk was titled \"Teach Truth With ___.\"", "Love", "Noise", "Speed", "Snacks", "Sunday afternoon session, October 2026; he taught that \"For disciples of Jesus Christ, truth and love always walk together.\""]
 ],
 college: [
-["The April 2026 Saturday morning session opened with what special event?","A solemn assembly sustaining President Oaks","A temple dedication","A choir-only concert","A new hymnbook release","It was President Oaks's first general conference as President of the Church."],
-["Elder David A. Bednar taught in April 2026: \"Enduring to the end is the joyous ___ of a lifetime.\"","quest","burden","test","race","From his talk \"All Who Have Endured Valiantly.\""],
-["Elder Ulisses Soares (April 2026) warned that modern tools should not replace guidance from whom?","The Holy Ghost","Our teachers","Our friends","The internet","He also taught that abiding in Christ is \"a constant.\""],
-["David J. Wunderli taught youth that Jesus Christ is not the weight. Instead, He is our what?","Relief","Coach","Judge","Rulebook","\"He is our relief, He is our strength.\""],
-["In April 2026 Elder Gerrit W. Gong taught that Jesus says, \"I am your ___.\"","Answer","Shepherd","Teacher","Light","\"I am your answer: your way, your truth, your life.\""],
-["Elder Neil L. Andersen's April 2026 talk focused on what?","Eternal marriage","Family history","Self-reliance","Seminary","He described marriage as a place where sacrifice, charity and patience grow."],
-["In April 2026 President Oaks invited us to follow Christ by using \"the language and methods of ___.\"","peacemakers","prophets","missionaries","scholars","From his Sunday morning talk \"Alive in Christ.\""],
-["Elder Patrick Kearon's April 2026 talk on serving in callings was titled what?","About His Business","Go and Do","Lift Where You Stand","Serve with Joy","\"About His Business.\""],
 ["In October 2026, President D. Todd Christofferson's talk \"O Be Wise\" declared what is morally wrong?","Gambling","Playing sports on Saturday","Drinking hot chocolate","Watching movies","He said gambling becomes consuming and compulsive."],
-["President Emily Belle Freeman's April 2026 talk was titled \"Best Days and ___ Days.\"","Worst","Rainy","Busy","Quiet","Sunday morning session, April 2026."],
-["President Dieter F. Uchtdorf's April 2026 Easter talk was titled what?","Encounter at the Empty Tomb","The Road to Emmaus","Morning in the Garden","The Third Day","Sunday morning session, April 2026."],
 ["Sister Tamara W. Runia's October 2026 talk compared our growth through trials to what?","The sculpting of our souls","Building a house","Planting a garden","Climbing a mountain","\"The Sculpting of Our Souls.\""],
 ["Elder Gérald Caussé taught in October 2026: \"Bearing witness is a foundational responsibility of ___.\"","discipleship","leadership","parenthood","citizenship","From \"The Gift of Testimony.\""],
-["Elder Brian J. Holmes taught in April 2026 that the Savior \"is not only our guide, He is the ___.\"","path","map","finish line","compass","Saturday afternoon session, April 2026."],
-["In April 2026 President Christofferson taught that with faith in Christ we can pray for the Holy Spirit to effect a mighty ___ in us.","change","miracle","storm","victory","Sunday afternoon session, April 2026."],
-["Announced shortly before April 2026 general conference, what changed for Sunday classes beginning September 6, 2026?","Sunday School and quorum classes now meet every week","Sacrament meeting was shortened to 40 minutes","Primary moved to a separate weekday meeting","Meetings returned to a three-hour block","The alternating-week schedule ended; sacrament meeting remains 60 minutes and each class is 25 minutes."],
-["Beginning in April 2026, which general conference session did the First Presidency discontinue?","The Saturday evening session","The Sunday afternoon session","The Saturday afternoon session","The Sunday morning session","Conference now has four daytime sessions: two on Saturday and two on Sunday."],
-["The 2025 statistical report released in April 2026 listed total Church membership at about how many?","17.9 million","15.2 million","20.4 million","12.8 million","17,887,212 members as of December 31, 2025, with 204 temples in operation."],
-["Elder Aaron T. Hall's April 2026 title \"I Glory in My Jesus\" quotes which Book of Mormon prophet?","Nephi","Alma","Ammon","Moroni","2 Nephi 33:6: \"I glory in my Jesus, for he hath redeemed my soul.\""],
-["Elder Quentin L. Cook's April 2026 talk \"Keys, Covenants and Easter\" named Gethsemane, Calvary and what third place?","The Garden Tomb","The Upper Room","The Sea of Galilee","The road to Emmaus","He called them \"eternity-shaping events\"; Sunday afternoon session, April 2026."],
-["Rosemary K. Chibota, called in April 2026 as Primary General President, was raised in which country?","Zimbabwe","Ghana","Kenya","Nigeria","Of Malawian origin; she and her husband led the Alabama Birmingham Mission, 2022–2025."],
 ["Elder Dale G. Renlund's October 2026 title \"How Long Will It Be Ere They Believe Me\" comes from which book?","Numbers","Exodus","Deuteronomy","Isaiah","Numbers 14:11, the Lord to Moses; he taught that trust erodes when we overlook God's blessings."],
 ["Elder David A. Bednar taught in October 2026 that all gospel ordinances and covenants must be sealed by what?","The Holy Spirit of Promise","The Melchizedek Priesthood","The oath and covenant","The law of consecration","\"Sealed by the Holy Spirit of Promise,\" Sunday afternoon session; see D&C 76:53."],
 ["Elder Patrick Kearon's October 2026 talk \"Jesus Lives to Lift\" drew its lesson from which activity?","Glider flying","Rock climbing","Scuba diving","Marathon running","He taught that the Savior is our \"ever-rising air\"; Saturday afternoon session."],
 ["In his October 2026 closing remarks, President Oaks invited all to which temple's open house, starting April 2027?","Salt Lake Temple","Manti Utah Temple","St. George Utah Temple","Ogden Utah Temple","He also introduced a new Church video series titled \"Dedicate.\""],
 ["Elder Vaiangina Sikahema (October 2026) told of grandparents who sailed in 1947 to hear an apostle. Where were they from?","Tonga","Samoa","Fiji","Tahiti","He warned against holding the oracles of God \"as a light thing\" (D&C 90:5)."],
 ["Sister Andrea Muñoz Spannaus (October 2026) invited young women to study which Article of Faith?","The thirteenth","The fourth","The ninth","The eleventh","\"God Is at Your Side,\" Sunday afternoon; she is second counselor in the Young Women general presidency."],
-["Which choir provided the music for the Saturday afternoon session of April 2026 general conference?", "Combined choir from BYU–Idaho", "BYU Men's Chorus", "A choir from northern Utah", "Utah Valley institute choir", "A combined choir from Brigham Young University–Idaho sang, directed by Atina Coates, Eda Ashby, Paul Busselberg and Randall Kempton, with Linda Margetts and Joseph Peeples at the organ."],
-["Elder Wan-Liang Wu's April 2026 title, \"I Will Give Away All My Sins To Know Thee,\" quotes which Book of Mormon figure?", "King Lamoni's father", "King Lamoni", "King Benjamin", "Zeezrom", "In Alma 22:18 the father of Lamoni prayed, \"I will give away all my sins to know thee,\" and Elder Wu taught that coming to Christ means being converted to Him."],
-["Elder Eduardo F. Ortega's April 2026 talk called Christ the \"Author and Finisher of Our Faith,\" a phrase from which New Testament book?", "Hebrews", "Romans", "Ephesians", "James", "Hebrews 12:2 says, \"Looking unto Jesus the author and finisher of our faith,\" and Elder Ortega taught that becoming a lifelong disciple of Christ is a process."],
-["Elder Alan R. Walker's April 2026 title \"A Peculiar Treasure\" comes from the Lord's covenant promise to Israel in which book?", "Exodus", "Leviticus", "Deuteronomy", "Joshua", "Exodus 19:5 promises, \"ye shall be a peculiar treasure unto me above all people.\" Elder Walker taught that becoming the Lord's treasure \"requires patient effort, faithful persistence and sacrifice.\""],
-["Elder Chi Hong (Sam) Wong's April 2026 title \"Remember 'Remember, Remember'\" echoes which Book of Mormon prophet's words to his sons?", "Helaman", "Alma", "Mosiah", "Mormon", "Helaman 5:12 begins, \"And now, my sons, remember, remember that it is upon the rock of our Redeemer, who is Christ, the Son of God, that ye must build your foundation.\""],
-["Which Apostle conducted the Sunday afternoon session of April 2026 general conference?", "Elder Dale G. Renlund", "Elder Neil L. Andersen", "Elder Quentin L. Cook", "Elder Gerrit W. Gong", "Elder Renlund conducted the Easter Sunday afternoon session, which President Christofferson opened with \"The Character of Christ.\""],
-["Elder Edward B. Rowe taught in April 2026 that Jesus is \"not only a perfect and personal guide\" but also the resurrected Redeemer and ___.", "Master Healer", "Good Shepherd", "Great Deliverer", "True Vine", "In \"Choose Jesus Christ as Your Guide,\" Elder Rowe said, \"His merciful hand is extended to you even now. Please take it!\""],
-["Elder Pedro X. Larreal's April 2026 talk \"I Feel My Savior's Love\" centered on which ordinance?", "The sacrament", "Baptism", "Confirmation", "The endowment", "He taught, \"The sacrament represents the Atonement of Jesus Christ,\" and urged, \"Elevate your spiritual preparation and reverence as you partake of the sacrament. It is vital.\""],
-["What was the title of Elder Gérald Caussé's April 2026 talk?", "Love All; Love Each", "Love One Another", "Love Like Jesus", "Love Thy Neighbor", "In \"Love All; Love Each\" he taught that \"in Christ's Church there should be no anonymity.\""],
-["How many times did President Dallin H. Oaks speak during April 2026 general conference?", "3", "1", "2", "4", "Thirty-two speakers delivered 34 talks; President Oaks gave introductory remarks, the Easter talk \"Alive in Christ\" and closing remarks."],
-["President Uchtdorf (April 2026): \"Because of what happened on that Sunday morning, we can speak of Jesus Christ in the ___.\"", "present tense", "past tense", "future tense", "first person", "From \"Encounter at the Empty Tomb\": \"He lives! Today.\""],
-["In his April 2026 introductory remarks, President Oaks said a solemn assembly like this one is held only when?", "When a new Church President is called", "Every April conference", "Every ten years", "When a temple is dedicated", "He said, \"We do this only in the first conference where a new President and prophet of the Church has been called.\""],
-["At the April 2026 Sunday afternoon session, the congregation joined the Tabernacle Choir in singing which hymn?", "I Stand All Amazed", "Come, Come, Ye Saints", "How Great Thou Art", "The Spirit of God", "The choir also sang \"He Is Risen,\" \"Lord, I Would Follow Thee,\" \"Tell Me the Stories of Jesus\" and \"Redeemer of Israel.\""],
-["Elder Kearon's April 2026 title \"About His Business\" recalls Jesus at age twelve in the temple, recorded in which Gospel?", "Luke", "Matthew", "Mark", "John", "Luke 2:49: \"wist ye not that I must be about my Father's business?\" Elder Kearon taught that \"callings from the Lord are tailor-made for our growth.\""],
-["President Eyring said in April 2026 that faithful Saints worldwide have \"flooded heaven with ___.\"", "prayers", "tears", "songs", "questions", "In \"Prayers for Peace\" he taught that prayer requires no flowery language, and God hears the secret prayers of the heart."],
-["Which of these was NOT one of the eight new General Authority Seventies sustained in April 2026?", "Elder Alfred Kyungu", "Elder Jeremiah J. Morgan", "Elder James O. Fantone", "Elder Christian C. Chigbundu", "Elder Kyungu was sustained in 2021; the eight new Seventies also included Elders Matthew J. Eyring, Hutch U. Fale, Kevin J. Hathaway, Thabo Lebethoa and Paul H. Sinclair."],
 ["Who conducted the Saturday afternoon session of October 2026 general conference?", "Elder Neil L. Andersen", "Elder Dale G. Renlund", "Elder Ronald A. Rasband", "Elder Patrick Kearon", "A choir from northern Utah directed by Jane Fjeldsted sang, and Elder Renlund gave the opening talk."],
 ["Sister Tamara W. Runia (October 2026) quoted the Lord's words to Joseph Smith in Liberty Jail: \"all these things shall give thee ___.\"", "experience", "strength", "patience", "peace", "Doctrine and Covenants 122:7: \"all these things shall give thee experience, and shall be for thy good.\" She taught that God is shaping us into something only He knows we can become."],
 ["In \"The Gift of Testimony\" (October 2026), Elder Caussé cited D&C 107:23, which calls Apostles \"special ___ of the name of Christ.\"", "witnesses", "servants", "messengers", "stewards", "Doctrine and Covenants 107:23 names the Twelve \"special witnesses of the name of Christ in all the world,\" and Elder Caussé said our testimony \"is a gift to be shared.\""],
@@ -700,56 +759,17 @@ college: [
 ["How many guest singers from around the world joined the Tabernacle Choir for October 2026 general conference?", "13", "5", "25", "40", "Thirteen members from 13 countries and territories, from Argentina to Sweden, memorized 17 songs in English for the conference."]
 ],
 pro: [
-["Who was announced in April 2026 as the new Primary General President, beginning August 1, 2026?","Rosemary K. Chibota","Susan H. Porter","Tamara W. Runia","Kristin M. Yee","Her counselors are Nina M. Garfield and Theresa A. Collins."],
 ["How many new General Authority Seventies were sustained in April 2026?","8","3","5","12","They included Kevin J. Hathaway, who then spoke in October 2026."],
-["Who conducted the Saturday morning session of April 2026 conference?","President D. Todd Christofferson","President Henry B. Eyring","Elder Ronald A. Rasband","Elder Dale G. Renlund","Elder Rasband conducted the Saturday afternoon session."],
-["Elder Wan-Liang Wu taught in April 2026: \"It is an intrinsic relationship between faith and ___.\"","works","hope","prayer","grace","Saturday afternoon session, April 2026."],
-["Which Seventy taught in April 2026: \"it is never too late for miracles\"?","Elder Taniela B. Wakolo","Elder Aaron T. Hall","Elder Alan R. Walker","Elder Edward B. Rowe","He also testified that \"the Lord honors patient faith.\""],
-["Elder Gary E. Stevenson taught in April 2026: \"We are all one ___. We all need help along the way.\"","family","team","body","fold","Saturday afternoon session, April 2026."],
 ["Elder Kevin J. Hathaway taught in October 2026 that the Lord is not delayed, distracted or ___ in His deliverance.","derelict","defeated","doubtful","discouraged","From \"Jesus Christ Is the Great Deliverer.\""],
 ["Elder Gong said in October 2026 that this year how many temples will be dedicated, plus one rededicated?","21","7","12","35","From \"Come to the Lord in His Holy House.\""],
-["Before his call to the Twelve, Elder Gérald Caussé served in what calling?","Presiding Bishop","Sunday School General President","Church Historian","Mission Department director","Both Elder Caussé and Elder Gilbert gave their first talks as Apostles in April 2026."],
-["Elder Clark G. Gilbert served as what before his call to the Twelve?","Commissioner of the Church Educational System","Presiding Bishop","Temple Department director","President of the Seventy","He gave his first talk as an Apostle, \"Come Home,\" in April 2026."],
-["Who was announced in April 2026 to join the Presidency of the Seventy?","Elder Benjamin M. Z. Tai","Elder Brook P. Hales","Elder Craig C. Christensen","Elder Eduardo Gavarret","The change took effect August 1, 2026."],
-["Elder Clement M. Matswagothata said the question should never be \"Will the Savior walk with me?\" because of what?","He will","It depends on our works","Only prophets know","We must earn it first","Saturday afternoon session, April 2026."],
 ["President Christofferson taught in October 2026 that work leads to prosperous, just and ___ societies.","equitable","wealthy","powerful","peaceful","From \"O Be Wise.\""],
 ["Elder Vaiangina Sikahema's October 2026 talk was titled what?","Prophets, Seers and Revelators","The Iron Rod","Faith of Our Fathers","Gather Israel","He spoke of ancestors' legacies of faith and of living prophets."],
-["Elder Gérald Caussé taught in April 2026: \"Though we may seem small in a physical sense, each of us is personally ___.\"","known","tested","measured","forgotten","His first conference talk as an Apostle."],
-["Elder Gary E. Stevenson's April 2026 talk had what unusual title?","Lost Luggage, Redeemed Souls","Lost Sheep, Rescued Souls","Missing Keys, Open Doors","Empty Bags, Full Hearts","Saturday afternoon session, April 2026; he taught that we serve as stewards of God's most precious possessions, His children."],
-["How many new Area Seventies were sustained at the April 2, 2026 general conference leadership meeting?","91","47","68","112","Another 75 Area Seventies were to be released on or before Aug. 1, 2026."],
-["Which of these General Authority Seventies was given emeritus status effective Aug. 1, 2026?","Elder Erich W. Kopischke","Elder Benjamin M. Z. Tai","Elder Michael A. Dunn","Elder Edward Dube","Seven were released in April 2026, including Elders Christensen, Gavarret, Hales, Jackson, Meurs and Palmer."],
-["What did the Church say the April 4, 2026 solemn assembly sustaining President Oaks would NOT include?","A Hosanna Shout","An opening prayer","A sustaining vote for the First Presidency","Music by the Tabernacle Choir","Newsroom said the solemn assembly in the Saturday morning session would not include a Hosanna Shout."],
-["Which Apostle's April 2026 talk was titled \"Keys, Covenants and Easter\"?","Elder Quentin L. Cook","Elder Neil L. Andersen","Elder Gerrit W. Gong","Elder Dale G. Renlund","Sunday afternoon session, April 2026; he spoke of Gethsemane, Calvary and the Garden Tomb."],
-["The 2025 Statistical Report released at April 2026 conference listed total Church membership as what?","17,887,212","17,254,394","18,306,071","16,975,120","The report also listed 3,695 stakes and 385,490 converts baptized during 2025."],
 ["In \"The 90 and 10\" (October 2026), Elder Michael A. Dunn compared mortality to what?","An ultramarathon","A triathlon","A mountain ascent","A cross-country bike race","Saturday afternoon session, October 2026; he taught that the Redeemer rescues \"not by shortening our course but by helping us lengthen our stride.\""],
 ["Who was the one Area Seventy sustained at the Oct. 1, 2026 general conference leadership meeting?","David Kannar","Steven D. Shumway","Sergio R. Vargas","Robert H. Simpson","From Queensland, Australia; Eighth Quorum of the Seventy, serving the Pacific and Philippines Areas. Robert H. Simpson was released at the same meeting."],
 ["Elder David A. Bednar's October 2026 talk was titled \"Sealed by the ___.\"","Holy Spirit of Promise","Power of the Priesthood","Blood of the Lamb","Oath and Covenant","Sunday afternoon session, October 2026; the phrase comes from D&C 132:7."],
 ["In \"The Gospel of Jesus Christ Is for All,\" President Oaks cited which Book of Mormon prophet's invitation to \"come unto Christ\"?","Amaleki","Abinadi","Amulek","Alma the Younger","Omni 1:26; Sunday morning session, October 2026."],
 ["President Rosemary K. Chibota's October 2026 talk used the Southern African greeting \"Sawubona,\" which means what?","I see you","Peace be with you","You are welcome here","We are one family","\"A Child of God,\" Sunday morning session; she began serving as Primary General President on Aug. 1, 2026."],
 ["In his October 2026 concluding remarks, President Oaks invited all to the open house of which temple, beginning April 2027?","Salt Lake Temple","Manti Utah Temple","Logan Utah Temple","Ogden Utah Temple","He also invited members to view a new Church video series called \"Dedicate.\""],
-["Who offered the opening prayer of the Saturday morning session of April 2026 general conference?", "Elder Michael B. Strong", "Elder Christopher H. Kim", "Elder Scott D. Whiting", "Elder Hugo E. Martínez", "Elder Michael B. Strong opened the April 4, 2026 solemn-assembly session with prayer, and Elder Christopher H. Kim gave the closing prayer."],
-["Elder Patrick Kearon (April 2026) defined what principle as \"a voluntary, personal commitment to support, uphold and help\" those called?", "Common consent", "Ministering", "Consecration", "Stewardship", "In \"About His Business\" he grounded common consent in Doctrine and Covenants 28:13: \"all things must be done in order, and by common consent in the church.\""],
-["Sister Kristin M. Yee told how a ministering brother's weekly temple invitation led her father to become what?", "A temple ordinance worker", "A ward mission leader", "A stake patriarch", "A seminary teacher", "In her April 2026 talk on ministering, Sister Yee said her father accepted the invitation to attend the temple weekly and eventually served as a temple ordinance worker."],
-["Elder Clark G. Gilbert's \"Come Home\" called Christ \"the repairer of the breach,\" a title from which Old Testament book?", "Isaiah", "Jeremiah", "Ezekiel", "Nehemiah", "Isaiah 58:12 says, \"thou shalt be called, The repairer of the breach, The restorer of paths to dwell in.\""],
-["Elder David A. Bednar taught in April 2026: \"We can possess charity, but ultimately charity should ___ us.\"", "possess", "change", "define", "fill", "From \"All Who Have Endured Valiantly,\" where he linked enduring to the end with the spiritual gift of charity in Moroni 7:45-47."],
-["Elder Michael John U. Teh described sunlight reflected into shadowed apartments by tall buildings in which city?", "Hong Kong", "Tokyo", "Seoul", "Manila", "In \"Follow the Prophet; He Knows the Way,\" he used the reflected light of Hong Kong's towers to teach that disciples become instruments through whom the Savior blesses others."],
-["As a young father behind on tithing, Elder Jorge T. Becerra felt prompted to sell what?", "His only car", "His wedding ring", "His guitar", "His family's piano", "In \"Tithing: Putting God First,\" he said the buyer paid exactly what he needed, and a friend soon offered him another vehicle."],
-["Elder Wan-Liang Wu's family moved from Taiwan to which country when he was 10, where missionaries taught him?", "Bolivia", "Peru", "Argentina", "Chile", "In \"I Will Give Away All My Sins To Know Thee,\" he recalled learning of \"a living God, his Heavenly Father, who loves him\" despite the language barrier."],
-["Elder Brian J. Holmes opened \"Jesus Christ Is the Way\" with a blind runner tethered to a guide at a marathon in which country?", "Switzerland", "Austria", "Norway", "New Zealand", "He watched the runner at the Jungfrau-Marathon and taught, \"As we remain tightly bound to Him, He is bound to us.\""],
-["Elder Clement M. Matswagothata said his surname from Botswana means what?", "Getting out of a difficult situation", "One who brings the rain", "Keeper of the family cattle", "Child born at sunrise", "In \"He Knows You by Name,\" he said the name also means \"someone who can do hard things,\" a reminder that the Savior guides him through every season of life."],
-["Elder Edward B. Rowe told of following the footsteps of a guide named Winta to avoid what?", "Land mines", "Quicksand", "Crocodiles", "Avalanches", "In \"Choose Jesus Christ as Your Guide,\" the young lawyer's trip through a war zone taught him to let Christ guide him \"amid its spiritual land mines.\""],
-["Elder Dale G. Renlund's \"Because of Jesus Christ\" opened with his family's dog, Lady, unable to choose between what?", "Two toy balls", "Two food bowls", "Two leashes", "Two dog beds", "Lady retreated to her bed rather than choose, illustrating how an eternal perspective helps us focus on the Savior amid many concerns."],
-["As a boy, Elder Alan R. Walker hunted for shiny rocks at the foot of the Andes near which Argentine city?", "Mendoza", "Salta", "Córdoba", "Bariloche", "In \"A Peculiar Treasure\" he recalled his grandparents' home and quoted Exodus 19:5: \"ye shall be a peculiar treasure unto me above all people.\""],
-["President Emily Belle Freeman's \"Best Days and Worst Days\" traced the best and worst days of which apostle?", "Peter", "Thomas", "John", "Paul", "She moved from Peter's confession in Matthew 16, to his sinking in Matthew 14, to \"Feed my sheep\" in John 21:17."],
-["Elder Chi Hong (Sam) Wong quoted Mosiah 2:41: the obedient dwell with God \"in a state of never-ending ___.\"", "happiness", "glory", "peace", "light", "Mosiah 2:41 reads, \"they are received into heaven, that thereby they may dwell with God in a state of never-ending happiness.\""],
-["Besides Nephi, Elder Aaron T. Hall cited which missionary who said, \"we will glory in the Lord\"?", "Ammon", "Aaron", "Alma", "Amulek", "Alma 26:16 records Ammon's words: \"let us glory, yea, we will glory in the Lord; yea, we will rejoice, for our joy is full.\""],
-["Elder Quentin L. Cook said the keys committed by which three messengers are \"central to the Restoration\"?", "Moses, Elias and Elijah", "Peter, James and John", "Moroni, John and Elijah", "Adam, Enoch and Noah", "They appeared to Joseph Smith and Oliver Cowdery in the Kirtland Temple on April 3, 1836, as recorded in Doctrine and Covenants 110."],
-["Elder Taniela B. Wakolo said his wife attended church alone for how many years before he was baptized?", "Eight", "Three", "Five", "Twelve", "In \"Come Unto Christ — Together,\" he said 24 missionaries had contact with him before his baptism, fulfilling her patriarchal blessing's promise that he would take her to the temple."],
-["Elder Gerrit W. Gong recalled a story President Oaks told at BYU about a grandfather's chest of what?", "Coins", "Letters", "Seeds", "Tools", "In \"'Tis Eastertide: No One Walks Alone,\" he recalled hearing the story as a BYU freshman on a panel with then-university president Oaks; one granddaughter \"carefully chose only a few coins, which were all gold pieces.\""],
-["In his April 2026 closing remarks, President Oaks paired \"Tell Me the Stories of Jesus\" with which hymn as capturing the conference?", "Redeemer of Israel", "I Stand All Amazed", "How Firm a Foundation", "Come, Come, Ye Saints", "He taught that \"Jesus Christ is the way to peace in this world and eternal life in the world to come,\" citing Alma 37:47, \"look to God and live.\""],
-["The 2025 Statistical Report released at April 2026 conference listed how many missions?", "451", "407", "476", "423", "The report also listed 488 districts, 32,046 wards and branches, and nine temples dedicated during 2025."],
-["Which member of the Primary General Presidency announced in April 2026 was born in Japan?", "Nina M. Garfield", "Rosemary K. Chibota", "Theresa A. Collins", "Amy A. Wright", "Sister Garfield, first counselor, was born in Japan to a Japanese mother and an American father and raised in Colorado."],
-["The First Presidency sustained in the April 4, 2026 solemn assembly had first been announced on what date?", "October 14, 2025", "October 2, 2025", "November 1, 2025", "January 10, 2026", "Newsroom noted the solemn assembly was the first formal sustaining of President Oaks and his counselors by the whole Church membership."],
 ["In \"O Be Wise,\" President Christofferson said the global gambling industry earned about how much in 2025?", "$758 billion", "$312 billion", "$1.2 trillion", "$540 billion", "He also noted that 46 percent of adults worldwide had gambled in the past year, and pleaded with all \"to live life on a higher plane.\""],
 ["Elder Dale G. Renlund (October 2026) told of a heart-transplant patient who complained about what?", "Cold oatmeal", "A noisy roommate", "A late nurse", "A hard pillow", "The story showed how quickly we forget great blessings; he taught, \"Jesus overcame the world; we do not have to do so ourselves.\""],
 ["President Timothy L. Farnes taught: \"To Jesus, these people were not interrupting His mission. They were His ___.\"", "mission", "family", "reward", "purpose", "From \"Divine Appointments,\" Saturday afternoon, October 2026, by the Young Men General President; he urged, \"Let us pray every day for eyes to see the divine appointments God places before us.\""],
@@ -772,6 +792,7 @@ pro: [
 ],
 },
 found: {
+read: [["We believe in God, the Eternal Father, and in His Son, Jesus Christ, and in the Holy Ghost.", "Articles of Faith 1:1"], ["We believe that men will be punished for their own sins, and not for Adam's transgression.", "Articles of Faith 1:2"], ["We believe the Bible to be the word of God as far as it is translated correctly; we also believe the Book of Mormon to be the word of God.", "Articles of Faith 1:8"], ["We believe in being honest, true, chaste, benevolent, virtuous, and in doing good to all men.", "Articles of Faith 1:13"], ["Jesus wept.", "John 11:35"], ["Love one another; as I have loved you.", "John 13:34"], ["Honour thy father and thy mother.", "Exodus 20:12"], ["Suffer the little children to come unto me, and forbid them not.", "Mark 10:14"], ["Let your light so shine before men.", "Matthew 5:16"], ["I am the good shepherd.", "John 10:11"], ["Search the scriptures.", "John 5:39"], ["Thou shalt not steal.", "Exodus 20:15"], ["Remember the sabbath day, to keep it holy.", "Exodus 20:8"], ["Ask, and it shall be given you; seek, and ye shall find.", "Matthew 7:7"], ["I can do all things through Christ which strengtheneth me.", "Philippians 4:13"], ["The Lord is my shepherd; I shall not want.", "Psalm 23:1"], ["Children, obey your parents in the Lord: for this is right.", "Ephesians 6:1"], ["Be thou an example of the believers.", "1 Timothy 4:12"], ["In the beginning God created the heaven and the earth.", "Genesis 1:1"], ["This is my beloved Son, in whom I am well pleased.", "Matthew 3:17"], ["I am the resurrection, and the life.", "John 11:25"], ["He is not here: for he is risen.", "Matthew 28:6"], ["Peace I leave with you, my peace I give unto you.", "John 14:27"], ["Be still, and know that I am God.", "Psalm 46:10"], ["The greatest of these is charity.", "1 Corinthians 13:13"], ["Thou shalt love thy neighbour as thyself.", "Matthew 22:39"], ["Be of good cheer; I have overcome the world.", "John 16:33"], ["Fear not, little flock.", "Doctrine and Covenants 6:34"], ["Pray always, that you may come off conqueror.", "Doctrine and Covenants 10:5"], ["For God so loved the world, that he gave his only begotten Son.", "John 3:16"]],
 pewee: [
 ["How many Articles of Faith are there?","13","10","12","7","Joseph Smith wrote them in the Wentworth Letter in 1842."],
 ["Who translated the Book of Mormon by the gift and power of God?","Joseph Smith","Brigham Young","Moroni","Oliver Cowdery","Oliver Cowdery served as his main scribe."],
@@ -1066,6 +1087,7 @@ pro: [
 ],
 },
 pmg: {
+read: [["Go ye therefore, and teach all nations.", "Matthew 28:19"], ["Go ye into all the world, and preach the gospel to every creature.", "Mark 16:15"], ["Ye are my friends, if ye do whatsoever I command you.", "John 15:14"], ["Ye have not chosen me, but I have chosen you.", "John 15:16"], ["The worth of souls is great in the sight of God.", "Doctrine and Covenants 18:10"], ["The field is white already to harvest.", "Doctrine and Covenants 4:4"], ["If ye have desires to serve God ye are called to the work.", "Doctrine and Covenants 4:3"], ["Serve him with all your heart, might, mind and strength.", "Doctrine and Covenants 4:2"], ["Ask, and ye shall receive; knock, and it shall be opened unto you.", "Doctrine and Covenants 4:7"], ["Open your mouths and they shall be filled.", "Doctrine and Covenants 33:8"], ["Except a man be born of water and of the Spirit, he cannot enter into the kingdom of God.", "John 3:5"], ["Repent, and be baptized every one of you in the name of Jesus Christ.", "Acts 2:38"], ["Be ye doers of the word, and not hearers only.", "James 1:22"], ["Thy word is a lamp unto my feet, and a light unto my path.", "Psalm 119:105"], ["I am the light of the world.", "John 8:12"], ["Behold, I stand at the door, and knock.", "Revelation 3:20"], ["Come unto Christ, and be perfected in him.", "Moroni 10:32"], ["Feast upon the words of Christ.", "2 Nephi 32:3"], ["By small and simple things are great things brought to pass.", "Alma 37:6"], ["Counsel with the Lord in all thy doings, and he will direct thee for good.", "Alma 37:37"], ["Pray unto the Father with all the energy of heart.", "Moroni 7:48"], ["The Spirit itself beareth witness with our spirit, that we are the children of God.", "Romans 8:16"], ["How beautiful upon the mountains are the feet of him that bringeth good tidings.", "Isaiah 52:7"], ["Ye shall be witnesses unto me.", "Acts 1:8"], ["I will go and do the things which the Lord hath commanded.", "1 Nephi 3:7"], ["Come, follow me.", "Luke 18:22"]],
 pewee: [
 ["Missionaries usually serve with a partner called a what?","Companion","Coach","Captain","Cousin","The Lord sends His servants two by two (Luke 10:1)."],
 ["What book do missionaries most often share with people they teach?","The Book of Mormon","A hymnbook","A dictionary","A cookbook","It is \"another testament of Jesus Christ.\""],
@@ -1359,6 +1381,7 @@ pro: [
 ],
 },
 mastery: {
+read: [["I will go and do the things which the Lord hath commanded.", "1 Nephi 3:7"], ["Adam fell that men might be; and men are, that they might have joy.", "2 Nephi 2:25"], ["Line upon line, precept upon precept.", "2 Nephi 28:30"], ["Feast upon the words of Christ.", "2 Nephi 32:3"], ["Ye must pray always, and not faint.", "2 Nephi 32:9"], ["When ye are in the service of your fellow beings ye are only in the service of your God.", "Mosiah 2:17"], ["Believe in God; believe that he is.", "Mosiah 4:9"], ["Willing to bear one another's burdens, that they may be light.", "Mosiah 18:8"], ["Wickedness never was happiness.", "Alma 41:10"], ["Behold, I am Jesus Christ, whom the prophets testified shall come into the world.", "3 Nephi 11:10"], ["Ye receive no witness until after the trial of your faith.", "Ether 12:6"], ["I give unto men weakness that they may be humble.", "Ether 12:27"], ["Charity is the pure love of Christ.", "Moroni 7:47"], ["By the power of the Holy Ghost ye may know the truth of all things.", "Moroni 10:5"], ["Choose you this day whom ye will serve.", "Joshua 24:15"], ["As for me and my house, we will serve the Lord.", "Joshua 24:15"], ["Trust in the Lord with all thine heart.", "Proverbs 3:5"], ["Though your sins be as scarlet, they shall be as white as snow.", "Isaiah 1:18"], ["With his stripes we are healed.", "Isaiah 53:5"], ["Before I formed thee in the belly I knew thee.", "Jeremiah 1:5"], ["Will a man rob God?", "Malachi 3:8"], ["Ye are the light of the world.", "Matthew 5:14"], ["Come unto me, all ye that labour and are heavy laden, and I will give you rest.", "Matthew 11:28"], ["Thou art the Christ, the Son of the living God.", "Matthew 16:16"], ["I am the way, the truth, and the life.", "John 14:6"], ["If ye love me, keep my commandments.", "John 14:15"], ["If any of you lack wisdom, let him ask of God.", "James 1:5"], ["Faith, if it hath not works, is dead.", "James 2:17"], ["Look unto me in every thought; doubt not, fear not.", "Doctrine and Covenants 6:36"], ["I, the Lord, am bound when ye do what I say.", "Doctrine and Covenants 82:10"], ["Seek learning, even by study and also by faith.", "Doctrine and Covenants 88:118"], ["This is my work and my glory—to bring to pass the immortality and eternal life of man.", "Moses 1:39"]],
 pewee: [
 ["Finish the verse: \"I will go and do the things which the Lord hath ___.\"","commanded","promised","written","planned","1 Nephi 3:7 (Nephi)."],
 ["Finish: \"When ye are in the service of your fellow beings ye are only in the service of your ___.\"","God","family","country","friends","Mosiah 2:17 (King Benjamin)."],
@@ -1693,6 +1716,106 @@ pro: [
 ["D&C 135:1 says Joseph and Hyrum were shot in Carthage Jail by an armed mob described how?", "Painted black", "Masked in white", "Dressed as soldiers", "Numbering a thousand", "D&C 135:1 says they \"were shot in Carthage jail, on the 27th of June, 1844, about five o'clock p.m., by an armed mob—painted black—of from 150 to 200 persons.\""]
 ],
 },
+lessons: {
+read: [["Strong drinks are not for the belly.", "Doctrine and Covenants 89:7"], ["Tobacco is not for the body.", "Doctrine and Covenants 89:8"], ["Hot drinks are not for the body or belly.", "Doctrine and Covenants 89:9"], ["Every herb in the season thereof, and every fruit in the season thereof.", "Doctrine and Covenants 89:11"], ["All grain is good for the food of man.", "Doctrine and Covenants 89:16"], ["Wheat for man, and corn for the ox, and oats for the horse.", "Doctrine and Covenants 89:17"], ["Shall run and not be weary, and shall walk and not faint.", "Doctrine and Covenants 89:20"], ["Shall find wisdom and great treasures of knowledge, even hidden treasures.", "Doctrine and Covenants 89:19"], ["Shall receive health in their navel and marrow to their bones.", "Doctrine and Covenants 89:18"], ["The destroying angel shall pass by them.", "Doctrine and Covenants 89:21"], ["Adapted to the capacity of the weak and the weakest of all saints.", "Doctrine and Covenants 89:3"], ["Daniel purposed in his heart that he would not defile himself.", "Daniel 1:8"], ["Prove thy servants, I beseech thee, ten days.", "Daniel 1:12"], ["Let them give us pulse to eat, and water to drink.", "Daniel 1:12"], ["God created man in his own image.", "Genesis 1:27"], ["Your body is the temple of the Holy Ghost.", "1 Corinthians 6:19"], ["Ye are bought with a price: therefore glorify God in your body.", "1 Corinthians 6:20"], ["Know ye not that ye are the temple of God?", "1 Corinthians 3:16"], ["The spirit and the body are the soul of man.", "Doctrine and Covenants 88:15"], ["Let virtue garnish thy thoughts unceasingly.", "Doctrine and Covenants 121:45"], ["I will not leave you comfortless: I will come to you.", "John 14:18"], ["The peace of God, which passeth all understanding.", "Philippians 4:7"], ["Let all things be done in cleanliness before me.", "Doctrine and Covenants 42:41"], ["The blessed and happy state of those that keep the commandments of God.", "Mosiah 2:41"], ["Ye shall know the truth, and the truth shall make you free.", "John 8:32"]],
+pewee: [
+["Which section of the Doctrine and Covenants is called the Word of Wisdom?", "Section 89", "Section 76", "Section 4", "Section 121", "Doctrine and Covenants 89 is the Word of Wisdom, the Lord's law of health."],
+["In what town was the Word of Wisdom revealed?", "Kirtland, Ohio", "Nauvoo, Illinois", "Palmyra, New York", "Salt Lake City, Utah", "The revelation was given at Kirtland, Ohio, on February 27, 1833."],
+["In what year was the Word of Wisdom revealed?", "1833", "1820", "1844", "1847", "February 27, 1833, in Kirtland, Ohio."],
+["Which prophet received the Word of Wisdom?", "Joseph Smith", "Brigham Young", "Heber J. Grant", "Russell M. Nelson", "The Lord gave the revelation through the Prophet Joseph Smith in 1833."],
+["In the Word of Wisdom, \"hot drinks\" means which two drinks?", "Coffee and tea", "Hot chocolate and cider", "Soup and broth", "Warm milk and juice", "Church leaders, beginning with Joseph and Hyrum Smith, taught that \"hot drinks\" means coffee and tea."],
+["The Word of Wisdom says tobacco \"is not for the body.\" What else does it say is not for the belly?", "Strong drinks", "Bread", "Fruit", "Water", "Doctrine and Covenants 89:7-8: strong drinks are \"not for the belly,\" and tobacco \"is not for the body.\""],
+["Doctrine and Covenants 89 says to use herbs and fruits \"with prudence and ___.\"", "Thanksgiving", "Salt", "Sugar", "Speed", "Doctrine and Covenants 89:11: \"to be used with prudence and thanksgiving.\""],
+["How does the Word of Wisdom say meat should be eaten?", "Sparingly", "Never", "At every meal", "Only raw", "Doctrine and Covenants 89:12 says flesh is \"to be used sparingly.\""],
+["Doctrine and Covenants 89 calls grain \"the staff of ___.\"", "Life", "Bread", "Strength", "Harvest", "Doctrine and Covenants 89:14: all grain is ordained \"to be the staff of life.\""],
+["Which grain does Doctrine and Covenants 89:17 say is \"for man\"?", "Wheat", "Corn", "Oats", "Barley", "\"Wheat for man, and corn for the ox, and oats for the horse, and rye for the fowls and for swine.\""],
+["Doctrine and Covenants 89:17 says corn is for which animal?", "The ox", "The horse", "The fowls", "The swine", "\"Wheat for man, and corn for the ox, and oats for the horse.\""],
+["Those who keep the Word of Wisdom \"shall run and not be ___.\"", "Weary", "Fast", "Late", "Alone", "Doctrine and Covenants 89:20: \"shall run and not be weary, and shall walk and not faint.\""],
+["Doctrine and Covenants 89 promises \"health in their navel and marrow to their ___.\"", "Bones", "Hearts", "Hands", "Teeth", "Doctrine and Covenants 89:18."],
+["Doctrine and Covenants 89:19 promises \"wisdom and great treasures of ___.\"", "Knowledge", "Gold", "Silver", "Food", "\"Shall find wisdom and great treasures of knowledge, even hidden treasures.\""],
+["Which angel does Doctrine and Covenants 89:21 say will pass by those who keep the Word of Wisdom?", "The destroying angel", "The guardian angel", "Moroni", "Gabriel", "\"The destroying angel shall pass by them, as the children of Israel, and not slay them.\""],
+["Which young man in the Old Testament asked to eat pulse (plant food) and water instead of the king's meat?", "Daniel", "Joseph", "David", "Samuel", "Daniel 1:8-12. Daniel would not eat the king's meat or drink his wine."],
+["How many days did Daniel ask to be tested on pulse and water?", "Ten", "Three", "Seven", "Forty", "Daniel 1:12: \"Prove thy servants, I beseech thee, ten days.\""],
+["Daniel's three friends were Shadrach, Meshach and who?", "Abednego", "Nebuchadnezzar", "Ashpenaz", "Belteshazzar", "Daniel 1:7. Their Hebrew names were Hananiah, Mishael and Azariah."],
+["Daniel was taken captive to which kingdom?", "Babylon", "Egypt", "Rome", "Assyria", "Daniel 1:1-4. King Nebuchadnezzar of Babylon took young men from Jerusalem to serve in his palace."],
+["After ten days of pulse and water, how did Daniel and his friends look?", "Fairer and fatter in flesh", "Thin and pale", "Sick and tired", "Exactly the same", "Daniel 1:15: \"their countenances appeared fairer and fatter in flesh than all the children which did eat the portion of the king's meat.\""],
+["The For the Strength of Youth chapter for October 2026 is titled \"Your Body Is ___.\"", "Sacred", "Strong", "Yours", "Perfect", "The October 2026 lessons come from the chapter \"Your Body Is Sacred.\""],
+["1 Corinthians 6:19 says your body is the temple of whom?", "The Holy Ghost", "Solomon", "The king", "Moses", "\"Know ye not that your body is the temple of the Holy Ghost which is in you?\""],
+["Genesis 1:27 says God created man in whose image?", "God's own image", "The angels' image", "The animals' image", "Adam's image", "\"So God created man in his own image, in the image of God created he him; male and female created he them.\""],
+["What has the Church said about vaping and e-cigarettes?", "They are against the Word of Wisdom", "They are fine for adults", "They are allowed on weekends", "Only missionaries may use them", "A 2019 Church statement on the Word of Wisdom says vaping and e-cigarettes are prohibited."],
+["Which of these is asked in a temple recommend interview?", "Do you understand and obey the Word of Wisdom?", "Do you eat vegetables every day?", "Can you run a mile?", "Do you drink milk?", "Keeping the Word of Wisdom has been a temple recommend requirement since 1921, under President Heber J. Grant."],
+["Joseph Smith taught the School of the Prophets in a room above whose store?", "Newel K. Whitney's", "Martin Harris's", "Oliver Cowdery's", "Sidney Rigdon's", "The School of the Prophets met in an upper room of the Newel K. Whitney store in Kirtland, Ohio."],
+["Brigham Young remembered the School of the Prophets room being filled with a cloud of what?", "Tobacco smoke", "Dust", "Steam", "Flour", "Brigham Young recalled the men smoking and chewing tobacco so that the room was in \"a cloud of tobacco smoke.\""],
+["Who had to clean the tobacco-stained floor of the School of the Prophets room?", "Emma Smith", "Lucy Mack Smith", "Mary Whitney", "Eliza R. Snow", "Emma Smith's cleaning of the floor led Joseph Smith to ask the Lord about tobacco; the answer was the Word of Wisdom."],
+["Doctrine and Covenants 88:15 says \"the spirit and the body are the ___ of man.\"", "Soul", "Temple", "Gift", "Light", "Doctrine and Covenants 88:15 is one of the scriptures in the chapter \"Your Body Is Sacred.\""],
+["The second Sunday lesson for October 2026 invites youth to learn more about what?", "The Word of Wisdom", "Tithing", "The Sabbath", "Baptism", "The October 2026 second Sunday lesson is \"Learn more about the Word of Wisdom.\""],
+],
+college: [
+["On what date was the Word of Wisdom (Doctrine and Covenants 89) revealed?", "February 27, 1833", "April 6, 1830", "September 22, 1827", "July 12, 1843", "The section heading gives the date: February 27, 1833, at Kirtland, Ohio."],
+["Doctrine and Covenants 89:2 says the Word of Wisdom was given \"not by commandment or constraint, but by ___.\"", "Revelation and the word of wisdom", "A vote of the council", "Tradition", "The law of Moses", "Doctrine and Covenants 89:2."],
+["Doctrine and Covenants 89:3 says the Word of Wisdom is \"adapted to the capacity of the weak and the ___ of all saints.\"", "Weakest", "Strongest", "Youngest", "Wisest", "Doctrine and Covenants 89:3: \"a principle with promise, adapted to the capacity of the weak and the weakest of all saints.\""],
+["Doctrine and Covenants 89:4 warns of \"evils and designs which do and will exist in the hearts of ___ men in the last days.\"", "Conspiring", "Wicked", "Proud", "Foolish", "Doctrine and Covenants 89:4."],
+["Doctrine and Covenants 89:5-6 allows wine only for what purpose?", "The sacrament", "Weddings", "Medicine", "Feasts", "\"Only in assembling yourselves together to offer up your sacraments before him,\" and then \"pure wine of the grape of the vine, of your own make.\""],
+["Doctrine and Covenants 89:7 says strong drinks are \"not for the belly, but for the ___ of your bodies.\"", "Washing", "Healing", "Warming", "Strengthening", "Doctrine and Covenants 89:7."],
+["Doctrine and Covenants 89:8 says tobacco is an herb for bruises and what?", "All sick cattle", "Headaches", "Sleep", "Cooking", "\"Tobacco is not for the body, neither for the belly, and is not good for man, but is an herb for bruises and all sick cattle.\""],
+["Doctrine and Covenants 89:13 says flesh should be used only in times of winter, cold, or what?", "Famine", "Harvest", "Celebration", "Travel", "Doctrine and Covenants 89:13."],
+["Which grain does Doctrine and Covenants 89:17 say is \"for the horse\"?", "Oats", "Wheat", "Rye", "Corn", "\"Wheat for man, and corn for the ox, and oats for the horse, and rye for the fowls and for swine.\""],
+["Doctrine and Covenants 89:17 names barley for useful animals and for what kind of drinks?", "Mild drinks", "Hot drinks", "Strong drinks", "Sweet drinks", "\"Barley for all useful animals, and for mild drinks, as also other grain.\""],
+["Doctrine and Covenants 89:18 promises health to those \"walking in obedience to the ___.\"", "Commandments", "Prophets", "Law of the land", "Council", "Doctrine and Covenants 89:18."],
+["Which President of the Church made keeping the Word of Wisdom a requirement for a temple recommend in 1921?", "Heber J. Grant", "Joseph F. Smith", "Brigham Young", "David O. McKay", "In 1921, under President Heber J. Grant, keeping the Word of Wisdom became required for a temple recommend."],
+["Which Church leaders first taught that \"hot drinks\" means coffee and tea?", "Joseph and Hyrum Smith", "Brigham Young and Heber C. Kimball", "Oliver Cowdery and David Whitmer", "Wilford Woodruff and Lorenzo Snow", "Joseph and Hyrum Smith taught the Saints that \"hot drinks\" referred to coffee and tea."],
+["The Church's 2019 statement says marijuana and opioids may be used only how?", "As prescribed by a competent physician", "On weekends", "After age 21", "In small amounts", "The 2019 statement on the Word of Wisdom: marijuana and opioids are not acceptable except as prescribed by a competent physician."],
+["A 2019 New Era article explained that lattes and drinks ending in \"-ccino\" usually contain what?", "Coffee", "Herbal tea", "Hot chocolate", "Only milk", "The New Era (August 2019) noted that lattes and \"-ccino\" drinks are coffee and so are not in keeping with the Word of Wisdom."],
+["President Boyd K. Packer taught that \"a fundamental purpose of the Word of Wisdom has to do with ___.\"", "Revelation", "Nutrition", "Long life", "Athletics", "President Boyd K. Packer, \"Prayers and Answers,\" October 1979: \"I have come to know also that a fundamental purpose of the Word of Wisdom has to do with revelation.\""],
+["President Packer said the Word of Wisdom \"may be much more valuable to you ___ than it is physically.\"", "Spiritually", "Financially", "Socially", "Mentally", "President Boyd K. Packer, \"Prayers and Answers,\" October 1979: \"As valuable as the Word of Wisdom is as a law of health, it may be much more valuable to you spiritually than it is physically.\""],
+["President Packer warned that in the Word of Wisdom \"everything harmful is not specifically ___.\"", "Listed", "Forbidden", "Taxed", "Explained", "President Boyd K. Packer, \"The Word of Wisdom: The Principle and the Promises,\" April 1996"],
+["President Dallin H. Oaks taught that one cigarette, one drink or one dose of a drug may not seem to matter, but over time \"the effect is powerful and may be ___.\"", "Irreversible", "Painless", "Pleasant", "Temporary", "President Dallin H. Oaks, \"Small and Simple Things,\" April 2018: \"Likely the effect on the body of one cigarette or one drink of alcohol or one dose of another drug cannot be measured. But over time, the effect is powerful and may be irreversible.\""],
+["President Joseph F. Smith said that because the Word of Wisdom was not first given as a commandment, \"the Lord was merciful and gave them a chance to ___.\"", "Overcome", "Vote", "Rest", "Argue", "President Joseph F. Smith taught that if the Word of Wisdom had come as a commandment at first, many Saints would have fallen under condemnation."],
+["In Daniel 1, who was the prince of the eunuchs who feared the king would see Daniel looking worse?", "Ashpenaz", "Melzar", "Arioch", "Belshazzar", "Daniel 1:3, 10. Ashpenaz was \"the master of his eunuchs.\""],
+["In Daniel 1, what Babylonian name was Daniel given?", "Belteshazzar", "Shadrach", "Meshach", "Abednego", "Daniel 1:7: \"unto Daniel the name of Belteshazzar.\""],
+["How long were Daniel and his friends to be trained before standing before the king?", "Three years", "Ten days", "One year", "Seven years", "Daniel 1:5: \"so nourishing them three years, that at the end thereof they might stand before the king.\""],
+["Daniel 1:20 says the king found the four young men how much better than his magicians and astrologers?", "Ten times better", "Twice as good", "A hundred times better", "A little better", "Daniel 1:20: \"he found them ten times better than all the magicians and astrologers that were in all his realm.\""],
+["Daniel 1:21 says Daniel continued until the first year of which king?", "Cyrus", "Darius", "Nebuchadnezzar", "Belshazzar", "Daniel 1:21: \"And Daniel continued even unto the first year of king Cyrus.\""],
+["Which scripture in the chapter \"Your Body Is Sacred\" says \"let virtue garnish thy thoughts unceasingly\"?", "Doctrine and Covenants 121:45", "Doctrine and Covenants 89:18", "Mosiah 2:41", "Philippians 4:7", "Doctrine and Covenants 121:45 is one of the chapter's scriptures."],
+["1 Corinthians 6:20 says, \"ye are bought with a ___: therefore glorify God in your body.\"", "Price", "Promise", "Prayer", "Covenant", "1 Corinthians 6:20."],
+["In the Sunday youth lesson structure that began in September 2026, how long is the Sunday School lesson?", "25 minutes", "10 minutes", "40 minutes", "50 minutes", "25 minutes of Sunday School, a 5-minute break, then 25 minutes in quorum or class."],
+["How many chapters does the For the Strength of Youth guide have?", "12", "7", "10", "20", "The Sunday lessons work through the guide's 12 chapters, one each month."],
+["Which For the Strength of Youth chapter is studied in November 2026, after \"Your Body Is Sacred\"?", "Truth Will Make You Free", "Love God", "Be Honest", "Serve Others", "The November 2026 chapter is \"Truth Will Make You Free\" (John 8:32)."],
+["Mosiah 2:41, in the chapter \"Your Body Is Sacred,\" describes \"the blessed and happy state of those that keep the ___ of God.\"", "Commandments", "Feasts", "Secrets", "Festivals", "Mosiah 2:41."],
+],
+pro: [
+["Doctrine and Covenants 89:1 says the Word of Wisdom is for the council of high priests, the church, \"and also the ___ in Zion.\"", "Saints", "Elders", "Bishops", "Missionaries", "Doctrine and Covenants 89:1."],
+["Doctrine and Covenants 89:2 says the Word of Wisdom shows \"the order and will of God in the ___ salvation of all saints in the last days.\"", "Temporal", "Eternal", "Spiritual", "Final", "Doctrine and Covenants 89:2."],
+["Doctrine and Covenants 89:14 says grain is ordained for the use of man and of what?", "Beasts", "Angels", "Kings", "Fowls only", "\"All grain is ordained for the use of man and of beasts, to be the staff of life.\""],
+["Doctrine and Covenants 89:15 says beasts and fowls are to be used \"only in times of famine and excess of ___.\"", "Hunger", "Labor", "Cold", "Travel", "Doctrine and Covenants 89:15."],
+["Doctrine and Covenants 89:17 assigns rye to which animals?", "The fowls and swine", "The ox", "The horse", "All useful animals", "\"Rye for the fowls and for swine, and for all beasts of the field.\""],
+["Doctrine and Covenants 89:21 compares the destroying angel passing by to which people?", "The children of Israel", "The Nephites", "The people of Enoch", "The Jaredites", "\"The destroying angel shall pass by them, as the children of Israel, and not slay them.\""],
+["Doctrine and Covenants 89:9 says hot drinks are \"not for the body or ___.\"", "Belly", "Mind", "Spirit", "Soul", "Doctrine and Covenants 89:9."],
+["Doctrine and Covenants 89:16 says fruit-bearing plants are good for food \"whether in the ground or ___.\"", "Above the ground", "In the water", "On the tree", "In the vineyard", "Doctrine and Covenants 89:16."],
+["Doctrine and Covenants 89:11 says herbs and fruits are to be used \"with prudence and ___.\"", "Thanksgiving", "Moderation", "Fasting", "Wisdom", "Doctrine and Covenants 89:11."],
+["About how many men were in the School of the Prophets when the Word of Wisdom was received?", "About 25", "About 5", "About 50", "About 100", "Revelations in Context: the room above the Newel K. Whitney store was very small, and about 25 elders packed the space."],
+["After the Word of Wisdom was read to the School of the Prophets, what did the men do with their tobacco pipes?", "Threw them into the fire", "Sold them", "Buried them", "Kept them at home", "Zebedee Coltrin, who was there, recalled that the men \"immediately threw their tobacco pipes into the fire.\""],
+["Which apostle recalled the School of the Prophets meeting in \"a cloud of tobacco smoke\"?", "Brigham Young", "Parley P. Pratt", "Orson Hyde", "Heber C. Kimball", "Brigham Young described the smoking and chewing that led Emma to complain and Joseph to inquire of the Lord."],
+["In what year did the Church issue the statement that vaping and e-cigarettes violate the Word of Wisdom?", "2019", "1921", "1999", "2010", "The August 2019 statement also addressed coffee drinks, marijuana and opioids."],
+["Which Church leader told of surfers in Australia and a shark barrier to teach that commandments protect us?", "Elder Von G. Keetch", "Elder Dieter F. Uchtdorf", "Elder Jeffrey R. Holland", "Elder David A. Bednar", "Elder Von G. Keetch, \"Blessed and Happy Are Those Who Keep the Commandments of God,\" October 2015."],
+["Daniel 1:8: \"Daniel purposed in his heart that he would not ___ himself with the portion of the king's meat.\"", "Defile", "Feed", "Fill", "Burden", "Daniel 1:8."],
+["In Daniel 1, which steward agreed to the ten-day test of pulse and water?", "Melzar", "Ashpenaz", "Arioch", "Nebuzaradan", "Daniel 1:11-14. Melzar was set over Daniel and his friends by the prince of the eunuchs."],
+["Daniel 1:1 says Nebuchadnezzar besieged Jerusalem in which year of King Jehoiakim's reign?", "The third year", "The first year", "The seventh year", "The tenth year", "Daniel 1:1: \"In the third year of the reign of Jehoiakim king of Judah came Nebuchadnezzar king of Babylon unto Jerusalem.\""],
+["Daniel 1:12 asked for \"pulse to eat, and ___ to drink.\"", "Water", "Milk", "Wine", "Juice", "Daniel 1:12."],
+["Hananiah, Mishael and Azariah were given which Babylonian names?", "Shadrach, Meshach and Abednego", "Belteshazzar, Arioch and Melzar", "Cyrus, Darius and Belshazzar", "Ashpenaz, Melzar and Belteshazzar", "Daniel 1:7."],
+["Doctrine and Covenants 88:15, cited in \"Your Body Is Sacred,\" says what makes up the soul of man?", "The spirit and the body", "The mind and the heart", "Faith and works", "The body and the breath", "\"And the spirit and the body are the soul of man.\""],
+["Which scripture cited in \"Your Body Is Sacred\" says, \"I will not leave you comfortless: I will come to you\"?", "John 14:18", "Philippians 4:7", "Mosiah 2:41", "Genesis 1:27", "John 14:18."],
+["Philippians 4:7, cited in \"Your Body Is Sacred,\" speaks of \"the peace of God, which passeth all ___.\"", "Understanding", "Sorrow", "Knowledge", "Fear", "Philippians 4:7."],
+["Doctrine and Covenants 42:41, cited in \"Your Body Is Sacred,\" says \"let all things be done in ___ before me.\"", "Cleanliness", "Order", "Faith", "Silence", "Doctrine and Covenants 42:41."],
+["On what date did the new Sunday youth lesson structure based on For the Strength of Youth begin?", "September 6, 2026", "January 4, 2026", "April 5, 2026", "October 4, 2026", "The structure began Sunday, September 6, 2026."],
+["In the 2026 Sunday youth structure, what follows the 25-minute Sunday School lesson?", "A 5-minute break, then 25 minutes in quorum or class", "A 10-minute testimony meeting", "A 15-minute activity", "Dismissal", "25 minutes of Sunday School, a 5-minute break, then 25 minutes in quorum or class."],
+["Which activity idea in the October 2026 For the Strength of Youth lessons involves cooking?", "Cookoff for a Healthy Body", "Bake Sale for the Temple", "Fast Sunday Feast", "Bread of Life Bakery", "The October 2026 activity ideas include \"Cookoff for a Healthy Body\" and \"Use Your Five Senses.\""],
+["The October 2026 activity ideas include \"Use Your Five ___.\"", "Senses", "Talents", "Friends", "Minutes", "\"Use Your Five Senses\" is an October 2026 activity idea."],
+["Besides alcohol, tobacco, coffee and tea, the Word of Wisdom as taught today forbids what?", "Illegal drugs", "Sugar", "Red meat", "Energy drinks", "Gospel Topics names alcoholic drinks, tobacco, tea and coffee as the substances the Lord revealed as harmful, and adds that prophets have taught members to avoid substances that are \"harmful or highly addictive, whether legal or illegal.\" For the Strength of Youth: \"alcohol, tobacco, coffee, tea, and other harmful drugs and substances are not for your body or your spirit.\""],
+["The 2019 statement says marijuana and opioids may be used only when prescribed by whom?", "A competent physician", "A bishop", "A parent", "A pharmacist", "The 2019 statement on the Word of Wisdom."],
+["Elder Boyd K. Packer taught in 1979 that the Word of Wisdom \"may be much more valuable to you spiritually than it is ___.\"", "Physically", "Financially", "Socially", "Mentally", "Elder Boyd K. Packer, \"Prayers and Answers,\" October 1979: \"As valuable as the Word of Wisdom is as a law of health, it may be much more valuable to you spiritually than it is physically.\""],
+],
+},
 };
 
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -1908,15 +2031,49 @@ const HERO_IMG = "data:image/webp;base64,UklGRnBSAQBXRUJQVlA4IGRSAQDQzQWdASp4BdM
 (function(){
 "use strict";
 const MODES = [
-  { id: "conf", name: "2026 Conference", desc: "April and October 2026 talks" },
+  { id: "lessons", name: "Lessons", desc: "This month's For the Strength of Youth lessons" },
+  { id: "conf_apr", name: "April 2026 Conference", desc: "April 2026 talks" },
+  { id: "conf_oct", name: "October 2026 Conference", desc: "October 2026 talks" },
   { id: "found", name: "Gospel Foundations", desc: "Core doctrine and Church history" },
   { id: "pmg", name: "Preach My Gospel", desc: "Missionary lessons and scriptures" },
   { id: "mastery", name: "Scripture Mastery", desc: "Doctrinal Mastery passages" },
-  { id: "scramble", name: "Scramble", desc: "Every topic, shuffled together" }
+  { id: "scramble", name: "Scramble", desc: "Mix the playbooks you tick" }
 ];
-const CAT_NAME = { conf: "2026 Conference", found: "Gospel Foundations", pmg: "Preach My Gospel", mastery: "Scripture Mastery" };
-const LVL_NAME = { pewee: "Pewee", college: "College", pro: "Pro", random: "Random" };
-const LVL_TAG = { pewee: "PEE", college: "COL", pro: "PRO", random: "RND" };
+const CAT_NAME = { lessons: "Lessons", conf_apr: "April 2026 Conference", conf_oct: "October 2026 Conference", found: "Gospel Foundations", pmg: "Preach My Gospel", mastery: "Scripture Mastery" };
+const POOL_SHORT = { lessons: "Lessons", conf_apr: "April 2026", conf_oct: "October 2026", found: "Foundations", pmg: "Preach My Gospel", mastery: "Scripture Mastery" };
+const POOL_IDS = Object.keys(CAT_NAME);
+// which playbooks a game mixes (Nick, 2026-10-11): Scramble draws from the pools ticked on the start page; a single playbook is its own pool
+function poolsFor(mode, picked) { if (mode === "scramble") { const p = (picked || []).filter(id => CAT_NAME[id]); return p.length ? p : POOL_IDS.slice(); } if (mode === "conf") return ["conf_apr", "conf_oct"]; return CAT_NAME[mode] ? [mode] : POOL_IDS.slice(); }
+const LVL_NAME = { read: "Peewee", pewee: "Junior", college: "College", pro: "Pro", random: "Random" }; // "read" = Peewee (read a scripture or quote aloud, then Done); "pewee" = Junior, the old Pewee (Nick, 2026-10-11)
+const LVL_TAG = { read: "PEE", pewee: "JR", college: "COL", pro: "PRO", random: "RND" };
+// what each level means, shown when a level button is hovered (Nick asked for an example of each level's question, 2026-10-11)
+const LVL_INFO = {
+  read: { ages: "Junior Primary, ages 3 to 7", how: "Read a short scripture or quote out loud, then tap Done. No wrong answers." },
+  pewee: { ages: "Senior Primary, ages 8 to 11", how: "Easy questions with four choices." },
+  college: { ages: "Youth, ages 12 to 18", how: "Harder questions with four choices." },
+  pro: { ages: "Adults", how: "The hardest questions." },
+  random: { ages: "Any age", how: "A different level every question: Junior, College or Pro." }
+};
+function exampleFor(level) { // a real question from the playbooks chosen on this screen
+  if (level === "random") return null;
+  const lvl = level === "random" ? "pewee" : level;
+  const cats = poolsFor(setup.mode, setup.pools).filter(c => QB[c] && QB[c][lvl] && QB[c][lvl].length);
+  if (!cats.length) return null;
+  const cat = cats[rnd(cats.length)], raw = QB[cat][lvl][rnd(QB[cat][lvl].length)];
+  return lvl === "read" ? { kind: "read", text: raw[0], ref: raw[1] || "", cat } : { kind: "quiz", text: raw[0], options: shuffle(raw.slice(1, 5)), cat };
+}
+function lvlTip() { let t = $("#lvlTip"); if (!t) { t = document.createElement("div"); t.id = "lvlTip"; t.className = "lvltip"; t.hidden = true; document.body.appendChild(t); } return t; }
+function showLvlTip(btn) {
+  const level = btn.dataset.v, info = LVL_INFO[level]; if (!info) return;
+  const ex = exampleFor(level), t = lvlTip();
+  t.innerHTML = `<b>${LVL_NAME[level]} <span class="ages">· ${info.ages}</span></b>${info.how}` + (ex ? `<div class="ex"><span class="eyebrow">Example from ${esc(POOL_SHORT[ex.cat] || ex.cat)}</span>` + (ex.kind === "read" ? `“${esc(ex.text)}” <span class="ref">${esc(ex.ref)}</span>` : `${esc(ex.text)}<ol type="A">${ex.options.map(o => `<li>${esc(o)}</li>`).join("")}</ol>`) + `</div>` : "");
+  t.hidden = false;
+  const r = btn.closest(".seg").getBoundingClientRect(), w = t.offsetWidth, h = t.offsetHeight;
+  let left = Math.max(12, Math.min(innerWidth - w - 12, r.left)), top = r.bottom + 8;
+  if (top + h > innerHeight - 8) top = Math.max(8, r.top - h - 8);
+  t.style.left = left + "px"; t.style.top = top + "px";
+}
+function hideLvlTip() { const t = $("#lvlTip"); if (t) t.hidden = true; }
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const rnd = n => Math.floor(Math.random() * n);
@@ -1946,7 +2103,7 @@ const DEF = [
 // ---------- state ----------
 let S = null;
 const setup = {
-  mode: "scramble", level: "pewee", team: 0, openTeams: false, // openTeams: phones may pick and switch teams; otherwise the host places them
+  mode: MODES.some(m => m.id === store.get("gf_mode")) ? store.get("gf_mode") : "scramble", pools: poolsFor("scramble", store.get("gf_pools")), level: "pewee", team: 0, openTeams: false, // openTeams: phones may pick and switch teams; otherwise the host places them
   roster: store.get("gf_roster") || [
     { name: "Grandpa", level: "pro", team: 0, av: 3 }, { name: "Ben", level: "pewee", team: 0, av: 1 },
     { name: "Ella", level: "college", team: 1, av: 9 }, { name: "Mia", level: "pewee", team: 1, av: 8 }
@@ -2195,14 +2352,14 @@ function qClips(q) { return [{ path: "q/" + qid(q.text) + ".mp3", text: q.text, 
 // once six pieces in a row have failed with none ever played, the question recordings are not there: the browser voice reads the questions instead
 function qClipsReady() { return VOX.on && !(READ.fail >= 6 && !READ.ok); }
 function preloadQuestion(q) {
-  if (!(readQ && q && qClipsReady())) return;
+  if (!(readQ && q && q.kind !== "read" && qClipsReady())) return;
   const paths = qClips(q).map(c => c.path); paths.forEach(p => clipAudio(p));
   READ.hist.push(paths); while (READ.hist.length > 3) READ.hist.shift().forEach(p => VOX.cache.delete(p)); // keep only the last few questions' clips in memory
 }
 // readQuestion(q, who): reads the question and its choices as shown (who = "Ben, Pewee question" for the browser voice, which has no recording of the names)
 function readQuestion(q, who) {
   readStop();
-  if (!sound || !readQ || !q) return;
+  if (!sound || !readQ || !q || q.kind === "read") return;
   if (!qClipsReady() || !TTS.ok && !VOX.on) {
     READ.tts = true; speak(`${who ? who + ". " : ""}${q.text} ${q.options.map((o, i) => `${"ABCD"[i]}, ${o}.`).join(" ")}`, { force: true, flush: true });
     ttsIdle().then(() => { if (!VOX.refQ.some(x => x.q) && !(VOX.refIt && VOX.refIt.q)) READ.tts = false; });
@@ -2231,6 +2388,7 @@ function syncVoice() {
 // ---------- setup UI ----------
 function renderModes() {
   $("#modeSel").innerHTML = MODES.map(m => `<option value="${m.id}" title="${m.desc}"${setup.mode === m.id ? " selected" : ""}>${m.name}</option>`).join("");
+  renderPools();
 }
 // the team lists on the picture, above the code; the caption says whether phones pick their team
 // teamList(t): a team's players in alphabetical order (Nick, 2026-10-05: "alphabetical order per team"); i is the roster index, so drags and edits still work
@@ -2258,7 +2416,18 @@ function renderRoster() {
 }
 function segSet(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(v)))); }
 
-$("#modeSel").addEventListener("change", e => { setup.mode = e.target.value; });
+$("#modeSel").addEventListener("change", e => { setup.mode = e.target.value; store.set("gf_mode", setup.mode); renderPools(); });
+function renderPools() { // the Scramble pool chips: tick which playbooks the questions come from (at least one stays ticked)
+  const pr = $("#poolRow"); if (!pr) return;
+  pr.hidden = setup.mode !== "scramble";
+  pr.innerHTML = `<span class="eyebrow">Mix</span>` + POOL_IDS.map(id => `<label class="pool"><input type="checkbox" value="${id}"${setup.pools.includes(id) ? " checked" : ""}><span>${POOL_SHORT[id]}</span></label>`).join("");
+}
+$("#poolRow").addEventListener("change", e => {
+  const v = e.target.value, on = e.target.checked;
+  let p = POOL_IDS.filter(id => id === v ? on : setup.pools.includes(id));
+  if (!p.length) { p = [v]; e.target.checked = true; }
+  setup.pools = p; store.set("gf_pools", p);
+});
 $("#avPick").addEventListener("click", e => {
   const b = e.target.closest("[data-av]"); if (!b) return;
   if (b.dataset.av === "team") { $("#crewChk").checked = true; $("#botChk").checked = false; }
@@ -2279,7 +2448,12 @@ $("#glChk").addEventListener("change", renderAvPick);
 $("#glStyles").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.gl = b.dataset.v; renderAvPick(); });
 $("#crewChk").addEventListener("change", () => { if ($("#crewChk").checked) { $("#botChk").checked = false; if (setup.av === "bot") setup.av = nextAv(); } renderAvPick(); });
 $("#botChk").addEventListener("change", () => { if ($("#botChk").checked) $("#crewChk").checked = false; else if (setup.av === "bot") setup.av = nextAv(); renderAvPick(); });
-$("#lvlSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.level = b.dataset.v; segSet("lvlSeg", setup.level); });
+$("#lvlSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.level = b.dataset.v; segSet("lvlSeg", setup.level); if (!matchMedia("(hover: hover)").matches) { showLvlTip(b); clearTimeout(showLvlTip.t); showLvlTip.t = setTimeout(hideLvlTip, 5000); } });
+$("#lvlSeg").addEventListener("mouseover", e => { const b = e.target.closest("button"); if (b) showLvlTip(b); });
+$("#lvlSeg").addEventListener("mouseleave", hideLvlTip);
+$("#lvlSeg").addEventListener("focusin", e => { const b = e.target.closest("button"); if (b) showLvlTip(b); });
+$("#lvlSeg").addEventListener("focusout", hideLvlTip);
+addEventListener("scroll", hideLvlTip, { passive: true });
 $("#teamSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; setup.team = +b.dataset.v; segSet("teamSeg", setup.team); });
 $("#addForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -2426,7 +2600,7 @@ $("#team1").addEventListener("input", renderRoster);
 $("#clearBtn").addEventListener("click", () => { if (setup.editing != null) endEdit(); setup.roster.filter(p => p.pid).forEach(p => netKick(p.pid)); setup.roster = []; renderRoster(); });
 $("#balanceBtn").addEventListener("click", () => {
   // Deal players alternately by level so each side gets a similar mix
-  const order = { pro: 0, college: 1, pewee: 2 };
+  const order = { pro: 0, college: 1, pewee: 2, read: 3, random: 1.5 };
   if (setup.editing != null) endEdit();
   const sorted = shuffle(setup.roster).sort((a, b) => order[a.level] - order[b.level]);
   sorted.forEach((p, i) => p.team = i % 2);
@@ -2464,7 +2638,7 @@ let CAM = { c: 50, z: 1, l: 50 };
 const ZOOM_PLAYS = false, FIG = 0.8; // FIG: figure size on the un-zoomed field (full size stacked the line into one pile; Nick, 2026-10-05 05:34Z) // the camera used to move in on the line for each play; Nick wants the whole field to stay in view (2026-10-05)
 function newGame() {
   S = {
-    screen: "game", mode: setup.mode, playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
+    screen: "game", mode: setup.mode, pools: poolsFor(setup.mode, setup.pools), playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Team A", score: 0, drive: START }, { name: $("#team1").value.trim() || "Team B", score: 0, drive: START }],
     players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, pass: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
@@ -2493,7 +2667,10 @@ function startPlay() {
   nextQuestion();
 }
 function drawQuestion(level) {
-  const cat = S.mode === "scramble" ? ["conf", "found", "pmg", "mastery"][rnd(4)] : S.mode;
+  const want = S.pools && S.pools.length ? S.pools : poolsFor(S.mode, null);
+  let cats = want.filter(c => QB[c] && QB[c][level] && QB[c][level].length);
+  if (!cats.length) cats = Object.keys(QB).filter(c => QB[c][level] && QB[c][level].length);
+  const cat = cats[rnd(cats.length)];
   const pool = QB[cat][level], key = cat + "|" + level;
   let used = S.used[key] || [];
   if (used.length >= pool.length) used = [];
@@ -2501,25 +2678,28 @@ function drawQuestion(level) {
   const idx = free[rnd(free.length)];
   used.push(idx); S.used[key] = used;
   const raw = pool[idx];
+  if (level === "read") return { cat, kind: "read", text: raw[0], ref: raw[1] || "", answer: "done", options: [], note: raw[2] || "" }; // Peewee: read it out loud, then tap Done
   return { cat, text: raw[0], answer: raw[1], options: shuffle(raw.slice(1, 5)), note: raw[5] };
 }
 function nextQuestion() {
   if (S.qi >= S.order.length) { S.phase = "ready"; S.q = null; return; }
   const p = S.players[S.order[S.qi]];
-  const lvl = p.level === "random" ? ["pewee", "college", "pro"][rnd(3)] : p.level;
+  const lvl = p.level === "random" ? ["pewee", "college", "pro"][rnd(3)] : (LVL_NAME[p.level] ? p.level : "pewee");
   S.q = drawQuestion(lvl); S.q.level = lvl; S.answered = null; NET.qvotes = {};
   preloadQuestion(S.q);
 }
 function whoAsks(p) { return p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"; }
+function readLabel(q) { return /^(\d\s)?[A-Z][A-Za-z&. ]+\s\d+:\d/.test(q.ref || "") || /^(Doctrine|JS|Joseph Smith|Articles of Faith|Moses|Abraham)/.test(q.ref || "") ? "Read this scripture out loud" : "Read this quote out loud"; }
 function answer(opt) {
   if (S.answered) return;
   readStop();
   const p = S.players[S.order[S.qi]];
-  const ok = opt === S.q.answer;
+  const ok = S.q.kind === "read" ? true : opt === S.q.answer;
   S.answered = { opt, ok };
   p.st.asked++;
   if (ok) { p.st.right++; S.line[p.team].push(p.id); sfx.good(); } else sfx.bad();
-  refSay(ok ? "correct" : "wrong", ok ? "Correct!" : `Not quite. The answer is ${S.q.answer}.`, { interrupt: true });
+  if (S.q.kind === "read") refSay("correct", "Correct!", { interrupt: true });
+  else refSay(ok ? "correct" : "wrong", ok ? "Correct!" : `Not quite. The answer is ${S.q.answer}.`, { interrupt: true });
   avSay(p.av, ok ? "right" : "wrong", 700);
   renderBubble(); renderChips();
   if (!p.bot) autoAdvance();
@@ -2833,6 +3013,11 @@ function botAnswer(p, token) {
     if (readingNow()) { setTimeout(go, 400); return; }
     setTimeout(() => {
     if (token !== DIR.token || !S || S.phase !== "questions" || S.answered || !S.q || S.players[S.order[S.qi]] !== p) return;
+    if (S.q.kind === "read") { // a bot taps Done, then moves on like it does after a quiz answer
+      answer("done");
+      setTimeout(() => { if (token === DIR.token && S && S.phase === "questions" && S.answered && S.players[S.order[S.qi]] === p) advance(); }, reduced ? 80 : 1900);
+      return;
+    }
     const ok = Math.random() < (BOT.acc[S.q.level] || 0.65);
     const wrong = S.q.options.filter(o => o !== S.q.answer);
     answer(ok ? S.q.answer : wrong[rnd(wrong.length)]);
@@ -2871,14 +3056,15 @@ function renderBubble() {
   const last = S.qi === S.order.length - 1;
   const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
-  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat]}</span><button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button></div>
-    <div class="q">${esc(q.text)}</div>
-    <div class="opts">${q.options.map((o, i) => { let cls = ""; if (a) { if (o === q.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>
-    ${a ? `<div class="foot"><span class="verdict ${a.ok ? "good" : "bad"}">${a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</span>
-    <span class="note">${a.ok ? "" : `Answer: <b>${esc(q.answer)}</b>. `}${esc(q.note || "")}</span>
+  b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat] || POOL_SHORT[q.cat] || "2026 Conference"}</span>${q.kind === "read" ? "" : `<button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button>`}</div>
+    ${q.kind === "read" ? `<div class="readlabel">${readLabel(q)}</div><div class="q read">${esc(q.text)}</div>` : `<div class="q">${esc(q.text)}</div>`}
+    ${q.kind === "read" ? "" : `<div class="opts">${q.options.map((o, i) => { let cls = ""; if (a) { if (o === q.answer) cls = "right"; else if (o === a.opt) cls = "wrong"; } return `<button type="button" class="opt ${cls}" data-o="${i}" ${a ? "disabled" : ""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`; }).join("")}</div>`}
+    ${a ? `<div class="foot"><span class="verdict ${a.ok ? "good" : "bad"}">${q.kind === "read" ? `Well read! ${esc(p.name)} takes the field.` : a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</span>
+    <span class="note">${q.kind === "read" ? `<span class="ref">${esc(q.ref)}</span> ` : a.ok ? "" : `Answer: <b>${esc(q.answer)}</b>. `}${esc(q.note || "")}</span>
     <button type="button" class="btn" id="nextBtn" data-label="${last ? "Line up!" : "Next player"}">${last ? "Line up!" : "Next player"}</button></div>` :
-    `<div class="foot"><span class="note">Question ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} answers on their phone.` : ""}${isBot ? ` ${esc(p.name)} is thinking…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</span>${vi && vi.got ? `<button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button>` : ""}</div>`}`;
+    `<div class="foot">${q.kind === "read" ? `<span class="ref">${esc(q.ref)}</span>` : ""}<span class="note">${q.kind === "read" ? "Reading" : "Question"} ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} ${q.kind === "read" ? "taps Done" : "answers"} on their phone.` : ""}${isBot ? ` ${esc(p.name)} is ${q.kind === "read" ? "reading" : "thinking"}…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</span>${vi && vi.got ? `<button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button>` : ""}${q.kind === "read" ? `<button type="button" class="btn" id="doneBtn">Done, I read it</button>` : ""}</div>`}`;
   b.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => answer(q.options[+x.dataset.o])));
+  const db = $("#doneBtn"); if (db) db.addEventListener("click", () => answer("done"));
   const nb = $("#nextBtn"); if (nb) { nb.addEventListener("click", advance); nb.focus({ preventScroll: true }); }
   const lb = $("#lockBtn"); if (lb) lb.addEventListener("click", () => checkVotes(true));
   const rb = $("#readQBtn"); if (rb) rb.addEventListener("click", () => { setReadQ(!readQ); renderBubble(); if (readQ && !S.answered) readQuestion(S.q, whoAsks(p)); $("#readQBtn").focus({ preventScroll: true }); });
@@ -3310,7 +3496,7 @@ function show() {
   $("#quitBtn").hidden = scr === "setup"; $("#quitBtn").textContent = "New game";
   $(".brand").hidden = scr === "setup"; // the start page carries the title in its picture (Nick: not twice)
   $("#setupBar").hidden = scr !== "setup"; $("#heroFoot").hidden = scr !== "setup"; // playbook and game length live in the top bar on the start page
-  $("#subtitle").textContent = scr === "setup" ? "" : (S.mode === "scramble" ? "Scramble" : CAT_NAME[S.mode]);
+  $("#subtitle").textContent = scr === "setup" ? "" : (S.mode === "scramble" ? (S.pools && S.pools.length < POOL_IDS.length ? "Scramble: " + S.pools.map(p => POOL_SHORT[p] || p).join(" + ") : "Scramble") : CAT_NAME[S.mode] || "2026 Conference");
   hideBubble(); DIR.token++;
   if (scr === "setup") { NET.pend.splice(0).forEach(r => { if (!setup.roster.some(p => p.pid === r.pid)) setup.roster.push(r); }); if (!$("#heroArt").innerHTML) $("#heroArt").innerHTML = `<img src="${HERO_IMG}" alt="Gospel Football: a brother and sister in church clothes and helmets on the field">`; renderModes(); renderRoster(); renderAvPick(); }
   if (scr === "game") {
@@ -3408,7 +3594,7 @@ function netJoin(conn, d) {
   const pid = String(d.pid || "").replace(/[^\w-]/g, "").slice(0, 40); if (!pid) return;
   const name = String(d.name || "").trim().slice(0, 24) || "Player";
   const av = Number.isInteger(d.av) && d.av >= 0 && d.av < AVATARS.length ? d.av : rnd(AVATARS.length);
-  const level = ["pewee", "college", "pro", "random"].includes(d.level) ? d.level : "pewee";
+  const level = ["read", "pewee", "college", "pro", "random"].includes(d.level) ? d.level : "pewee";
   const wantTeam = d.team === 1 ? 1 : 0, gl = typeof GLASSES !== "undefined" && GLASSES.styles.includes(d.gl) ? d.gl : null;
   const inGame = !!S && S.screen !== "setup";
   const rec = phoneRec({ pid });
@@ -3472,6 +3658,7 @@ function netMsg(conn, d) {
   if (d.t === "answer") {
     if (S.phase !== "questions" || S.answered || !S.q) return;
     const cur = S.players[S.order[S.qi]], opt = String(d.opt);
+    if (S.q.kind === "read") { if (opt === "done" && (cur.pid === ph.pid || (cur.crew && cur.team === rec.team))) answer("done"); return; } // Peewee: the reader (or anyone on a team reading) taps Done
     if (!S.q.options.includes(opt)) return;
     if (cur.pid === ph.pid) { answer(opt); return; }
     if (cur.crew && cur.team === rec.team) { NET.qvotes[ph.pid] = opt; if (!checkVotes()) renderBubble(); }
@@ -3485,7 +3672,7 @@ function netMsg(conn, d) {
 }
 function voteInfo() {
   if (!S || S.screen !== "game" || S.phase !== "questions" || !S.q || S.answered) return null;
-  const cur = S.players[S.order[S.qi]]; if (!cur || !cur.crew) return null;
+  const cur = S.players[S.order[S.qi]]; if (!cur || !cur.crew || (S.q && S.q.kind === "read")) return null; // a team reading has no vote, just Done
   const need = onlinePhones(cur.team); if (!need.length) return null;
   const tally = {}; let got = 0;
   need.forEach(ph => { const v = NET.qvotes[ph.pid]; if (v != null) { got++; tally[v] = (tally[v] || 0) + 1; } });
@@ -3548,7 +3735,7 @@ function stateFor(ph) {
     const cur = S.players[S.order[S.qi]], q = S.q, a = S.answered;
     const asker = cur.pid === ph.pid || (cur.crew && cur.team === rec.team);
     base.view = asker ? "question" : "watch";
-    base.q = { who: cur.name, av: cur.av, gl: cur.gl || null, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level], cat: CAT_NAME[q.cat], text: q.text, options: q.options, n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
+    base.q = { who: cur.name, av: cur.av, gl: cur.gl || null, team: cur.team, crew: !!cur.crew, bot: !!cur.bot, level: LVL_NAME[q.level] || q.level, cat: CAT_NAME[q.cat] || POOL_SHORT[q.cat] || "2026 Conference", text: q.text, options: q.options, kind: q.kind || "quiz", ref: q.ref || "", n: S.qi + 1, of: S.order.length, side: cur.team === off ? "offense" : "defense" };
     if (a) base.answered = { opt: a.opt, ok: a.ok, answer: q.answer, note: q.note || "" };
     if (asker && cur.crew) { const v = voteInfo(); base.vote = v ? { got: v.got, need: v.need, mine: NET.qvotes[ph.pid] ?? null } : null; }
     return base;
@@ -3586,8 +3773,9 @@ function netSync() {
 }
 function saveGame() { if (!S) { store.set("gf_game", null); return; } S.savedAt = Date.now(); store.set("gf_game", S); }
 function savedGame() { const g = store.get("gf_game"); return g && g.screen && g.savedAt && Date.now() - g.savedAt < 8 * 3600e3 ? g : null; }
-$("#phoneBtn").addEventListener("click", () => { $("#qrModal").hidden = false; $("#qrBig").innerHTML = NET.peer ? qrHTML(true) : ""; $("#phoneOff").hidden = !NET.peer; });
+$("#phoneBtn").addEventListener("click", () => { $("#qrModal").hidden = false; $("#qrBig").innerHTML = NET.peer ? qrHTML(true) : ""; $("#phoneOff").hidden = !NET.peer; $("#phoneNew").hidden = !NET.peer; });
 $("#phoneOff").addEventListener("click", () => { netStop(); $("#qrModal").hidden = true; });
+$("#phoneNew").addEventListener("click", () => { netStop(); netStart(null); $("#qrBig").innerHTML = qrHTML(true); }); // a fresh code: joined phones must scan again
 $("#qrClose").addEventListener("click", () => { $("#qrModal").hidden = true; });
 $("#qrModal").addEventListener("click", e => { if (e.target === $("#qrModal")) $("#qrModal").hidden = true; });
 
