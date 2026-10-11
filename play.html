@@ -163,7 +163,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261011-193706';</script>
+<script>window.GF_BUILD = '20261011-194352';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -298,7 +298,7 @@ const LVL_HINT = { // what each level means, with an example (the big screen sho
   random: `<b>Random</b> · A different level every question: Junior, College or Pro.`
 };
 function lvlHint() { const h = $("#lvlHint"); if (h) h.innerHTML = LVL_HINT[form.level] || ""; }
-let me = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", lastKey = "", sentPick = null, sentHike = false, myAns = null, editing = false;
+let me = null, lastMe = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", lastKey = "", sentPick = null, sentHike = false, myAns = null, editing = false;
 let pending = null, stopped = false, misses = 0, lastMsg = 0;
 const form = { av: 0, level: "pewee", team: 0, avSet: false, gl: "black" };
 const key = () => "gfme_" + code;
@@ -372,6 +372,12 @@ function onData(d) {
     setStatus("This player is open in another tab or phone. Close this one, or reload to take over.", true);
   }
   else if (d.t === "full") { me = null; try { localStorage.removeItem(key()); } catch (e) {} state = null; showSign("The roster is full (16 players). Ask the host to make room, then sign up again."); }
+  else if (d.t === "name_taken") { // somebody in this game already has that name: back to the form with the old record, if any
+    me = lastMe || null; lastMe = null;
+    if (me) saveMe(me); else { try { localStorage.removeItem(key()); } catch (e) {} state = null; }
+    showSign(`Someone in this game is already called ${d.name || "that"}. Pick a name of your own.`);
+    $("#nameIn").value = d.name || ""; $("#nameIn").focus({ preventScroll: true }); $("#nameIn").select();
+  }
   else if (d.t === "kicked") { me = null; try { localStorage.removeItem(key()); } catch (e) {} state = null; showSign("The host took you off the roster. You can sign up again."); }
   else if (d.t === "state") {
     if (d.build && d.build !== GF_BUILD) { // the big screen runs a newer page: reload once to match it
@@ -425,6 +431,7 @@ $("#signForm").addEventListener("submit", e => {
   const name = $("#nameIn").value.trim().slice(0, 24);
   if (!name) { $("#signErr").textContent = "Type your name first."; return; }
   $("#signErr").textContent = "";
+  lastMe = me; // kept so a name the host turns down puts things back as they were
   me = { pid: (me && me.pid) || newPid(), name, av: form.av, level: form.level, team: form.team, gl: $("#glChk").checked && canGlasses(form.av) ? form.gl : null };
   saveMe(me); editing = false;
   if (stopped) { stopped = false; ensure(); }

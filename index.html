@@ -110,6 +110,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .hero .hero-teams li span { overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams li.none { color: #9fb0aa; font-style: italic; }
 .hero .hero-teams .av { flex: none; }
+.hero .hero-teams .note.warn { color: var(--gold); font-weight: 600; }
 .hero .hero-teams .note { grid-column: 1 / -1; font-family: var(--f-ui); max-width: none; font-size: calc(12px * var(--hn)); line-height: 1.25; color: #b7c6c0; margin: 2px 0 0; }
 .hero .hero-phones h2 { font-size: 16px; text-shadow: none; color: var(--chalk); letter-spacing: .04em; }
 .hero .hero-phones .hint { display: none; }
@@ -564,7 +565,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-193706';</script>
+<script>window.GF_BUILD = '20261011-194352';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2403,7 +2404,7 @@ function renderHeroTeams() {
   const names = [$("#team0").value || "Team A", $("#team1").value || "Team B"];
   box.innerHTML = [0, 1].map(t => { const list = teamList(t);
     return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, "calc(20px * var(--hz))", p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
-    `<p class="note">${setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move, click to edit, double-click to rename." : "Drag to move a player, click to edit, double-click to rename. Open teams to let phones pick."}</p>`;
+    `<p class="note${setup.heroMsg ? " warn" : ""}">${setup.heroMsg ? esc(setup.heroMsg) : setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move, click to edit, double-click to rename." : "Drag to move a player, click to edit, double-click to rename. Open teams to let phones pick."}</p>`;
   if (drag && !drag.pending && drag.hero) { const l = box.querySelector(`li[data-i="${drag.i}"]`); if (l) { l.classList.add("dragging"); drag.li = l; } }
   fitHeroTeams();
 }
@@ -2479,6 +2480,7 @@ $("#addForm").addEventListener("submit", e => {
   const crew = $("#crewChk").checked, bot = !crew && $("#botChk").checked;
   const name = $("#pName").value.trim() || (crew ? crewName() : bot ? botName(setup.av) : "");
   if (!name) { $("#setupErr").textContent = "Type a player name, then press Add."; return; }
+  if (nameTaken(name, setup.editing)) { $("#setupErr").textContent = `Someone is already called ${name}. Every player needs a name of their own.`; return; }
   if (!crew && !bot && setup.av === "bot") setup.av = nextAv(); // Robo is only for computer players
   const rec = { name, level: setup.level, team: setup.team, crew, bot, av: crew ? "team" : setup.av };
   if (!crew && $("#glChk").checked && canGlasses(setup.av)) rec.gl = setup.gl;
@@ -2511,6 +2513,16 @@ function endEdit() {
 }
 $("#cancelEdit").addEventListener("click", () => { endEdit(); renderRoster(); });
 $("#removeBtn").addEventListener("click", () => { const i = setup.editing; if (i == null) return; const rem = setup.roster.splice(i, 1)[0]; endEdit(); if (rem && rem.pid && typeof netKick === "function") netKick(rem.pid); renderRoster(); });
+const normName = n => String(n || "").trim().replace(/\s+/g, " ").toLowerCase();
+function nameTaken(name, skipIndex, skipPid) { // every player needs a name of their own (Nick, 2026-10-11): checked against the roster, the players on the field and phones waiting to join; case and spacing do not count
+  const k = normName(name); if (!k) return false;
+  const same = p => normName(p.name) === k, notMe = p => !skipPid || p.pid !== skipPid;
+  if (setup.roster.some((p, i) => (skipIndex == null || i !== skipIndex) && notMe(p) && same(p))) return true;
+  if (typeof S !== "undefined" && S && S.players && S.players.some(p => notMe(p) && same(p))) return true;
+  return typeof NET !== "undefined" && NET && NET.pend ? NET.pend.some(p => notMe(p) && same(p)) : false;
+}
+let heroMsgT = 0;
+function heroSay(msg) { setup.heroMsg = msg; clearTimeout(heroMsgT); heroMsgT = setTimeout(() => { setup.heroMsg = ""; renderHeroTeams(); }, 5000); } // a short notice in the picture's team box, where a rename happens
 function crewName() { let n = 1; while (setup.roster.some(p => p.name === "Team player " + n)) n++; return "Team player " + n; }
 const BOT_NAMES = ["Gizmo Bot", "Sprocket Bot", "Pixel Bot", "Bolt Bot", "Chip Bot", "Widget Bot", "Zippy Bot", "Rusty Bot", "Beep Bot", "Dynamo Bot"];
 // a bot is named after its picture when that name is free, else from the robot names
@@ -2562,7 +2574,7 @@ $("#heroTeams").addEventListener("pointerdown", e => {
   if (e.target.closest("input")) return;
   const h = e.target.closest("h3[data-team]"), li = e.target.closest("li[data-i]");
   if (h && doubleTap(h)) { e.preventDefault(); const t = +h.dataset.team; renameBox(h, $("#team" + t).value, v => { $("#team" + t).value = v; renderRoster(); }); return; }
-  if (li && doubleTap(li)) { e.preventDefault(); clearTimeout(editT); if (drag) { dropDrag(drag); drag = null; } const i = +li.dataset.i; renameBox(li.querySelector("span") || li, setup.roster[i].name, v => { setup.roster[i].name = v; if (setup.editing === i) $("#pName").value = v; renderRoster(); }); return; }
+  if (li && doubleTap(li)) { e.preventDefault(); clearTimeout(editT); if (drag) { dropDrag(drag); drag = null; } const i = +li.dataset.i; renameBox(li.querySelector("span:not(.av)") || li, setup.roster[i].name, v => { if (nameTaken(v, i)) { heroSay(`Someone is already called ${v}. Every player needs a name of their own.`); renderRoster(); return; } setup.roster[i].name = v; if (setup.editing === i) $("#pName").value = v; renderRoster(); }); return; }
   startDrag(e); // the team lists on the picture drag too
 });
 function moveDrag(e) {
@@ -3625,6 +3637,7 @@ function netJoin(conn, d) {
     const n = inGame ? S.players.length + NET.pend.filter(p => p.pid !== pid).length : setup.roster.length;
     if (n >= 16) { try { conn.send({ t: "full" }); } catch (e) {} setTimeout(() => { try { conn.close(); } catch (e) {} }, 300); return; }
   }
+  if ((!rec || d.edit) && nameTaken(name, null, pid)) { try { conn.send({ t: "name_taken", name }); } catch (e) {} return; } // every player needs a name of their own (Nick, 2026-10-11); an automatic rejoin keeps whatever the host already has
   let ph = NET.phones.find(p => p.pid === pid);
   if (ph) { // the same player from a new connection (reload, or a second tab): the newest one wins, the old one is told
     const old = ph.conn; ph.conn = conn; ph.online = true;
