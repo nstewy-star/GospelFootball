@@ -90,25 +90,27 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .hero .hero-side { position: absolute; right: 1.8%; top: 4%; bottom: 4%; width: 26%; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; min-height: 0; }
 .hero .hero-phones { padding: 8px 10px 10px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 0; gap: 4px; flex: none; align-items: center; }
 /* who is on which team, above the code */
-.hero .hero-teams { flex: 0 1 auto; min-height: 0; overflow: hidden; padding: 8px 10px 8px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 2px 8px; }
+.hero .hero-teams { --hz: 1; --hn: 1; flex: 0 1 auto; min-height: 0; overflow: hidden; padding: 8px 10px 8px; border-radius: 16px; background: rgba(6,18,26,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 2px 8px; } /* --hz scales the lists (2 = twice the old size, Nick 2026-10-11: hard to read on the big screen); fitHeroTeams() lowers it until the box fits the picture */
+.hero .hero-teams.stack { grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 6px 0; } /* while the lists are big the teams sit one above the other, so the box stays narrow and never reaches the girl */
 .hero .hero-teams .hcol { display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: 0; border-radius: 10px; padding: 2px 4px; }
 .hero .hero-teams .hcol.over { outline: 2px dashed var(--gold); outline-offset: 1px; }
 .hero .hero-teams li[data-i] { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
 .hero .hero-teams li.dragging { opacity: .35; }
 .hero .hero-teams li .av { pointer-events: none; }
 .hero .hero-teams h3 { cursor: text; }
-.hero .hero-teams input.rename { font: inherit; font-size: 13px; font-weight: 600; width: 100%; min-width: 0; padding: 1px 5px; border-radius: 6px; border: 1px solid var(--gold); background: #0f2430; color: var(--chalk); outline: none; }
+.hero .hero-teams input.rename { font: inherit; font-size: calc(13px * var(--hz)); font-weight: 600; width: 100%; min-width: 0; padding: 1px 5px; border-radius: 6px; border: 1px solid var(--gold); background: #0f2430; color: var(--chalk); outline: none; }
 .hero .hero-teams h3 input.rename { text-transform: none; letter-spacing: 0; }
 .hero .hero-teams:empty { display: none; }
-.hero .hero-teams h3 { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-family: var(--f-ui); font-size: 13.5px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--chalk); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hero .hero-teams h3 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+.hero .hero-teams h3 { flex: none; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-family: var(--f-ui); font-size: calc(13.5px * var(--hz)); line-height: 1.15; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--chalk); display: flex; align-items: center; gap: calc(6px * var(--hz)); }
+.hero .hero-teams.stack h3, .hero .hero-teams.stack li { white-space: normal; text-overflow: clip; } /* big lists wrap a long name instead of cutting it */
+.hero .hero-teams h3 .dot { width: calc(9px * var(--hz)); height: calc(9px * var(--hz)); border-radius: 50%; flex: none; display: inline-block; }
 .hero .hero-teams h3 small { font-weight: 500; color: #b7c6c0; letter-spacing: 0; text-transform: none; }
 .hero .hero-teams ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; overflow: auto; }
-.hero .hero-teams li { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 1.2; color: #e8f0ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero .hero-teams li { flex: none; display: flex; align-items: center; gap: calc(6px * var(--hz)); font-size: calc(13px * var(--hz)); line-height: 1.15; color: #e8f0ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams li span { overflow: hidden; text-overflow: ellipsis; }
 .hero .hero-teams li.none { color: #9fb0aa; font-style: italic; }
-.hero .hero-teams .av { width: 20px; height: 20px; flex: none; }
-.hero .hero-teams .note { grid-column: 1 / -1; font-family: var(--f-ui); max-width: none; font-size: 12px; line-height: 1.25; color: #b7c6c0; margin: 2px 0 0; }
+.hero .hero-teams .av { flex: none; }
+.hero .hero-teams .note { grid-column: 1 / -1; font-family: var(--f-ui); max-width: none; font-size: calc(12px * var(--hn)); line-height: 1.25; color: #b7c6c0; margin: 2px 0 0; }
 .hero .hero-phones h2 { font-size: 16px; text-shadow: none; color: var(--chalk); letter-spacing: .04em; }
 .hero .hero-phones .hint { display: none; }
 .hero .hero-phones .qr { width: clamp(96px, 9.5vw, 140px); height: clamp(96px, 9.5vw, 140px); padding: 5px; border-radius: 10px; }
@@ -562,7 +564,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-192259';</script>
+<script>window.GF_BUILD = '20261011-193706';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2116,7 +2118,7 @@ setup.roster = setup.roster.filter(p => p && typeof p === "object");
 setup.roster.forEach((p, i) => { if (p.av == null) p.av = p.crew ? "team" : p.bot ? "bot" : i % AVATARS.length; else if (Number.isInteger(p.av) && p.av >= AVATARS.length) p.av = p.av % AVATARS.length; });
 setup.av = nextAv();
 function nextAv() { const used = setup.roster.map(p => p.av); for (let k = 0; k < AVATARS.length; k++) if (!used.includes(k)) return k; return rnd(AVATARS.length); }
-const avHTML = (av, size, gl) => `<span class="av" style="width:${size}px;height:${size}px">${avatarSVG(av, null, gl)}</span>`;
+const avHTML = (av, size, gl) => { const s = typeof size === "number" ? size + "px" : size; return `<span class="av" style="width:${s};height:${s}">${avatarSVG(av, null, gl)}</span>`; };
 setup.gl = "black"; // the glasses style being picked in the editor
 function renderAvPick() {
   const crew = $("#crewChk") && $("#crewChk").checked, bot = !crew && $("#botChk") && $("#botChk").checked;
@@ -2400,10 +2402,24 @@ function renderHeroTeams() {
   const box = $("#heroTeams"); if (!box) return;
   const names = [$("#team0").value || "Team A", $("#team1").value || "Team B"];
   box.innerHTML = [0, 1].map(t => { const list = teamList(t);
-    return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, 20, p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
+    return `<div class="hcol" data-team="${t}"><h3 data-team="${t}" title="Double-click to rename the team"><span class="dot" style="background:var(${t ? "--away" : "--home"})"></span>${esc(names[t])} <small>${list.length}</small></h3><ul>${list.length ? list.map(({ p, i }) => `<li data-i="${i}" data-grip="${i}" title="Drag to the other team">${avHTML(p.av, "calc(20px * var(--hz))", p.gl)}<span>${esc(p.name)}</span></li>`).join("") : `<li class="none">Nobody yet</li>`}</ul></div>`; }).join("") +
     `<p class="note">${setup.openTeams ? "Teams are open: players pick or switch on their phones. Drag to move, click to edit, double-click to rename." : "Drag to move a player, click to edit, double-click to rename. Open teams to let phones pick."}</p>`;
   if (drag && !drag.pending && drag.hero) { const l = box.querySelector(`li[data-i="${drag.i}"]`); if (l) { l.classList.add("dragging"); drag.li = l; } }
+  fitHeroTeams();
 }
+function fitHeroTeams() { // the lists start at twice the old size (Nick, 2026-10-11: hard to read on the big screen) and shrink only as far as the picture needs; with the teams stacked the box stays narrow and clear of the girl
+  const box = $("#heroTeams"); if (!box || !box.childElementCount || box.offsetParent === null) return;
+  box.classList.add("stack");
+  let hz = 2;
+  const spills = () => box.scrollHeight > box.clientHeight + 1 || [...box.querySelectorAll("ul")].some(u => u.scrollHeight > u.clientHeight + 1); // the lists scroll rather than push the box out, so check them too
+  for (;;) {
+    box.style.setProperty("--hz", hz.toFixed(2)); box.style.setProperty("--hn", (1 + (hz - 1) / 2).toFixed(2)); // the hint line grows half as fast
+    if (!spills() || hz <= 1.001) break;
+    hz = Math.max(1, hz - 0.1);
+  }
+  if (hz <= 1.001 && spills()) box.classList.remove("stack"); // a long roster at the old size: two columns with scrolling lists, as before
+}
+window.addEventListener("resize", () => { if (!$("#hero").hidden) fitHeroTeams(); });
 function renderRoster() {
   store.set("gf_roster", setup.roster);
   renderHeroTeams();
