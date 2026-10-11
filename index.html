@@ -213,7 +213,7 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 
 /* Stadium (3D) */
 .arena { position: relative; }
-.stadium { --far: 40%; position: relative; height: clamp(380px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
+.stadium { --far: 40%; position: relative; height: clamp(280px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
   background: linear-gradient(#0b1e2b 0%, #10303c calc(var(--far) - 56px), #173a44 calc(var(--far) - 40px), #1d4047 calc(var(--far) - 8px), #113a2e var(--far), #0f2f27 100%);
   perspective: 1100px; perspective-origin: 50% 18%; }
 .stadium::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--far) - 40px); height: 40px; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
@@ -342,7 +342,7 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 /* Thought bubble question */
 .shade { position: absolute; inset: 0; z-index: 28; background: rgba(5,12,13,.35); }
 .shade[hidden] { display: none; }
-.thought { position: absolute; z-index: 29; left: 8px; right: 8px; top: 8px; max-height: 48%; overflow: auto; background: var(--chalk); color: #14211f; border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: bubbleIn .3s ease-out; }
+.thought { position: relative; margin-top: 10px; min-height: 162px; background: var(--chalk); color: #14211f; border-radius: 16px; padding: 8px 14px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: bubbleIn .3s ease-out; }
 .stadium.asking .chip { display: none; }
 .thought .opts { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .thought .opt { padding: 5px 10px; font-size: 15px; border-radius: 10px; line-height: 1.25; }
@@ -392,9 +392,12 @@ table { border-collapse: collapse; width: 100%; font-size: 16px; font-variant-nu
 th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
 td.n, th.n { text-align: right; }
+body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the field (Nick, 2026-10-11), so the page keeps less empty space under the play-by-play line */
+@media (max-height: 860px) and (min-width: 561px) { /* laptop windows: a flatter scoreboard leaves more height for the field and the question under it */
+  .board { padding: 6px 16px; } .tm { gap: 0; } .tm .sc { font-size: clamp(30px, 5vw, 40px); } .mid .big { font-size: 18px; }
+}
 @media (max-width: 560px) {
   :root { --tw: 58px; }
-  .thought { max-height: 74%; }
   :root { --tilt: 48deg; }
   .stadium { height: 400px; perspective-origin: 50% 8%; }
   .cap { top: 11%; font-size: 18px; } .headline { top: 19%; font-size: clamp(22px, 7vw, 34px); }
@@ -410,12 +413,12 @@ td.n, th.n { text-align: right; }
   .tk-text { font-size: 15px; }
   .chip { font-size: 12px; }
 }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: 0s !important; } } /* 0s, not .01ms: a tiny transition made every size change (the stadium height, the camera width) read back as its old value for a frame, so the field never shrank to fit for anyone with reduced motion on */
 </style>
 
 <div class="wrap" id="app">
   <header class="top">
-    <div class="brand"><h1>Gospel <span>Football</span></h1><span class="eyebrow" id="subtitle">A General Conference game</span></div>
+    <div class="brand"><h1>Gospel <span>Football</span></h1><span class="eyebrow" id="subtitle"></span></div>
     <div class="setupbar" id="setupBar" hidden>
       <label class="barsel" for="modeSel"><span class="eyebrow">Playbook</span><select id="modeSel"></select></label>
       <div class="pools" id="poolRow" hidden></div>
@@ -547,8 +550,8 @@ td.n, th.n { text-align: right; }
         <div class="headline" id="headline" hidden></div>
         <div class="shade" id="shade" hidden></div>
         <div class="tdot" id="tdot1" hidden></div><div class="tdot" id="tdot2" hidden></div>
-        <div class="thought" id="thought" hidden role="dialog" aria-label="Question"></div>
       </div>
+      <div class="thought" id="thought" hidden role="dialog" aria-label="Question"></div>
       <div class="ticker" id="ticker" hidden></div>
     </div>
     <details class="logbox"><summary>Play-by-play</summary><ul class="log" id="log"></ul></details>
@@ -559,7 +562,7 @@ td.n, th.n { text-align: right; }
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-180531';</script>
+<script>window.GF_BUILD = '20261011-192259';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2869,17 +2872,17 @@ function buildField() {
   setBall(FX(losNow()), 50, 0);
   camNow(CAM.c, CAM.z, CAM.l);
 }
-const FIELD_TOP = 80, FIELD_BOTTOM = 12, BELOW_STADIUM = 190, SIZED = { top: -1 }; // px kept above the far sideline for the captions, under the near sideline, and under the stadium for the result bar and the play-by-play line
+const FIELD_TOP = 50, FIELD_BOTTOM = 12, BELOW_STADIUM = 238, SIZED = { top: -1 }; // the question panel sits under the field now (Nick, 2026-10-11), so less is kept above the far sideline and more below the stadium // px kept above the far sideline for the captions, under the near sideline, and under the stadium for the result bar and the play-by-play line
 function sizeVars() {
   // The result bar sits under the stadium (Nick: it must not block the end-zone names), so the stadium takes the window height that is left and the field shrinks to fit above the bar instead of scrolling.
   const cam = $("#plane").parentElement, st = cam.parentElement;
   st.style.height = ""; cam.style.width = "";
   if (!phone()) {
     const top = Math.round(st.getBoundingClientRect().top + window.scrollY); SIZED.top = top;
-    st.style.height = Math.round(Math.max(380, Math.min(620, innerHeight - top - BELOW_STADIUM))) + "px";
+    st.style.height = Math.round(Math.max(280, Math.min(620, innerHeight - top - BELOW_STADIUM))) + "px";
     const avail = st.clientHeight - FIELD_TOP - FIELD_BOTTOM;
     let w = 100;
-    for (let i = 0; i < 3; i++) { const h = cam.getBoundingClientRect().height; if (h <= avail + 0.5) break; w = Math.max(40, w * avail / h); cam.style.width = w.toFixed(1) + "%"; }
+    for (let i = 0; i < 4; i++) { const h = cam.getBoundingClientRect().height; if (h <= avail + 0.5) break; w = Math.max(30, w * avail / h); cam.style.width = w.toFixed(1) + "%"; }
   }
   st.style.setProperty("--far", Math.round(st.clientHeight - FIELD_BOTTOM - cam.getBoundingClientRect().height) + "px");
   document.documentElement.style.setProperty("--pw", cam.clientWidth + "px");
@@ -2892,7 +2895,7 @@ function benchSpot(p) {
   const mates = S.players.filter(q => q.team === p.team);
   const b = mates.indexOf(p);
   const step = Math.min(6, 44 / Math.max(1, mates.length));
-  return { x: p.team === 0 ? -2 + b * step : 102 - b * step, y: 3 + (b % 2) * 9 }; // two rows, so names stay readable
+  return { x: p.team === 0 ? 1 + b * step : 99 - b * step, y: 3 + (b % 2) * 9 }; // two rows, so names stay readable; the bench starts on the goal line, not in the end zone, so a long name tag clears the goal post when the field is drawn small
 }
 function inLine(p) { return S.line[p.team].includes(p.id); }
 function lineSpot(p) {
@@ -3490,7 +3493,7 @@ function show() {
   const scr = S ? S.screen : "setup";
   $("#setup").style.display = scr === "setup" ? "flex" : "none";
   $("#hero").hidden = scr !== "setup";
-  $("#game").hidden = scr !== "game"; $("#game").style.display = scr === "game" ? "flex" : "none";
+  $("#game").hidden = scr !== "game"; $("#game").style.display = scr === "game" ? "flex" : "none"; document.body.classList.toggle("ingame", scr === "game");
   $("#end").hidden = scr !== "end"; $("#end").style.display = scr === "end" ? "flex" : "none";
   $("#end").style.flexDirection = "column"; $("#end").style.gap = "16px";
   $("#quitBtn").hidden = scr === "setup"; $("#quitBtn").textContent = "New game";
