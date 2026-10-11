@@ -163,7 +163,7 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
     <div class="card" id="view"></div>
   </section>
 </div>
-<script>window.GF_BUILD = '20261011-202334';</script>
+<script>window.GF_BUILD = '20261011-214840';</script>
 <script src="peerjs.min.js"></script>
 <script>
 // Avatars: the 7 x 4 roster (seven looks by four ages for boys and girls) made with ChatGPT; pictures live in img/ next to the page.
@@ -305,6 +305,10 @@ const key = () => "gfme_" + code;
 function loadMe() { try { return JSON.parse(localStorage.getItem(key())); } catch (e) { return null; } }
 function saveMe(m) { try { localStorage.setItem(key(), JSON.stringify(m)); } catch (e) {} }
 function newPid() { return "p" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+// Every phone keeps a copy of the game: a new big screen can pick the game up by its code and ask for it (Nick, 2026-10-11).
+const snapKey = () => "gfsnap_" + code;
+let snap = null; try { snap = JSON.parse(localStorage.getItem(snapKey())); } catch (e) { snap = null; }
+function keepSnap(s, at) { snap = s ? { s, at: +at || Date.now() } : null; try { if (snap) localStorage.setItem(snapKey(), JSON.stringify(snap)); else localStorage.removeItem(snapKey()); } catch (e) {} }
 function setStatus(text, bad) { const s = $("#status"); s.textContent = text; s.classList.toggle("on", !bad && text === "Connected"); }
 function send(m) { try { if (conn && conn.open && !dead(conn)) { conn.send(m); return true; } } catch (e) {} setStatus("Not connected, try again", true); ensure(); return false; }
 function dead(c) { try { const pc = c.peerConnection, dc = c.dataChannel; return (pc && ["disconnected", "failed", "closed"].includes(pc.iceConnectionState)) || (dc && dc.readyState !== "open"); } catch (e) { return false; } }
@@ -347,7 +351,7 @@ function dial() {
   setStatus("Finding the game…", true);
   const c = peer.connect("gfb-" + code, { reliable: true });
   pending = c;
-  c.on("open", () => { if (pending === c) pending = null; conn = c; dialing = null; misses = 0; lastMsg = Date.now(); setStatus("Connected"); myAns = null; if (me) send({ t: "join", ...me }); }); // a fresh link forgets a Done or answer that may never have arrived
+  c.on("open", () => { if (pending === c) pending = null; conn = c; dialing = null; misses = 0; lastMsg = Date.now(); setStatus("Connected"); myAns = null; if (me) send({ t: "join", ...me, snapAt: snap ? snap.at : 0 }); }); // a fresh link forgets a Done or answer that may never have arrived
   c.on("data", onData);
   c.on("close", () => { if (pending === c) pending = null; if (conn === c) { conn = null; if (!stopped) { setStatus("Lost the big screen. Reconnecting…", true); retry(1500); } } });
   c.on("error", () => { if (pending === c) pending = null; if (conn === c) conn = null; dialing = null; retry(3000); });
@@ -365,6 +369,8 @@ function onData(d) {
   if (!d || typeof d !== "object") return;
   lastMsg = Date.now();
   if (d.t === "pong") return;
+  if (d.t === "snap") { keepSnap(typeof d.s === "string" ? d.s : null, d.at); return; }
+  if (d.t === "snap_req") { send({ t: "snap", s: snap ? snap.s : null, at: snap ? snap.at : 0 }); return; }
   if (d.t === "hello") { hello = d; applyTeams(); if (!me) { if ($("#signScr").hidden) showSign(); else $("#signNote").textContent = signNote(); } else render(); }
   else if (d.t === "joined") { if (me && (d.team === 0 || d.team === 1) && me.team !== d.team) { me.team = d.team; form.team = d.team; saveMe(me); render(); } }
   else if (d.t === "replaced") { // this player is open in a newer tab or on another phone: stop fighting over the spot
@@ -390,6 +396,7 @@ function onData(d) {
     }
     if (d.me && me && (d.me.team === 0 || d.me.team === 1) && me.team !== d.me.team) { me.team = d.me.team; form.team = d.me.team; saveMe(me); } // the host's placement wins
     if (!hello) hello = { teams: d.teams, started: !!d.started }; if (hello.open !== !!d.open || !hello.teams) { hello.open = !!d.open; hello.teams = d.teams || hello.teams; applyTeams(); }
+    if (d.view === "end") keepSnap(null); // the game is over: nothing to resume from this copy
     state = d; render();
   }
 }
@@ -435,7 +442,7 @@ $("#signForm").addEventListener("submit", e => {
   me = { pid: (me && me.pid) || newPid(), name, av: form.av, level: form.level, team: form.team, gl: $("#glChk").checked && canGlasses(form.av) ? form.gl : null };
   saveMe(me); editing = false;
   if (stopped) { stopped = false; ensure(); }
-  send({ t: "join", ...me, edit: true });
+  send({ t: "join", ...me, edit: true, snapAt: snap ? snap.at : 0 });
   showOnly("main"); render();
   try { navigator.vibrate && navigator.vibrate(30); } catch (x) {}
 });

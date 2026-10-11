@@ -83,7 +83,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .hero[hidden] { display: none !important; }
 .hero-art > img { display: block; width: 100%; height: clamp(300px, min(calc(100vh - 190px), 45vw), 600px); object-fit: cover; object-position: 50% 0; } /* fills the window above Kick off; taller than the picture's own shape crops only the stands at the sides, and the kids stay centred */
 .hero .hero-left { position: absolute; left: 2%; top: 4%; bottom: 4%; width: 18%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 8px; min-height: 0; }
-.hero .hero-text { flex: none; max-width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px 14px 12px; border-radius: 16px; background: rgba(6,18,26,.58); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+.hero .hero-text { flex: 0 1 auto; min-height: 0; overflow: auto; max-width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px 14px 12px; border-radius: 16px; background: rgba(6,18,26,.58); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
 .hero h2 { font-size: clamp(22px, 3vw, 42px); color: var(--chalk); text-shadow: 0 3px 0 #0a1a22, 0 6px 18px rgba(0,0,0,.5); line-height: 1; }
 .hero h2 span { color: var(--gold); }
 .hero p { margin: 0; font-family: var(--f-read); font-size: clamp(13px, 1.3vw, 16px); color: #e8f0ec; text-shadow: 0 2px 6px rgba(0,0,0,.6); max-width: 34ch; }
@@ -121,7 +121,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .hero .hero-phones .qr-text .code { font-size: clamp(22px, 2.4vw, 34px); letter-spacing: .16em; text-indent: .16em; text-align: center; }
 .hero .hero-phones .btn.ghost { padding: 6px 12px; font-size: 13px; }
 .hero .hero-phones:empty { display: none; }
-@media (max-width: 1300px) { .hero .hero-text p { display: none; } } /* the blurb goes before the code does */
+@media (max-width: 1300px) { .hero .hero-text > p { display: none; } } /* the blurb goes before the code does */
+.hero .hero-text:has(.resume:not([hidden])) > p { display: none; } /* and makes room for a game to resume */
+/* Resume (Nick, 2026-10-11): a game set aside by New game, and a game on another screen picked up by its code */
+.hero .resume { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(242,239,228,.18); }
+.hero .resume .rs-note { margin: 0; font-size: 13px; line-height: 1.3; color: #d5e2dc; }
+.hero .resume .rs-note.warn { color: var(--gold); font-weight: 600; }
+.hero .resume .row { gap: 6px; }
+.hero .resume .btn { padding: 7px 12px; font-size: 14px; }
+.hero .resume .rs-code { align-items: center; flex-wrap: wrap; }
+.hero .resume .rs-code label { font-size: 13px; color: #b7c6c0; flex: 1 1 100%; }
+.hero .resume .rs-code input { width: 5.2em; font-size: 16px; padding: 6px 8px; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
+.askbar { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 10px; max-width: min(96vw, 760px); padding: 10px 14px; border-radius: 14px; background: var(--gold); color: #1a1400; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.askbar[hidden] { display: none; }
+.askbar .btn { padding: 7px 12px; font-size: 14px; }
+.askbar .btn.ghost { color: #1a1400; border-color: rgba(0,0,0,.35); }
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .hero-foot[hidden] { display: none; }
 .card[hidden] { display: none; } /* the old Line up the teams card stays in the page for its inputs but never shows (Nick, 2026-10-05 05:07Z) */
@@ -444,7 +458,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
 
   <div class="hero" id="hero" hidden>
     <div class="hero-art" id="heroArt"></div>
-    <div class="hero-left"><div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Peewee, Junior, College and Pro levels for the whole family.</p></div><div class="hero-phones phones" id="phoneBox"></div></div>
+    <div class="hero-left"><div class="hero-text"><h2>Gospel <span>Football</span></h2><p>Answer the question, take the field, and run the play. Peewee, Junior, College and Pro levels for the whole family.</p><div class="resume" id="resumeBox" hidden></div></div><div class="hero-phones phones" id="phoneBox"></div></div>
     <div class="hero-side"><div class="hero-teams" id="heroTeams"></div></div>
   </div>
   <div class="hero-foot" id="heroFoot" hidden>
@@ -563,10 +577,11 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
 
   <!-- END -->
   <section id="end" hidden></section>
+  <div class="askbar" id="askBar" hidden></div>
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-202334';</script>
+<script>window.GF_BUILD = '20261011-214840';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2657,7 +2672,7 @@ $("#voiceBtn").addEventListener("click", () => {
   if (voiceMode === "off") hush(); else refSay("newgame", "I'll call the plays.", { interrupt: true });
 });
 function syncSound() { $("#soundBtn").textContent = sound ? "Sound on" : "Sound off"; $("#soundBtn").setAttribute("aria-pressed", String(sound)); }
-$("#quitBtn").addEventListener("click", () => { if (S && S.screen === "game" && !S.confirmQuit) { S.confirmQuit = true; $("#quitBtn").textContent = "Tap again to quit"; setTimeout(() => { if (S) { S.confirmQuit = false; $("#quitBtn").textContent = "New game"; } }, 2500); return; } S = null; show(); });
+$("#quitBtn").addEventListener("click", () => { if (S && S.screen === "game" && !S.confirmQuit) { S.confirmQuit = true; $("#quitBtn").textContent = "Tap again to quit"; setTimeout(() => { if (S) { S.confirmQuit = false; $("#quitBtn").textContent = "New game"; } }, 2500); return; } const g = S; S = null; setAside(g); show(); }); // the game stays on the start page's Resume button (and on the phones) for two days
 
 
 // ---------- game ----------
@@ -2669,6 +2684,7 @@ const POS = {};
 let CAM = { c: 50, z: 1, l: 50 };
 const ZOOM_PLAYS = false, FIG = 0.8; // FIG: figure size on the un-zoomed field (full size stacked the line into one pile; Nick, 2026-10-05 05:34Z) // the camera used to move in on the line for each play; Nick wants the whole field to stay in view (2026-10-05)
 function newGame() {
+  netResumeCancel(); // a game starting here ends any search for another one
   S = {
     screen: "game", mode: setup.mode, pools: poolsFor(setup.mode, setup.pools), playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Team A", score: 0, drive: START }, { name: $("#team1").value.trim() || "Team B", score: 0, drive: START }],
@@ -3555,12 +3571,12 @@ function show() {
     if (S.phase === "ready") { S.restored = false; render(); readyUp(); } // saved between the last question and the huddle
     else { render(); if (S.phase === "questions" && S.restored) { S.restored = false; stepUp(); } }
   }
-  if (scr === "end") renderEnd();
+  if (scr === "end") { renderEnd(); netSnapClear(); }
   saveGame(); renderPhones(); netSync();
 }
 window.addEventListener("resize", () => { if (S && S.screen === "game") { sizeVars(); camNow(CAM.c, CAM.z, CAM.l); positionBubble(); } });
 function start(data) {
-  if (!(data && data.S)) { const g = savedGame(); if (g) data = Object.assign({}, data || {}, { S: g }); } // a plain reload picks the autosave up too
+  if (!(data && data.S)) { const g = savedGame(); if (g) data = Object.assign({}, data || {}, { S: g }); else { const old = store.get("gf_game"), l = lastGame(); if (old && old.screen === "game" && (!l || (old.savedAt || 0) > (l.savedAt || 0))) setAside(old); } } // a plain reload picks the autosave up too; an older one waits on the start page's Resume button
   if (data && data.S) { S = data.S; S.restored = true; }
   if (data && data.setup) Object.assign(setup, data.setup);
   syncSound(); syncVoice(); segSet("lvlSeg", setup.level); segSet("teamSeg", setup.team);
@@ -3573,7 +3589,7 @@ function start(data) {
 // ---------- phones as controllers (peer-to-peer through PeerJS) ----------
 const PLAY_PAGE = (typeof window.GF_PLAY_URL === "string" && window.GF_PLAY_URL) || "play.html";
 const GF_BUILD = (typeof window.GF_BUILD === "string" && window.GF_BUILD) || "dev";
-const NET = { peer: null, code: null, status: "off", err: "", phones: [], pend: [], qvotes: {}, last: {} };
+const NET = { peer: null, code: null, status: "off", err: "", phones: [], pend: [], qvotes: {}, last: {}, snapJs: null, snapKey: null, resume: null, moved: null, kept: null, ask: null };
 // netCfg(): where the signalling server is. ?ps=host:port names one (local testing); a page served over plain http (the local
 // play download: the laptop runs the site and the signalling together) uses its own origin at /peerjs; otherwise the public PeerJS cloud.
 function netCfg() {
@@ -3608,7 +3624,18 @@ function netStart(code) {
     if (e && e.type === "unavailable-id") { // the old session's id is still registered (a reload or a wifi blip): keep the code the phones know
       NET.peer = null; try { peer.destroy(); } catch (x) {}
       NET.retry = (NET.retry || 0) + 1;
-      if (NET.retry <= 8) { NET.status = "starting"; NET.err = ""; renderPhones(); setTimeout(() => { if (!NET.peer) netStart(NET.code); }, 3000); }
+      const resuming = NET.resume && NET.resume.code === NET.code && !NET.resume.done, hosting = !!S && S.screen === "game";
+      if (resuming) netTakeover(NET.code); // another screen holds this code: ask it to hand the game over
+      if (NET.retry <= 8 || ((resuming || hosting) && NET.retry <= 40)) { NET.status = "starting"; NET.err = ""; renderPhones(); clearTimeout(NET.retryT); NET.retryT = setTimeout(() => { if (!NET.peer) netStart(NET.code); }, 3000); }
+      else if (resuming) { // two minutes and nobody handed the game over: stop looking, keep the code form
+        const r = NET.resume; r.done = true; clearTimeout(r.timer); clearTimeout(r.wait); if (r.endTakeover) r.endTakeover();
+        r.err = `Nobody handed over game ${NET.code}. Tap "Hand it over" on the other screen, or open the game page on a phone that was in it, then try again.`;
+        NET.retry = 0; NET.status = "off"; store.set("gf_phones", false); netReplayJoins(); renderPhones();
+      }
+      else if (hosting) { // another screen has used this code for two minutes: this copy of the game most likely moved there (a reopened browser restoring its autosave)
+        const g = S; g.movedTo = NET.code; setAside(g); S = null; store.set("gf_game", null); NET.moved = { code: NET.code };
+        NET.retry = 0; NET.status = "off"; store.set("gf_phones", false); store.set("gf_code", null); NET.snapKey = null; NET.snapJs = null; show();
+      }
       else { NET.retry = 0; netStart(); }
       return;
     }
@@ -3641,6 +3668,12 @@ function netHello() { NET.phones.forEach(ph => { try { if (ph.conn && ph.conn.op
 function autoTeam(inGame) { const src = inGame ? S.players.concat(NET.pend) : setup.roster; const c = [0, 1].map(t => src.filter(p => p.team === t).length); return c[0] === c[1] ? rnd(2) : c[0] < c[1] ? 0 : 1; }
 function netJoin(conn, d) {
   const pid = String(d.pid || "").replace(/[^\w-]/g, "").slice(0, 40); if (!pid) return;
+  if (NET.resume && !NET.resume.done && !S) { // picking a game up by its code: the phone's copy of the game comes first, its join is replayed after
+    let ph = NET.phones.find(p => p.pid === pid);
+    if (ph) { ph.conn = conn; ph.online = true; } else { ph = { pid, conn, online: true }; NET.phones.push(ph); }
+    ph.joinMsg = d; ph.snapAt = +d.snapAt || 0; ph.snapDone = false; try { conn.send({ t: "snap_req" }); } catch (e) {}
+    renderPhones(); return;
+  }
   const name = String(d.name || "").trim().slice(0, 24) || "Player";
   const av = Number.isInteger(d.av) && d.av >= 0 && d.av < AVATARS.length ? d.av : rnd(AVATARS.length);
   const level = ["read", "pewee", "college", "pro", "random"].includes(d.level) ? d.level : "pewee";
@@ -3675,6 +3708,7 @@ function netJoin(conn, d) {
     if (pd) Object.assign(pd, { name, av, level, team, gl }); else NET.pend.push({ name, level, team, av, gl, pid });
   }
   try { conn.send({ t: "joined", pid, team }); } catch (e) {}
+  if (inGame && NET.snapJs) { try { conn.send({ t: "snap", s: NET.snapJs, at: S.savedAt }); } catch (e) {} } // every phone keeps a copy of the game (see netSnap)
   renderPhones(); if (inGame) render(); else renderRoster();
   netSync();
 }
@@ -3700,6 +3734,8 @@ function netAdmit() {
 function netMsg(conn, d) {
   if (!d || typeof d !== "object") return;
   if (d.t === "join") return netJoin(conn, d);
+  if (d.t === "takeover") return netTakeoverAsk(conn, d); // another big screen wants this game (resume by code)
+  if (d.t === "snap") return netGotSnap(conn, d); // a phone's copy of a game this screen is picking up
   const ph = phoneOf(conn); if (!ph) return;
   if (d.t === "ping") { try { conn.send({ t: "pong" }); } catch (e) {} return; }
   if (d.t === "leave") { if (!S) { const i = setup.roster.findIndex(p => p.pid === ph.pid); if (i >= 0) { if (setup.editing != null) endEdit(); setup.roster.splice(i, 1); } NET.phones.splice(NET.phones.indexOf(ph), 1); renderRoster(); renderPhones(); } return; }
@@ -3767,6 +3803,7 @@ function renderPhones() {
   }
   const big = $("#qrBig"); if (big && !$("#qrModal").hidden) big.innerHTML = NET.peer ? qrHTML() : "";
   if (!S) renderRoster();
+  renderResume(); renderAsk();
 }
 function stateFor(ph) {
   const rec = phoneRec(ph);
@@ -3821,8 +3858,170 @@ function netSync() {
     try { ph.conn.send(st); } catch (e) {}
   });
 }
-function saveGame() { if (!S) { store.set("gf_game", null); return; } S.savedAt = Date.now(); store.set("gf_game", S); }
+function saveGame() { if (!S) { store.set("gf_game", null); return; } S.savedAt = Date.now(); store.set("gf_game", S); netSnap(); }
 function savedGame() { const g = store.get("gf_game"); return g && g.screen && g.savedAt && Date.now() - g.savedAt < 8 * 3600e3 ? g : null; }
+// ---------- resuming a game (Nick, 2026-10-11: "I need to be able to resume a game I had loaded from the front page", also from another browser) ----------
+// A game set aside by New game, by a handoff to another screen, or by age is offered on the start page for two days (gf_last).
+function lastGame() { const g = store.get("gf_last"); return g && g.screen === "game" && Array.isArray(g.players) && g.savedAt && Date.now() - g.savedAt < 48 * 3600e3 ? g : null; }
+function setAside(g) { if (g && g.screen === "game") { g.confirmQuit = false; store.set("gf_last", g); } }
+function gameLine(g) { const t = g.teams || []; return `${esc((t[0] || {}).name || "Team A")} ${(t[0] || {}).score || 0} · ${esc((t[1] || {}).name || "Team B")} ${(t[1] || {}).score || 0}, huddle ${g.huddleNo || 1} of ${g.playsTotal || "?"}`; }
+// netSnap(): every phone keeps a copy of the game, so a new big screen can pick the game up by its code even when the old screen is gone.
+function netSnap() {
+  if (!NET.peer || !S || S.screen !== "game") return;
+  const key = JSON.stringify(Object.assign({}, S, { savedAt: 0, confirmQuit: false }));
+  if (key === NET.snapKey) return;
+  NET.snapKey = key; NET.snapJs = JSON.stringify(S);
+  const m = { t: "snap", s: NET.snapJs, at: S.savedAt };
+  NET.phones.forEach(ph => { if (ph.online && ph.conn && ph.conn.open) { try { ph.conn.send(m); } catch (e) {} } });
+}
+function netSnapClear() { // the game is over: the phones drop their copies
+  if (NET.resume && !NET.resume.done) return;
+  NET.snapKey = null; NET.snapJs = null;
+  NET.phones.forEach(ph => { if (ph.online && ph.conn && ph.conn.open) { try { ph.conn.send({ t: "snap", s: null, at: 0 }); } catch (e) {} } });
+}
+// netReplayJoins(): phones that joined while this screen was looking for a game were only asked for their copy; now they join for real
+function netReplayJoins() { NET.phones.slice().forEach(ph => { if (ph.joinMsg) { const m = ph.joinMsg; ph.joinMsg = null; if (ph.conn && ph.conn.open) netJoin(ph.conn, m); } }); }
+// netResume(code): pick a game up on this screen by its four-letter code. The screen that still has it is asked to hand it over
+// (it keeps the code registered); otherwise the phones that were in the game reconnect here and send their copies, the newest wins.
+function netResume(code) {
+  code = String(code || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
+  if (S && S.screen === "game") return;
+  if (code.length !== 4) { NET.resume = { code, err: "Type the four letters of the game code.", done: true }; renderResume(); return; }
+  if (typeof Peer === "undefined") { NET.resume = { code, err: "The phone link didn't load, so this screen can't reach the other one.", done: true }; renderResume(); return; }
+  netResumeCancel();
+  NET.resume = { code, at: Date.now(), snaps: [], asked: false, slow: false }; NET.moved = null; NET.kept = null;
+  if (NET.peer && NET.code !== code) netStop();
+  if (!NET.peer) { NET.retry = 0; netStart(code); } else netAskSnaps();
+  NET.resume.timer = setTimeout(() => { const r = NET.resume; if (r && r.code === code && !r.done) { r.slow = true; renderResume(); } }, 20000);
+  renderResume();
+}
+function netResumeCancel() { // Stop looking (or a game starts here): parked phones join for real, and a code nobody answered for is given up
+  const r = NET.resume; NET.resume = null; if (!r) return;
+  clearTimeout(r.timer); clearTimeout(r.wait); if (r.endTakeover) r.endTakeover();
+  netReplayJoins(); renderPhones();
+}
+function netAskSnaps() { NET.phones.forEach(ph => { try { if (ph.online && ph.conn && ph.conn.open) { ph.snapDone = false; ph.conn.send({ t: "snap_req" }); } } catch (e) {} }); }
+function netTakeover(code) { // ask the screen that holds this code for the game, over a throwaway connection that stays open until it answers
+  const r = NET.resume; if (!r || r.done || r.taking) return; r.taking = true;
+  const p = new Peer(undefined, netCfg()); let over = false;
+  const end = () => { if (over) return; over = true; r.taking = false; if (r.endTakeover === end) r.endTakeover = null; setTimeout(() => { try { p.destroy(); } catch (e) {} }, 300); };
+  r.endTakeover = end;
+  let fail = setTimeout(end, 12000); // only while connecting: once the other screen is reached, the link lives until it answers
+  p.on("open", () => {
+    let c; try { c = p.connect("gfb-" + code, { reliable: true }); } catch (e) { end(); return; }
+    c.on("open", () => { clearTimeout(fail); try { c.send({ t: "takeover" }); } catch (e) {} r.asked = true; renderResume(); });
+    c.on("data", d => {
+      if (!d || d.t !== "handoff") return;
+      if (d.s) { const ok = netGotSnap(null, { s: d.s, at: d.at, from: "screen" }); if (ok) { try { c.send({ t: "got" }); } catch (e) {} } setTimeout(end, 800); return; } // the other screen lets go only once it hears "got"
+      if (d.kept) { clearTimeout(r.timer); NET.resume = null; NET.kept = code; NET.retry = 99; netReplayJoins(); renderResume(); } // the other screen said no: the next retry draws a fresh code here
+      else if (!r.askedNone) { r.askedNone = true; renderResume(); } // that screen has no game under this code; a phone may still have one
+      end();
+    });
+    c.on("error", end); c.on("close", end);
+  });
+  p.on("error", () => { clearTimeout(fail); end(); });
+}
+// cleanSnap(g): a copy that came over the wire is data from another device: only the game's own <b> markup survives in any text
+function cleanSnap(v) {
+  if (typeof v === "string") return v.replace(/<(?!\/?b>)[^>]*>?/g, "");
+  if (Array.isArray(v)) return v.map(cleanSnap);
+  if (v && typeof v === "object") { const o = {}; for (const k in v) o[k] = cleanSnap(v[k]); return o; }
+  return v;
+}
+function netGotSnap(conn, d) { // returns true when the copy is accepted (a handoff is acknowledged on that)
+  const r = NET.resume; if (!r || r.done || !d || typeof d.s !== "string") return false;
+  if (S && S.screen === "game") { netResumeCancel(); return false; } // a game started here meanwhile: a late copy never replaces it
+  let g = null; try { g = JSON.parse(d.s); } catch (e) { return false; }
+  if (!g || g.screen !== "game" || !Array.isArray(g.players) || !Array.isArray(g.teams)) return false;
+  g = cleanSnap(g); g.log = (Array.isArray(g.log) ? g.log : []).slice(0, 60).map(x => ({ t: x && x.t === "flag" ? "flag" : (x && x.t === 1 ? 1 : 0), text: String((x && x.text) || "") }));
+  const at = +d.at || +g.savedAt || 0; if (!at || Date.now() - at > 48 * 3600e3) return false; // a copy of an older game under the same code
+  const from = conn ? "phone" : "screen", ph = conn ? phoneOf(conn) : null; if (ph) ph.snapDone = true;
+  r.snaps.push({ g, at, from });
+  if (from === "screen") { netAdopt(); return true; } // the screen that had the game is the freshest source
+  if (!r.first) r.first = Date.now();
+  clearTimeout(r.wait); r.wait = setTimeout(netAdopt, 1500); // give the other phones a moment, then take the newest copy
+  renderResume(); return true;
+}
+function netAdopt() {
+  const r = NET.resume; if (!r || r.done || !r.snaps.length) return;
+  const best = r.snaps.reduce((a, b) => (b.at > a.at ? b : a));
+  const newer = NET.phones.some(ph => ph.joinMsg && !ph.snapDone && ph.online && ph.conn && ph.conn.open && ph.snapAt > best.at); // a phone with a fresher copy has joined but not answered yet
+  if (newer && Date.now() - (r.first || 0) < 8000) { clearTimeout(r.wait); r.wait = setTimeout(netAdopt, 1000); return; }
+  r.done = true; clearTimeout(r.wait); clearTimeout(r.timer);
+  takeUp(best.g);
+}
+// takeUp(g): continue the game g on this screen (from the start page's Resume button, a handoff or a phone's copy)
+function takeUp(g) {
+  if (!g || g.screen !== "game") return;
+  const r = NET.resume; NET.resume = null; if (r) { clearTimeout(r.timer); clearTimeout(r.wait); if (r.endTakeover) r.endTakeover(); }
+  g.restored = true; g.confirmQuit = false; delete g.movedTo;
+  // phones that joined the start page meanwhile take the field at the next huddle instead of vanishing with the old roster
+  setup.roster.forEach(p => { if (p.pid && phoneOnline(p.pid) && !g.players.some(q => q.pid === p.pid) && !NET.pend.some(q => q.pid === p.pid)) NET.pend.push({ name: p.name, level: p.level, team: p.team, av: p.av, gl: p.gl || null, pid: p.pid }); });
+  S = g; NET.retry = 0; NET.moved = null; NET.kept = null; NET.snapKey = null; NET.snapJs = null; NET.qvotes = {}; NET.last = {};
+  setup.roster = S.players.map(p => { const x = { name: p.name, level: p.level, team: p.team, av: p.av, gl: p.gl || null }; if (p.pid) x.pid = p.pid; if (p.crew) x.crew = true; if (p.bot) x.bot = true; return x; });
+  store.set("gf_roster", setup.roster); store.set("gf_last", null);
+  show();
+  netReplayJoins();
+}
+// netTakeoverAsk(): another screen asks for this game. A game being played here needs a tap first (15 s when nobody is looking at this screen);
+// a game set aside goes straight over. The game leaves this screen only once the other screen says it has it ("got").
+function netTakeoverAsk(conn, d) {
+  const held = () => (S ? (S.screen === "game" ? S : null) : lastGame()); // the end screen hands nothing over
+  if (!held()) { try { conn.send({ t: "handoff", s: null }); } catch (e) {} return; }
+  const mine = () => NET.ask && NET.ask.give === give;
+  const finish = () => {
+    if (!mine()) return; NET.ask = null;
+    if (S && S.screen === "game") { S.movedTo = NET.code; setAside(S); S = null; } else { const g = lastGame(); if (g) { g.movedTo = NET.code; setAside(g); } }
+    store.set("gf_game", null); NET.moved = { code: NET.code }; netStop(); store.set("gf_code", null); NET.snapKey = null; NET.snapJs = null; show();
+  };
+  const give = () => {
+    if (!mine()) return;
+    if (!(conn && conn.open)) { NET.ask = null; renderAsk(); return; } // the asker went away: keep the game
+    const g = held(); if (!g) { NET.ask = null; try { conn.send({ t: "handoff", s: null }); } catch (e) {} renderAsk(); return; }
+    NET.ask = { give, keep, sent: true }; renderAsk();
+    try { conn.send({ t: "handoff", s: JSON.stringify(g), at: g.savedAt }); } catch (e) {}
+    setTimeout(() => { if (mine() && NET.ask.sent) { NET.ask = { give, keep, late: true }; renderAsk(); } }, 6000); // no "got": the game stays here
+  };
+  const keep = () => { if (!mine()) return; NET.ask = null; try { if (conn && conn.open) conn.send({ t: "handoff", s: null, kept: true }); } catch (e) {} renderAsk(); };
+  const gone = () => { if (mine() && !NET.ask.sent) { NET.ask = null; renderAsk(); } };
+  conn.on("data", m => { if (m && m.t === "got" && mine() && NET.ask.sent) finish(); });
+  conn.on("close", gone); conn.on("error", gone);
+  if (!S) { give(); return; }
+  NET.ask = { give, keep, at: Date.now() }; renderAsk();
+  if (document.hidden) setTimeout(() => { if (mine() && !NET.ask.sent) give(); }, 15000);
+}
+function renderAsk() {
+  const bar = $("#askBar"); if (!bar) return;
+  if (!NET.ask) { bar.hidden = true; bar.innerHTML = ""; return; }
+  bar.hidden = false;
+  if (NET.ask.sent) { bar.innerHTML = `<span>Handing the game over…</span>`; return; }
+  bar.innerHTML = `<span>${NET.ask.late ? "The other screen didn't answer. " : ""}Another screen wants to continue this game (code <b>${esc(NET.code || "")}</b>).</span><button class="btn" type="button" id="askGive">Hand it over</button><button class="btn ghost" type="button" id="askKeep">Keep it here</button>`;
+  $("#askGive").addEventListener("click", () => NET.ask && NET.ask.give());
+  $("#askKeep").addEventListener("click", () => NET.ask && NET.ask.keep());
+}
+function renderResume() {
+  const box = $("#resumeBox"); if (!box) return;
+  const r = NET.resume, last = lastGame(), looking = r && !r.done;
+  const moved = NET.moved || (last && last.movedTo ? { code: last.movedTo } : null);
+  let h = "";
+  if (looking) {
+    h += `<p class="rs-note">Looking for game <b>${esc(r.code)}</b>… ${r.asked ? "The other screen is asked to hand it over." : r.askedNone ? "A phone that was in the game can still send its copy." : "Keep the phones on, or the other screen open."}${r.slow ? " No copy has turned up yet: open the game page on a phone that was in it." : ""}</p><div class="row"><button class="btn ghost" type="button" id="resumeCancel">Stop looking</button></div>`;
+  } else if (r && r.err) {
+    h += `<p class="rs-note warn">${esc(r.err)}</p>`;
+  } else if (NET.kept) {
+    h += `<p class="rs-note warn">The other screen kept game ${esc(NET.kept)}.</p>`;
+  } else if (moved) {
+    h += `<p class="rs-note warn">This game moved to another screen (code ${esc(moved.code || "")}).</p><div class="row"><button class="btn ghost" type="button" id="resumeBack">Take it back</button></div>`;
+  }
+  if (last && !looking && !moved) h += `<p class="rs-note">Game in progress: ${gameLine(last)}</p><div class="row"><button class="btn" type="button" id="resumeLast">Resume game</button></div>`;
+  if (!looking) h += `<form class="row rs-code" id="resumeForm"><label for="resumeIn">Game on another screen?</label><input type="text" id="resumeIn" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CODE" aria-label="Game code"><button class="btn ghost" type="submit">Resume</button></form>`;
+  box.hidden = !h; box.innerHTML = h;
+  const cancel = $("#resumeCancel"); if (cancel) cancel.addEventListener("click", () => { netResumeCancel(); if (!NET.peer && store.get("gf_phones") !== false) { NET.retry = 0; netStart(); } });
+  const back = $("#resumeBack"); if (back) back.addEventListener("click", () => netResume(moved && moved.code));
+  const rl = $("#resumeLast"); if (rl) rl.addEventListener("click", () => { const g = lastGame(); if (g) takeUp(g); });
+  const f = $("#resumeForm"); if (f) f.addEventListener("submit", e => { e.preventDefault(); netResume($("#resumeIn").value); });
+  const inp = $("#resumeIn"); if (inp) inp.addEventListener("input", () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4); });
+}
 $("#phoneBtn").addEventListener("click", () => { $("#qrModal").hidden = false; $("#qrBig").innerHTML = NET.peer ? qrHTML(true) : ""; $("#phoneOff").hidden = !NET.peer; $("#phoneNew").hidden = !NET.peer; });
 $("#phoneOff").addEventListener("click", () => { netStop(); $("#qrModal").hidden = true; });
 $("#phoneNew").addEventListener("click", () => { netStop(); netStart(null); $("#qrBig").innerHTML = qrHTML(true); }); // a fresh code: joined phones must scan again
