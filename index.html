@@ -216,7 +216,7 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 
 /* Stadium (3D) */
 .arena { position: relative; }
-.stadium { --far: 40%; position: relative; height: clamp(280px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
+.stadium { --far: 50px; position: relative; height: clamp(280px, 62vh, 620px); border-radius: 22px; overflow: hidden; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.5);
   background: linear-gradient(#0b1e2b 0%, #10303c calc(var(--far) - 56px), #173a44 calc(var(--far) - 40px), #1d4047 calc(var(--far) - 8px), #113a2e var(--far), #0f2f27 100%);
   perspective: 1100px; perspective-origin: 50% 18%; }
 .stadium::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--far) - 40px); height: 40px; background: repeating-linear-gradient(90deg, rgba(242,239,228,.08) 0 6px, transparent 6px 14px); opacity: .6; }
@@ -319,12 +319,12 @@ details.rules summary { cursor: pointer; font-family: var(--f-display); font-siz
 .chip { position: absolute; top: 12px; z-index: 20; background: rgba(7,17,19,.8); backdrop-filter: blur(4px); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; max-width: 48%; }
 .chip.l { left: 12px; } .chip.r { right: 12px; color: var(--muted); }
 .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cap { position: absolute; left: 50%; top: 7.5%; transform: translateX(-50%); font-family: var(--f-display); font-size: clamp(20px, 3.4vw, 32px); color: var(--chalk); text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.6); white-space: nowrap; z-index: 0; pointer-events: none; } /* the big caption sits behind the field, the players and their bubbles (Nick) */
+.cap { position: absolute; left: 50%; top: calc(var(--far) / 2); transform: translate(-50%, -50%); font-family: var(--f-display); font-size: min(clamp(20px, 3.4vw, 32px), calc(var(--far) * .6)); line-height: 1; color: var(--chalk); text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.6); white-space: nowrap; z-index: 0; pointer-events: none; } /* the big caption sits behind the field, the players and their bubbles (Nick); it is centred in the back wall above the far sideline (--far) and sized to fit it, since the field hid its lower half once the question panel moved under the field (Nick, 2026-10-11) */
 .cap.show { animation: capIn .35s ease-out; }
 .cap.good { color: var(--gold); } .cap.bad { color: #ff8a7a; } .cap.flag { color: var(--flag); } .cap.meh { color: #cfe3dc; }
 .cap[hidden] { display: none; }
-@keyframes capIn { from { transform: translateX(-50%) scale(.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-.headline { position: absolute; left: 50%; top: 12%; transform: translate(-50%, -50%); font-family: var(--f-display); font-size: clamp(24px, 4.2vw, 48px); color: var(--gold); text-shadow: 0 4px 0 #000, 0 0 30px rgba(0,0,0,.8); z-index: 0; pointer-events: none; white-space: nowrap; animation: bannerIn .5s ease-out; }
+@keyframes capIn { from { transform: translate(-50%, -50%) scale(.5); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.headline { position: absolute; left: 50%; top: calc(var(--far) / 2); transform: translate(-50%, -50%); font-family: var(--f-display); font-size: min(clamp(24px, 4.2vw, 48px), calc(var(--far) * .9)); line-height: 1; color: var(--gold); text-shadow: 0 4px 0 #000, 0 0 30px rgba(0,0,0,.8); z-index: 0; pointer-events: none; white-space: nowrap; animation: bannerIn .5s ease-out; }
 .headline.bad { color: #ff8a7a; } .headline.flag { color: var(--flag); } .headline.meh { color: var(--chalk); }
 .headline[hidden] { display: none; }
 @keyframes bannerIn { from { transform: translate(-50%, -50%) scale(.4); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
@@ -403,7 +403,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   :root { --tw: 58px; }
   :root { --tilt: 48deg; }
   .stadium { height: 400px; perspective-origin: 50% 8%; }
-  .cap { top: 11%; font-size: 18px; } .headline { top: 19%; font-size: clamp(22px, 7vw, 34px); }
+  .cap { font-size: min(18px, calc(var(--far) * .6)); } .headline { font-size: min(clamp(22px, 7vw, 34px), calc(var(--far) * .9)); }
   .top { gap: 8px; } .brand { width: 100%; } .icon-btn { font-size: 12px; padding: 6px 10px; }
   .cam { width: 190%; left: -45%; bottom: 2%; }
   .board { padding: 8px 10px; gap: 6px; }
@@ -565,7 +565,7 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   <div class="modal" id="qrModal" hidden><div class="modal-card"><div id="qrBig"></div><div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="phoneNew" title="Draw a fresh four-letter code. Phones that already joined will have to scan again.">New code</button><button class="btn ghost" type="button" id="phoneOff">Turn off phones</button><button class="btn ghost" type="button" id="qrClose">Close</button></div></div></div>
 </div>
 
-<script>window.GF_BUILD = '20261011-194352';</script>
+<script>window.GF_BUILD = '20261011-200940';</script>
 <script src="peerjs.min.js"></script>
 <script src="qrcode.js"></script>
 <script>window.GF_SITE_URL = 'https://nstewy-star.github.io/GospelFootball/';</script>
@@ -2758,6 +2758,7 @@ function buildSnaps() {
 const KEYED = [{ k: "block", label: "Block", w: 46 }, { k: "grass", label: "Picks grass", w: 24 }, { k: "hold", label: "Holding", w: 12 }, { k: "int", label: "Intercept", w: 18 }]; // the defense read the play: mostly blocks and picks, fewer flags
 const FOOLED = [{ k: "block", label: "Block", w: 10 }, { k: "grass", label: "Picks grass", w: 70 }, { k: "hold", label: "Holding", w: 14 }, { k: "int", label: "Intercept", w: 6 }];
 const SCRAMBLE = [{ yds: 0, w: 3 }, { yds: 3, w: 3 }, { yds: 6, w: 2 }, { yds: -2, w: 2 }];
+function penYards(spot) { return Math.min(5, Math.max(0, Math.floor((100 - Math.min(99, spot)) / 2))); } // holding is 5 yards, or half the distance to the goal inside the 10; it never reaches the end zone
 function resolveSnap(sn) {
   const o = sn.o != null ? S.players[sn.o] : null;
   const defT = S.teams[1 - S.possession].name;
@@ -2789,8 +2790,14 @@ function resolveSnap(sn) {
   const r = Object.assign(base, { ok: a.k, dk: b.k, oa: a.label + (a.yds ? ` +${a.yds}` : ""), da: b.label, gain: 0 });
   if (b.k === "hold") {
     r.flag = true;
-    if (a.k === "fum") { r.gain = 5; r.text = `${lead}${o.name} fumbles, but there's a flag! Holding on ${d.name} wipes it out. 5 yards.`; return r; }
-    r.gain = a.yds + 5; r.text = `${lead}Flag on the play! Holding on ${d.name}. ${o.name}'s ${a.label.toLowerCase()} plus the penalty: ${r.gain} yards.`; return r;
+    const spot = S.teams[S.possession].drive, played = a.k === "fum" ? 0 : Math.max(0, a.yds || 0);
+    if (spot + played >= 100) { r.pen = 0; r.gain = played; r.text = `${lead}Flag on the play, but ${o.name}'s ${a.label.toLowerCase()} goes all the way, so the penalty is declined.`; return r; } // the play itself scored
+    r.pen = penYards(spot + played); // a penalty never scores (Nick, 2026-10-11): at most half the distance to the goal, so from the 1 the ball stays on the 1
+    const penText = r.pen >= 5 ? "5 yards" : r.pen ? `half the distance to the goal, ${r.pen} yard${r.pen > 1 ? "s" : ""}` : "half the distance to the goal, so the ball stays on the 1";
+    if (a.k === "fum") { r.gain = r.pen; r.text = `${lead}${o.name} fumbles, but there's a flag! Holding on ${d.name} wipes it out. The penalty: ${penText}.`; return r; }
+    r.gain = played + r.pen;
+    if (a.k === "inc") { r.text = `${lead}Flag on the play! Holding on ${d.name}. ${o.name}'s pass falls incomplete, but the penalty ${r.pen >= 5 ? "moves the ball 5 yards" : r.pen ? `is half the distance to the goal: ${r.pen} yard${r.pen > 1 ? "s" : ""}` : "is half the distance to the goal, so the ball stays on the 1"}.`; return r; }
+    r.text = `${lead}Flag on the play! Holding on ${d.name}. ${o.name}'s ${a.label.toLowerCase()}${played ? ` for ${played}` : ""} plus the penalty (${penText}): ${r.gain} yard${r.gain === 1 ? "" : "s"} in all.`; return r;
   }
   if (a.k === "fum") { r.turnover = true; r.stop = true; r.text = `${lead}${o.name} fumbles and ${d.name} recovers!`; return r; }
   if (b.k === "int") {
@@ -2860,7 +2867,7 @@ function applySnap(sn) {
 function headlineFor(res, outcome) {
   if (outcome === "td") return { t: "TOUCHDOWN!", k: "good" };
   if (res.turnover) return { t: res.int ? "INTERCEPTED!" : "FUMBLE!", k: "bad" };
-  if (res.flag) return { t: `FLAG! +${res.gain} YARDS`, k: "flag" };
+  if (res.flag) return { t: res.pen != null && res.pen < 5 ? (res.pen ? `FLAG! HALF THE DISTANCE, +${res.pen}` : "FLAG! HALF THE DISTANCE") : `FLAG! +${res.gain} YARDS`, k: "flag" };
   if (res.gain < 0) return { t: `SACK! ${res.gain} YARDS`, k: "bad" };
   if (res.gain > 0) return { t: res.first ? `+${res.gain}, FIRST DOWN!` : `+${res.gain} YARDS`, k: "good" };
   if (res.ok === "inc") return { t: "INCOMPLETE", k: "meh" };
@@ -3018,7 +3025,7 @@ function confetti() {
   for (let i = 0; i < 70; i++) { const c = document.createElement("i"); c.style.left = Math.random() * 100 + "%"; c.style.background = cols[i % cols.length]; c.style.animationDelay = Math.random() * .6 + "s"; c.style.animationDuration = 1.6 + Math.random() * 1.4 + "s"; box.appendChild(c); }
   setTimeout(() => box.remove(), 3600);
 }
-async function dropFlag(x, y) { sfx.flag(); prop3d("flagp", "\u{1F6A9}", x, y); cap("FLAG! Holding, +5", "flag"); await sleep(700); }
+async function dropFlag(x, y, pen) { sfx.flag(); prop3d("flagp", "\u{1F6A9}", x, y); cap(pen == null || pen >= 5 ? "FLAG! Holding, +5" : pen ? `FLAG! Holding, half the distance (+${pen})` : "FLAG! Holding, half the distance", "flag"); await sleep(700); }
 
 // ---------- question bubble ----------
 async function stepUp() {
@@ -3246,7 +3253,7 @@ async function animateSnap(sn, res, los, token) {
     if (!alive()) return;
     if (ok === "fum") {
       await carry(1.5, 500);
-      if (dk === "hold") { await dropFlag(X(1), lane - 6); cap("Flag! Fumble wiped out", "flag"); await carry(5, 500); return; }
+      if (dk === "hold") { await dropFlag(X(1), lane - 6, res.pen); cap("Flag! Fumble wiped out", "flag"); await carry(Math.max(0.3, res.pen == null ? 5 : res.pen), 500); return; }
       sfx.crunch(); sfx.groan(); cap("FUMBLE!", "bad"); avSay(o.av, "hit"); if (d) avSay(d.av, "block", 700); await moveBall(X(4.5), lane + 7, 450, 25);
       if (d) { pose(d, dk === "grass" ? "" : "hit"); await moveTok(d, { x: X(4.5), y: lane + 7 }, 450); cap(dk === "grass" ? "Defense wakes up and grabs it!" : "Recovered by the defense!", "bad"); }
       return;
@@ -3265,7 +3272,7 @@ async function animateSnap(sn, res, los, token) {
     if (dk === "int") runs.push(sleep(200).then(() => { cap("Whiff! Guessed pass", "meh"); return moveTok(d, { x: X(2), y: lane - 12 }, 500); }));
     if (dk === "hold") runs.push(moveTok(d, { x: X(Math.max(1, base) - 1.5), y: lane + 4 }, ms));
     await Promise.all(runs); if (!alive()) return;
-    if (dk === "hold") await dropFlag(X(1), lane - 6);
+    if (dk === "hold") await dropFlag(X(1), lane - 6, res.pen);
     sfx.good(); if (res.gain >= 10) sfx.roar(res.gain >= 20 ? 1.8 : 1.2); cap(`+${res.gain}`, "good"); return;
   }
   // pass plays
@@ -3283,7 +3290,7 @@ async function animateSnap(sn, res, los, token) {
   await Promise.all(legs); if (!alive()) return;
   if (ok === "inc" && dk !== "block") {
     await moveBall(X(rx + 6), oLane - 18, 900, 70, 0); cap("Incomplete", "meh");
-    if (dk === "hold") { await dropFlag(X(1), lane - 6); cap("Incomplete, but a flag! +5", "flag"); }
+    if (dk === "hold") { await dropFlag(X(1), lane - 6, res.pen); cap(res.pen == null || res.pen >= 5 ? "Incomplete, but a flag! +5" : res.pen ? `Incomplete, but a flag! Half the distance, +${res.pen}` : "Incomplete, but a flag! Half the distance: still on the 1", "flag"); }
     return;
   }
   if (dk === "int") {
@@ -3298,7 +3305,7 @@ async function animateSnap(sn, res, los, token) {
   }
   await moveBall(X(rx), oLane, ok === "deep" ? 1000 : 750, ok === "deep" ? 90 : 55, handH()); // caught, in the hands
   cap("Caught it!", "good"); sfx.good(); avSay(o.av, "run", 500);
-  if (dk === "hold") await dropFlag(X(1), lane - 6);
+  if (dk === "hold") await dropFlag(X(1), lane - 6, res.pen);
   if (res.gain > rx) { await sleep(250); await carry(res.gain, Math.min(1800, 400 + (res.gain - rx) * 50), null, true); }
   if (!alive()) return;
   if (res.gain >= 15) sfx.roar(res.gain >= 25 ? 1.8 : 1.2);
