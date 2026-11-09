@@ -100,6 +100,10 @@ label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; let
 .stats b { display: block; font-family: var(--f-display); font-size: 26px; }
 .stats span { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .note .cat { white-space: nowrap; }
+.guide { border-top: 1px solid rgba(255,255,255,.12); padding-top: 10px; margin-top: 4px; }
+.guide summary { cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: 15px; padding: 6px 0; }
+.guide ul { margin: 6px 0 10px; padding-left: 20px; font-family: var(--f-read); font-size: 16px; line-height: 1.45; }
+.guide li { margin: 4px 0; }
 /* Short screens (a phone with its browser bars showing): tighter question card while this phone acts, so four answers fit above the fold. Placed after the base rules so it wins the cascade. */
 @media (max-height: 760px) {
   #main.act { gap: 8px; } body:has(#main.act) .wrap { padding-top: 6px; gap: 8px; }
@@ -297,6 +301,23 @@ const LVL_HINT = { // what each level means, with an example (the big screen sho
   pro: `<b>Pro</b> · Adults. The hardest questions, for example: <i>Where was Joseph Smith martyred on June 27, 1844?</i> A) Liberty Jail B) Carthage Jail C) Far West D) Nauvoo Mansion House`,
   random: `<b>Random</b> · A different level every question: Junior, College or Pro.`
 };
+// After sign-up the phone shows how to play and how to win each award (Nick, 2026-11-09)
+const GUIDE = `<details class="guide" open><summary>How to play</summary><ul>
+<li>Every huddle, each player gets one question on their phone. Peewee players read a scripture or quote out loud and tap Done.</li>
+<li>Answer right and you run onto the field. Miss it and you watch this play from the sideline.</li>
+<li>The quarterback picks who gets the ball. The defensive captain guesses who it will be. Guess right and the defense is ready. Guess wrong and the runner has room.</li>
+<li>Offense can run, pass, juke, throw deep or break away. Defense can block, intercept, pick grass, or get a holding flag.</li>
+<li>4 downs to reach the yellow line for a first down. A touchdown is 7 points, a field goal is 3.</li>
+</ul></details>
+<details class="guide"><summary>Awards</summary><ul>
+<li>🏃 <b>Most yards:</b> gain the most yards when the ball comes to you.</li>
+<li>🏈 <b>Touchdown maker:</b> score the most touchdowns.</li>
+<li>🎯 <b>Top passer:</b> throw for the most yards as quarterback.</li>
+<li>🛡️ <b>Brick wall:</b> make the most stops on defense: blocks, batted passes, sacks, picks and fumble recoveries.</li>
+<li>🧤 <b>Ball hawk:</b> make the most interceptions.</li>
+<li>🔥 <b>Hot streak:</b> get the most questions right in a row.</li>
+<li>📖 <b>Scripture scholar:</b> get the most questions right in the whole game.</li>
+</ul></details>`;
 function lvlHint() { const h = $("#lvlHint"); if (h) h.innerHTML = LVL_HINT[form.level] || ""; }
 let me = null, lastMe = null, hello = null, state = null, peer = null, conn = null, dialing = null, retryT = null, lastView = "", lastKey = "", sentPick = null, sentHike = false, myAns = null, editing = false;
 let pending = null, stopped = false, misses = 0, lastMsg = 0;
@@ -481,9 +502,9 @@ function render() {
   let h = "";
   if (view === "lobby") {
     const list = t => `<div><h3><span class="dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${teamColor(t)};margin-right:6px"></span>${esc(teamOf(t))}</h3><ul class="roster">${(s.roster || []).filter(p => p.team === t).map(p => `<li><span class="av">${avatarSVG(p.av, null, p.gl)}</span><span>${esc(p.name)}</span>${p.phone ? `<span style="opacity:${p.on ? 1 : .4}">\u{1F4F1}</span>` : ""}</li>`).join("") || "<li class='note'>Nobody yet</li>"}</ul></div>`;
-    h = `<div class="eyebrow">You're in</div><p class="msg">You're on <b>${esc(teamOf(m.team))}</b>. Waiting for the big screen to kick off.</p><div class="cols">${list(0)}${list(1)}</div><div><button class="btn ghost" type="button" id="editBtn">${hello && hello.open ? "Change my name, picture or team" : "Change my name or picture"}</button></div>`;
+    h = `<div class="eyebrow">You're in</div><p class="msg">You're on <b>${esc(teamOf(m.team))}</b>. Waiting for the big screen to kick off.</p><div class="cols">${list(0)}${list(1)}</div><div><button class="btn ghost" type="button" id="editBtn">${hello && hello.open ? "Change my name, picture or team" : "Change my name or picture"}</button></div>${GUIDE}`;
   } else if (view === "pending") {
-    h = `<div class="eyebrow">You're in</div><p class="msg">You'll take the field at the next huddle. Watch the big screen!</p>`;
+    h = `<div class="eyebrow">You're in</div><p class="msg">You'll take the field at the next huddle. Watch the big screen!</p>${GUIDE}`;
   } else if (view === "question" || view === "watch") {
     const q = s.q, a = s.answered, mineQ = view === "question", isRead = q.kind === "read";
     const who = q.crew ? `Team question for ${esc(teamOf(q.team))}` : `${esc(q.who)}'s question`;
