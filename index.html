@@ -3092,7 +3092,7 @@ function buildSnaps() {
   const off = S.line[S.possession], def = S.line[1 - S.possession];
   const slot = S.target != null ? off.indexOf(S.target) : -1;
   const n = S.cands.length;
-  const keyed = n >= 2 ? S.guess === S.target : n === 1 && def.length > 0; // with one receiver everyone knows where it's going
+  const keyed = n >= 2 && S.guess === S.target; // a lone receiver gets the normal odds: the defense only reads the play by guessing right (Nick, 2026-11-09)
   const fooled = n >= 2 && S.guess !== S.target;
   return [{ o: S.target, d: slot >= 0 && def[slot] != null ? def[slot] : null, slot: Math.max(0, slot), cands: S.cands.slice(), guess: S.guess, keyed, fooled }];
 }
@@ -3813,7 +3813,7 @@ function renderTicker() {
     const n = S.cands.length, o = S.target != null ? S.players[S.target] : null;
     const unb = Math.max(0, S.line[1 - off].length - S.line[off].length);
     html = `<div class="tk-head">${esc(offT.name)} ball · ${downText()} at ${yardText(offT.drive)}</div>
-      <p class="tk-text">${n >= 2 ? "Target locked, and the defense has made its guess." : n === 1 ? `Only ${esc(o.name)} made the line, so everyone knows where the ball is going.` : "Nobody on offense made the line, so the quarterback is on their own."} ${unb ? `${unb} ${unb === 1 ? "defender has" : "defenders have"} nobody to block them.` : ""} ${driveLabel()}.</p>
+      <p class="tk-text">${n >= 2 ? "Target locked, and the defense has made its guess." : n === 1 ? `Only ${esc(o.name)} made the line, so the ball goes to ${esc(o.name)}.` : "Nobody on offense made the line, so the quarterback is on their own."} ${unb ? `${unb} ${unb === 1 ? "defender has" : "defenders have"} nobody to block them.` : ""} ${driveLabel()}.</p>
       <div class="tk-btns"><button type="button" class="btn" id="hikeBtn">Hike!</button></div>`;
   } else if (S.phase === "playing" && S.sub === "anim") {
     html = `<p class="tk-text">Watch the play…</p>`;
