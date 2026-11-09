@@ -432,6 +432,17 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
   .chip { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: 0s !important; } } /* 0s, not .01ms: a tiny transition made every size change (the stadium height, the camera width) read back as its old value for a frame, so the field never shrank to fit for anyone with reduced motion on */
+
+#thought .parlist { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+#thought .parchip { font: 600 14px/1.2 var(--f-read, inherit); padding: 4px 10px; border-radius: 999px; border: 2px solid; background: rgba(255,255,255,.7); color: #23322f; }
+#thought .parchip.ok { background: #d9f2df; }
+#thought .parchip.no { background: #f6dcdc; opacity: .75; }
+.awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.award { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.04); }
+.award .aw-icon { font-size: 26px; }
+.award .aw-title { font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .06em; opacity: .75; }
+.award .aw-who { font-weight: 700; font-size: 17px; }
+.award .aw-v { font-size: 13px; opacity: .8; }
 </style>
 
 <div class="wrap" id="app">
@@ -468,6 +479,12 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
       <button class="btn ghost" type="button" id="fillBtn">Fill with team players</button>
       <button class="btn ghost" type="button" id="botsBtn">Fill with bots</button>
       <button class="btn ghost" type="button" id="clearBtn">Clear roster</button>
+      <label class="barsel" for="ansSel" title="All at once: everyone with a phone (and every bot) gets their own question at the same time; players without a phone still answer on the big screen one by one."><span class="eyebrow">Answers</span>
+        <select id="ansSel">
+          <option value="one" selected>One at a time</option>
+          <option value="all">All at once</option>
+        </select>
+      </label>
     </div>
     <button class="btn" id="startHero" type="button">Kick off</button>
     <div class="err" id="setupErr"></div>
@@ -2996,6 +3013,8 @@ $("#voiceBtn").addEventListener("click", () => {
   voiceMode = voiceMode === "off" ? "plays" : "off"; store.set("gf_voice", voiceMode); syncVoice();
   if (voiceMode === "off") hush(); else refSay("newgame", "I'll call the plays.", { interrupt: true });
 });
+// "All at once" game mode (Nick, 2026-11-09: "everyone on the team gets questions in parallel ... anyone without a phone would answer on the big screen"; "make sure this is a game mode. don't change the current play")
+{ const a = $("#ansSel"); if (a) { a.value = store.get("gf_answers") === "all" ? "all" : "one"; a.addEventListener("change", () => store.set("gf_answers", a.value)); } }
 function syncSound() { $("#soundBtn").textContent = sound ? "Sound on" : "Sound off"; $("#soundBtn").setAttribute("aria-pressed", String(sound)); }
 $("#quitBtn").addEventListener("click", () => { if (S && S.screen === "game" && !S.confirmQuit) { S.confirmQuit = true; $("#quitBtn").textContent = "Tap again to quit"; setTimeout(() => { if (S) { S.confirmQuit = false; $("#quitBtn").textContent = "New game"; } }, 2500); return; } const g = S; S = null; setAside(g); show(); }); // the game stays on the start page's Resume button (and on the phones) for two days
 
@@ -3011,7 +3030,7 @@ const ZOOM_PLAYS = false, FIG = 0.8; // FIG: figure size on the un-zoomed field 
 function newGame() {
   netResumeCancel(); // a game starting here ends any search for another one
   S = {
-    screen: "game", mode: setup.mode, pools: poolsFor(setup.mode, setup.pools), playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
+    screen: "game", mode: setup.mode, pools: poolsFor(setup.mode, setup.pools), together: !!($("#ansSel") && $("#ansSel").value === "all"), playsTotal: +$("#playsSel").value, playNo: 0, ot: 0, huddleNo: 0, goFor4: false, driveEnd: null, qbNo: [0, 0], capNo: [0, 0], qb: null, cap: null,
     teams: [{ name: $("#team0").value.trim() || "Team A", score: 0, drive: START }, { name: $("#team1").value.trim() || "Team B", score: 0, drive: START }],
     players: setup.roster.map((p, i) => ({ id: i, name: p.name, level: p.level, team: p.team, crew: !!p.crew, bot: !!p.bot && !p.crew, av: p.av, gl: !p.crew && p.gl || null, pid: p.pid || null, st: { asked: 0, right: 0, yds: 0, pass: 0, stops: 0, tds: 0, ints: 0 } })),
     possession: rnd(2), down: 1, ltg: START + 10, phase: "questions", sub: null, order: [], qi: 0, q: null, answered: null,
@@ -3037,6 +3056,14 @@ function startPlay() {
   const def = shuffle(S.players.filter(p => p.team !== S.possession)).map(p => p.id);
   S.order = [];
   for (let i = 0; i < Math.max(off.length, def.length); i++) { if (off[i] != null) S.order.push(off[i]); if (def[i] != null) S.order.push(def[i]); }
+  S.par = null; S.waitPar = false;
+  if (S.together) {
+    const par = S.order.filter(id => { const p = S.players[id]; return !p.crew && (p.bot || (p.pid && phoneOnline(p.pid))); });
+    if (par.length) {
+      S.order = S.order.filter(id => !par.includes(id)); S.par = {};
+      par.forEach(id => { const p = S.players[id], lvl = p.level === "random" ? ["pewee", "college", "pro"][rnd(3)] : (LVL_NAME[p.level] ? p.level : "pewee"); const q = drawQuestion(lvl); q.level = lvl; S.par[id] = { q, a: null }; });
+    }
+  }
   nextQuestion();
 }
 function drawQuestion(level) {
@@ -3055,11 +3082,55 @@ function drawQuestion(level) {
   return { cat, text: raw[0], answer: raw[1], options: shuffle(raw.slice(1, 5)), note: raw[5] };
 }
 function nextQuestion() {
-  if (S.qi >= S.order.length) { S.phase = "ready"; S.q = null; return; }
+  if (S.qi >= S.order.length) { S.q = null; if (parPending()) { S.waitPar = true; return; } S.waitPar = false; S.phase = "ready"; return; }
   const p = S.players[S.order[S.qi]];
   const lvl = p.level === "random" ? ["pewee", "college", "pro"][rnd(3)] : (LVL_NAME[p.level] ? p.level : "pewee");
   S.q = drawQuestion(lvl); S.q.level = lvl; S.answered = null; NET.qvotes = {};
   preloadQuestion(S.q);
+}
+function streak(p, ok) { p.st.run = ok ? (p.st.run || 0) + 1 : 0; p.st.best = Math.max(p.st.best || 0, p.st.run); }
+function parPending() { return !!(S && S.par && Object.values(S.par).some(e => !e.a)); }
+function parAnswer(id, opt) {
+  const e = S && S.par && S.par[id]; if (!e || e.a || S.screen !== "game" || S.phase !== "questions") return;
+  const p = S.players[id], q = e.q, ok = q.kind === "read" ? true : opt === q.answer;
+  e.a = { opt, ok }; p.st.asked++; streak(p, ok);
+  if (ok) { p.st.right++; S.line[p.team].push(p.id); sfx.good(); }
+  const busy = !S.waitPar && S.order[S.qi] != null ? S.order[S.qi] : null; // the player in the spotlight keeps their spot until they move on
+  if (ok) moveTok(p, lineSpot(p), 900);
+  S.players.filter(x => x.id !== p.id && x.id !== busy && inLine(x)).forEach(x => moveTok(x, lineSpot(x), 600));
+  renderBubble(); renderChips(); netSync();
+  if (S.waitPar && !parPending()) parDone();
+}
+function parDone() { // everyone answered: line up after a moment so the last check mark shows
+  const token = DIR.token, h = S.huddleNo;
+  setTimeout(() => { if (S && token === DIR.token && S.huddleNo === h && S.phase === "questions" && S.waitPar) parLineUp(); }, reduced ? 60 : 1400);
+}
+function parLineUp() { // "Line up now", or everyone is in: whoever has not answered sits this one out
+  if (!S || S.phase !== "questions" || !S.waitPar) return;
+  Object.values(S.par || {}).forEach(e => { if (!e.a) e.a = { opt: null, ok: false, late: true }; });
+  ++DIR.token; S.waitPar = false; S.phase = "ready"; S.q = null; hideBubble(); renderChips();
+  Promise.all(S.players.filter(inLine).map(x => moveTok(x, lineSpot(x), 600))).then(() => { if (S && S.phase === "ready") readyUp(); });
+}
+const PARBOT = { s: null, h: null };
+function parBots() { // bots answer their own questions after a pause, like a person thinking
+  if (!S || !S.par || (PARBOT.s === S && PARBOT.h === S.huddleNo)) return;
+  PARBOT.s = S; PARBOT.h = S.huddleNo; const h = S.huddleNo;
+  Object.keys(S.par).map(Number).filter(id => S.players[id].bot && !S.par[id].a).forEach(id => setTimeout(() => {
+    if (!S || S.huddleNo !== h || S.phase !== "questions") return;
+    const e = S.par[id]; if (!e || e.a) return;
+    if (e.q.kind === "read") { parAnswer(id, "done"); return; }
+    const okb = Math.random() < (BOT.acc[e.q.level] || 0.65), wrong = e.q.options.filter(o => o !== e.q.answer);
+    parAnswer(id, okb ? e.q.answer : wrong[rnd(wrong.length)]);
+  }, reduced ? 40 + rnd(80) : 2500 + rnd(6000)));
+}
+function renderWait() {
+  const b = $("#thought"), ids = Object.keys(S.par || {}).map(Number), done = ids.filter(id => S.par[id].a).length;
+  const chip = id => { const p = S.players[id], a = S.par[id].a; return `<span class="parchip ${a ? (a.ok ? "ok" : "no") : ""}" style="border-color:var(${p.team ? "--away" : "--home"})">${a ? (a.ok ? "\u2713" : "\u2717") : "\u2026"} ${esc(p.name)}</span>`; };
+  b.innerHTML = `<div class="who">Everyone is answering at once<span class="tag">${done} of ${ids.length} in</span></div>
+    <div class="parlist">${ids.map(chip).join("")}</div>
+    <div class="foot"><span class="note">Right answers run onto the field. Players who haven't answered sit this one out.</span><button type="button" class="btn" id="parGoBtn">${done === ids.length ? "Line up!" : "Line up now"}</button></div>`;
+  const g = $("#parGoBtn"); if (g) g.addEventListener("click", parLineUp);
+  netSync();
 }
 function whoAsks(p) { return p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"; }
 function readLabel(q) { return /^(\d\s)?[A-Z][A-Za-z&. ]+\s\d+:\d/.test(q.ref || "") || /^(Doctrine|JS|Joseph Smith|Articles of Faith|Moses|Abraham)/.test(q.ref || "") ? "Read this scripture out loud" : "Read this quote out loud"; }
@@ -3069,7 +3140,7 @@ function answer(opt) {
   const p = S.players[S.order[S.qi]];
   const ok = S.q.kind === "read" ? true : opt === S.q.answer;
   S.answered = { opt, ok };
-  p.st.asked++;
+  p.st.asked++; streak(p, ok);
   if (ok) { p.st.right++; S.line[p.team].push(p.id); sfx.good(); } else sfx.bad();
   if (S.q.kind === "read") refSay("correct", "Correct!", { interrupt: true });
   else refSay(ok ? "correct" : "wrong", ok ? "Correct!" : `Not quite. The answer is ${S.q.answer}.`, { interrupt: true });
@@ -3391,6 +3462,8 @@ async function dropFlag(x, y, pen) { sfx.flag(); prop3d("flagp", "\u{1F6A9}", x,
 async function stepUp() {
   if (!S || S.screen !== "game" || S.phase !== "questions") return;
   const token = ++DIR.token;
+  parBots();
+  if (S.waitPar) { hideBubble(); hideCap(); headline(null); camNow(phone() ? FX(losNow()) : 50, 1); renderTicker(); showBubble(); if (!parPending()) parDone(); return; }
   const p = S.players[S.order[S.qi]];
   hideBubble(); hideCap(); headline(null);
   if (phone()) camNow(spotlight().x, 1, 62); else camNow(50, 1);
@@ -3449,9 +3522,11 @@ function showBubble() {
 function hideBubble() { readStop(); const t = $("#thought"); t.hidden = true; t.innerHTML = ""; $("#shade").hidden = true; $("#tdot1").hidden = true; $("#tdot2").hidden = true; stadium().classList.remove("asking"); }
 function renderBubble() {
   if (!S || S.phase !== "questions") return;
+  if (S.waitPar) { renderWait(); return; }
+  if (!S.q) return;
   const p = S.players[S.order[S.qi]], q = S.q, a = S.answered, off = S.possession;
   const role = p.team === off ? "offense" : "defense";
-  const last = S.qi === S.order.length - 1;
+  const last = S.qi === S.order.length - 1, parN = S.par ? Object.keys(S.par).length : 0, parIn = parN ? Object.values(S.par).filter(e => e.a).length : 0;
   const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
   b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat] || POOL_SHORT[q.cat] || "2026 Conference"}</span>${q.kind === "read" ? "" : `<button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button>`}</div>
@@ -3460,7 +3535,7 @@ function renderBubble() {
     ${a ? `<div class="foot"><span class="verdict ${a.ok ? "good" : "bad"}">${q.kind === "read" ? `Well read! ${esc(p.name)} takes the field.` : a.ok ? `Correct! ${esc(p.name)} takes the field.` : `Not quite. ${esc(p.name)} sits this one out.`}</span>
     <span class="note">${q.kind === "read" ? `<span class="ref">${esc(q.ref)}</span> ` : a.ok ? "" : `Answer: <b>${esc(q.answer)}</b>. `}${esc(q.note || "")}</span>
     <button type="button" class="btn" id="nextBtn" data-label="${last ? "Line up!" : "Next player"}">${last ? "Line up!" : "Next player"}</button></div>` :
-    `<div class="foot">${q.kind === "read" ? `<span class="ref">${esc(q.ref)}</span>` : ""}<span class="note">${q.kind === "read" ? "Reading" : "Question"} ${S.qi + 1} of ${S.order.length} in this huddle.${onPhone ? ` ${esc(p.name)} ${q.kind === "read" ? "taps Done" : "answers"} on their phone.` : ""}${isBot ? ` ${esc(p.name)} is ${q.kind === "read" ? "reading" : "thinking"}…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</span>${vi && vi.got ? `<button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button>` : ""}${q.kind === "read" ? `<button type="button" class="btn" id="doneBtn">Done, I read it</button>` : ""}</div>`}`;
+    `<div class="foot">${q.kind === "read" ? `<span class="ref">${esc(q.ref)}</span>` : ""}<span class="note">${q.kind === "read" ? "Reading" : "Question"} ${S.qi + 1} of ${S.order.length} in this huddle.${parN ? ` Phones: ${parIn} of ${parN} answered.` : ""}${onPhone ? ` ${esc(p.name)} ${q.kind === "read" ? "taps Done" : "answers"} on their phone.` : ""}${isBot ? ` ${esc(p.name)} is ${q.kind === "read" ? "reading" : "thinking"}…` : ""}${vi ? ` Team vote on phones: ${vi.got} of ${vi.need} in.` : ""}</span>${vi && vi.got ? `<button type="button" class="btn ghost" id="lockBtn">Lock in the team's answer</button>` : ""}${q.kind === "read" ? `<button type="button" class="btn" id="doneBtn">Done, I read it</button>` : ""}</div>`}`;
   b.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => answer(q.options[+x.dataset.o])));
   const db = $("#doneBtn"); if (db) db.addEventListener("click", () => answer("done"));
   const nb = $("#nextBtn"); if (nb) { nb.addEventListener("click", advance); nb.focus({ preventScroll: true }); }
@@ -3794,7 +3869,7 @@ async function startHuddle() {
   cap("Huddle up!", "", 1200);
   camNow(phone() ? FX(S.teams[S.possession].drive) : 50, 1);
   setBall(FX(S.teams[S.possession].drive), 50, 0);
-  await Promise.all(S.players.map(p => moveTok(p, benchSpot(p), 900)));
+  await Promise.all(S.players.map(p => moveTok(p, inLine(p) ? lineSpot(p) : benchSpot(p), 900))); // an early answer (all at once) already put that player on the line
   if (token !== DIR.token) return;
   stepUp();
 }
@@ -3877,6 +3952,21 @@ function render() {
   if (S.phase === "playing" && S.sub === "result") finishSnapUI();
   saveGame(); netSync(); botTurn();
 }
+function awardsHTML() { // one shout-out per category, so more players hear their name at the end
+  const P = S.players.filter(p => !p.crew), aw = [];
+  const top = (f, min) => { const best = P.reduce((m, p) => Math.max(m, f(p)), 0); if (best < (min || 1)) return null; return { v: best, ps: P.filter(p => f(p) === best) }; };
+  const add = (icon, title, r, unit) => { if (r) aw.push({ icon, title, ps: r.ps, v: r.v, unit: r.v === 1 ? unit.replace(/^(\w+)s\b/, "$1").replace(/s$/, "") : unit }); };
+  add("\u{1F3C3}", "Most yards", top(p => p.st.yds), "yards");
+  add("\u{1F3C8}", "Touchdown maker", top(p => p.st.tds), "TDs");
+  add("\u{1F3AF}", "Top passer", top(p => p.st.pass || 0), "passing yards");
+  add("\u{1F6E1}\uFE0F", "Brick wall", top(p => p.st.stops), "stops");
+  add("\u{1F9E4}", "Ball hawk", top(p => p.st.ints), "picks");
+  add("\u{1F525}", "Hot streak", top(p => p.st.best || 0, 2), "right in a row");
+  add("\u{1F4D6}", "Scripture scholar", top(p => p.st.right), "right answers");
+  if (!aw.length) return "";
+  const names = ps => ps.slice(0, 3).map(p => esc(p.name)).join(", ") + (ps.length > 3 ? ` and ${ps.length - 3} more` : "");
+  return `<div class="card"><h2>Awards</h2><div class="awards">${aw.map(a => `<div class="award"><span class="aw-icon">${a.icon}</span><span class="av" style="width:44px;height:44px;border:3px solid var(${a.ps[0].team ? "--away" : "--home"})">${avatarSVG(a.ps[0].av, teamColor(a.ps[0].team, true), a.ps[0].gl)}</span><div><div class="aw-title">${a.title}</div><div class="aw-who">${names(a.ps)}</div><div class="aw-v">${a.v} ${a.unit}</div></div></div>`).join("")}</div></div>`;
+}
 function renderEnd() {
   const t = S.teams, w = t[0].score === t[1].score ? -1 : t[0].score > t[1].score ? 0 : 1;
   const ranked = S.players.slice().sort((a, b) => (b.st.tds * 30 + b.st.yds + (b.st.pass || 0) * 0.5 + b.st.stops * 8 + b.st.ints * 15 + b.st.right * 5) - (a.st.tds * 30 + a.st.yds + (a.st.pass || 0) * 0.5 + a.st.stops * 8 + a.st.ints * 15 + a.st.right * 5));
@@ -3891,6 +3981,7 @@ function renderEnd() {
     <span class="av" style="width:96px;height:96px;border:4px solid var(${mvp.team ? "--away" : "--home"})">${avatarSVG(mvp.av, teamColor(mvp.team, true), mvp.gl)}</span>
     <div class="row" style="justify-content:center"><button class="btn" id="againBtn" type="button">Rematch</button><button class="btn ghost" id="setupBtn" type="button">Change players</button></div>
   </div>
+  ${awardsHTML()}
   <div class="card"><h2>Box score</h2><div class="tablewrap"><table>
     <thead><tr><th>Player</th><th>Team</th><th>Level</th><th class="n">Correct</th><th class="n">Yards</th><th class="n">Passing</th><th class="n">TDs</th><th class="n">Stops</th><th class="n">Picks</th></tr></thead>
     <tbody>${ranked.map(p => `<tr><td><span class="av" style="width:28px;height:28px">${avatarSVG(p.av, null, p.gl)}</span> ${esc(p.name)}</td><td><span class="dot" style="background:var(${p.team ? "--away" : "--home"})"></span> ${esc(t[p.team].name)}</td><td><span class="lvl ${p.level}">${LVL_NAME[p.level]}</span></td><td class="n">${p.st.right}/${p.st.asked}</td><td class="n">${p.st.yds}</td><td class="n">${p.st.pass || 0}</td><td class="n">${p.st.tds}</td><td class="n">${p.st.stops}</td><td class="n">${p.st.ints}</td></tr>`).join("")}</tbody>
@@ -4089,6 +4180,7 @@ function netMsg(conn, d) {
   if (!S || S.screen !== "game") return;
   const rec = phoneRec(ph); if (!rec) return;
   if (d.t === "answer") {
+    if (S.par && S.par[rec.id] && !S.par[rec.id].a) { const e = S.par[rec.id], o = String(d.opt); if (S.phase === "questions" && (e.q.kind === "read" ? o === "done" : e.q.options.includes(o))) parAnswer(rec.id, o); return; } // all at once: this phone's own question
     if (S.phase !== "questions" || S.answered || !S.q) return;
     const cur = S.players[S.order[S.qi]], opt = String(d.opt);
     if (S.q.kind === "read") { if (opt === "done" && (cur.pid === ph.pid || (cur.crew && cur.team === rec.team))) answer("done"); return; } // Peewee: the reader (or anyone on a team reading) taps Done
@@ -4165,7 +4257,16 @@ function stateFor(ph) {
   const off = S.possession, mine = rec.team === off, offT = S.teams[off], defT = S.teams[1 - off];
   base.poss = off; base.down = downText(); base.play = driveLabel(); base.st = rec.st;
   if (S.screen === "end") { const t = S.teams; base.view = "end"; base.final = t[0].score === t[1].score ? "It's a tie!" : `${t[t[0].score > t[1].score ? 0 : 1].name} win!`; return base; }
-  if (S.phase === "questions" && S.q) {
+  if (S.phase === "questions" && S.par && S.par[rec.id]) { // all at once: the phone shows its own question (a team vote for its team still comes first once it has answered)
+    const e = S.par[rec.id], cur = S.q && !S.waitPar ? S.players[S.order[S.qi]] : null;
+    if (!e.a || !(cur && cur.crew && cur.team === rec.team && !S.answered)) {
+      const q = e.q; base.view = "question";
+      base.q = { who: rec.name, av: rec.av, gl: rec.gl || null, team: rec.team, crew: false, bot: false, level: LVL_NAME[q.level] || q.level, cat: CAT_NAME[q.cat] || POOL_SHORT[q.cat] || "2026 Conference", text: q.text, options: q.options, kind: q.kind || "quiz", ref: q.ref || "", n: S.huddleNo, of: 0, side: rec.team === off ? "offense" : "defense" };
+      if (e.a && !e.a.late) base.answered = { opt: e.a.opt, ok: e.a.ok, answer: q.answer, note: q.note || "" };
+      return base;
+    }
+  }
+  if (S.phase === "questions" && S.q && !S.waitPar) {
     const cur = S.players[S.order[S.qi]], q = S.q, a = S.answered;
     const asker = cur.pid === ph.pid || (cur.crew && cur.team === rec.team);
     base.view = asker ? "question" : "watch";
