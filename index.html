@@ -436,6 +436,8 @@ body.ingame .wrap { padding-bottom: 16px; } /* the question panel sits under the
 #thought .parlist { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
 #thought .parchip { font: 600 14px/1.2 var(--f-read, inherit); padding: 4px 10px; border-radius: 999px; border: 2px solid; background: rgba(255,255,255,.7); color: #23322f; }
 #thought .parchip.ok { background: #d9f2df; }
+#thought button.parchip { cursor: pointer; }
+#thought .parchip.off { background: #fff3cd; }
 #thought .parchip.no { background: #f6dcdc; opacity: .75; }
 .awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
 .award { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.04); }
@@ -3107,7 +3109,7 @@ function parDone() { // everyone answered: line up after a moment so the last ch
 }
 function parLineUp() { // "Line up now", or everyone is in: whoever has not answered sits this one out
   if (!S || S.phase !== "questions" || !S.waitPar) return;
-  Object.values(S.par || {}).forEach(e => { if (!e.a) e.a = { opt: null, ok: false, late: true }; });
+  Object.keys(S.par || {}).forEach(id => { const e = S.par[id]; if (e.a) return; const p = S.players[id]; p.st.asked++; streak(p, false); e.a = { opt: null, ok: false, late: true }; });
   ++DIR.token; S.waitPar = false; S.phase = "ready"; S.q = null; hideBubble(); renderChips();
   Promise.all(S.players.filter(inLine).map(x => moveTok(x, lineSpot(x), 600))).then(() => { if (S && S.phase === "ready") readyUp(); });
 }
@@ -3123,13 +3125,20 @@ function parBots() { // bots answer their own questions after a pause, like a pe
     parAnswer(id, okb ? e.q.answer : wrong[rnd(wrong.length)]);
   }, reduced ? 40 + rnd(80) : 2500 + rnd(6000)));
 }
+function parToScreen(id) { // a phone that dropped (or a player standing at the screen): answer on the big screen, one by one
+  if (!S || !S.par || !S.par[id] || S.par[id].a || S.phase !== "questions") return;
+  delete S.par[id]; S.order.push(id);
+  if (S.waitPar) { S.waitPar = false; nextQuestion(); stepUp(); } else renderBubble();
+}
 function renderWait() {
   const b = $("#thought"), ids = Object.keys(S.par || {}).map(Number), done = ids.filter(id => S.par[id].a).length;
-  const chip = id => { const p = S.players[id], a = S.par[id].a; return `<span class="parchip ${a ? (a.ok ? "ok" : "no") : ""}" style="border-color:var(${p.team ? "--away" : "--home"})">${a ? (a.ok ? "\u2713" : "\u2717") : "\u2026"} ${esc(p.name)}</span>`; };
+  const chip = id => { const p = S.players[id], a = S.par[id].a, tap = !a && !p.bot, off = tap && !(p.pid && phoneOnline(p.pid));
+    return `<${tap ? `button type="button" data-par="${id}" title="Answer on this screen"` : "span"} class="parchip ${a ? (a.ok ? "ok" : "no") : ""}${off ? " off" : ""}" style="border-color:var(${p.team ? "--away" : "--home"})">${a ? (a.ok ? "\u2713" : "\u2717") : off ? "\u{1F4F5}" : "\u2026"} ${esc(p.name)}${off ? " \u00b7 answer here" : ""}</${tap ? "button" : "span"}>`; };
   b.innerHTML = `<div class="who">Everyone is answering at once<span class="tag">${done} of ${ids.length} in</span></div>
     <div class="parlist">${ids.map(chip).join("")}</div>
-    <div class="foot"><span class="note">Right answers run onto the field. Players who haven't answered sit this one out.</span><button type="button" class="btn" id="parGoBtn">${done === ids.length ? "Line up!" : "Line up now"}</button></div>`;
+    <div class="foot"><span class="note">Right answers run onto the field. Tap a name to answer on this screen. Line up now: anyone who hasn't answered sits this one out.</span><button type="button" class="btn" id="parGoBtn">${done === ids.length ? "Line up!" : "Line up now"}</button></div>`;
   const g = $("#parGoBtn"); if (g) g.addEventListener("click", parLineUp);
+  b.querySelectorAll("[data-par]").forEach(x => x.addEventListener("click", () => parToScreen(+x.dataset.par)));
   netSync();
 }
 function whoAsks(p) { return p.crew ? S.teams[p.team].name + ", team question" : p.name + ", " + LVL_NAME[S.q.level] + " question"; }
@@ -3526,7 +3535,7 @@ function renderBubble() {
   if (!S.q) return;
   const p = S.players[S.order[S.qi]], q = S.q, a = S.answered, off = S.possession;
   const role = p.team === off ? "offense" : "defense";
-  const last = S.qi === S.order.length - 1, parN = S.par ? Object.keys(S.par).length : 0, parIn = parN ? Object.values(S.par).filter(e => e.a).length : 0;
+  const last = S.qi === S.order.length - 1 && !parPending(), parN = S.par ? Object.keys(S.par).length : 0, parIn = parN ? Object.values(S.par).filter(e => e.a).length : 0;
   const onPhone = !!(p.pid && phoneOnline(p.pid)), vi = voteInfo(), isBot = !!p.bot;
   const b = $("#thought");
   b.innerHTML = `<div class="who"><span class="av" style="width:32px;height:32px;border:2px solid var(${p.team ? "--away" : "--home"})">${avatarSVG(p.av, teamColor(p.team, true), p.gl)}</span>${esc(p.name)} <span class="lvl ${q.level}">${LVL_NAME[q.level]}</span> <span style="font-weight:500;text-transform:none;color:#4b5e5a">on ${role}${p.crew ? `. Team question: everyone on ${esc(S.teams[p.team].name)} answers together` : ""}</span><span class="tag">${CAT_NAME[q.cat] || POOL_SHORT[q.cat] || "2026 Conference"}</span>${q.kind === "read" ? "" : `<button type="button" class="readq" id="readQBtn" aria-pressed="${readQ}" title="${readQ ? "The referee reads each question out loud. Tap to stop." : "Tap to have the referee read each question out loud."}">${readQ ? "Read questions: on" : "Read questions: off"}</button>`}</div>
@@ -4097,7 +4106,7 @@ function netDrop(conn) {
   const ph = phoneOf(conn); if (!ph) return;
   ph.online = false; ph.conn = null; delete NET.last[ph.pid];
   renderPhones();
-  if (S && S.screen === "game") { if (!checkVotes()) render(); } else if (!S) renderRoster();
+  if (S && S.screen === "game") { if (!checkVotes()) render(); if (S.phase === "questions" && S.waitPar) renderWait(); } else if (!S) renderRoster();
 }
 function helloMsg() { return { t: "hello", code: NET.code, teams: teamNames(), started: !!S && S.screen !== "setup", open: !!setup.openTeams }; }
 // netHello(): tell every phone the current settings (teams open or not)
